@@ -9,6 +9,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const portfinder = require('portfinder')
+const restapi = require('./restapi')
 
 const HOST = process.env.HOST
 const PORT = process.env.PORT && Number(process.env.PORT)
@@ -43,11 +44,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     watchOptions: {
       poll: config.dev.poll,
     },
-    setup(app){
-        app.get('/api/state', function(req, res) {
-            res.json({ custom: 'response' });
-        });
-    }
+    setup : restapi
   },
   plugins: [
     new webpack.DefinePlugin({
