@@ -6,6 +6,9 @@ import router from './router';
 import EventsBus from './core/bus.vue';
 import storage from './core/storage';
 
+Vue.use(Vuex);
+Vue.use(Vuetify);
+
 window.Vue = Vue;
 
 let theBus  = new Vue(EventsBus);
@@ -14,22 +17,20 @@ Vue.prototype.$bus          = theBus;
 Vuex.Store.prototype.$bus   = theBus;
 window.Vue.$bus             = theBus;
 
-Vue.use(Vuex);
-Vue.use(Vuetify);
-
-window.Vue      = Vue;
 window.$store   = new Vuex.Store(storage);
 window.$bus     = theBus;
 
 Vue.config.productionTip = false;
 
 new Vue({
-  el: '#app',
-  router,
-  components: { App },
-  template: '<App/>'
+    el: '#app',
+    router,
+    store : window.$store,
+    components: { App },
+    template: '<App/>'
 });
 
+window.$store.dispatch('initData');
 
 setTimeout(() => {
     window.$bus.$emit('application-loaded');

@@ -5,6 +5,7 @@ const fs = require('fs')
 const path = require('path')
 
 const virtual_state_data = path.join(__dirname, '/devstorage/state.json');
+const virtual_aplist_data = path.join(__dirname, '/devstorage/apoints.json');
 
 module.exports = function(app){
 
@@ -21,7 +22,20 @@ module.exports = function(app){
 
     });
 
-    app.put('/api/state', function(req, res) {
+    app.get('/api/available_ap', function(req, res) {
+
+        console.log('>Get available access points list');
+        fs.readFile(virtual_aplist_data, (err, result) => {
+            if (err) {
+                console.log(err);
+                res.send('');
+            } else
+                res.json(JSON.parse(result));
+        });
+
+    });
+
+    app.put('/api/netconfig', function(req, res) {
 
         console.log('> Post store data: ', req.files.file.data.toString('ascii'));
         req.files.file.mv(virtual_state_data);

@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <v-app id="inspire" dark>
+    <v-app id="inspire" :light="theme=='light'" :dark="theme=='dark'">
       <v-navigation-drawer id="mainmenu" clipped fixed v-model="drawer" app>
         <v-list dense>
           <router-link :to="{name:'Dashboard'}">
@@ -44,8 +44,12 @@
 <script>
 export default {
   name: 'App',
+  computed : {
+      theme(){
+          return this.$store.state.display.theme;
+      }
+  },
   data: () => ({
-    drawer: null
   }),
 }
 </script>
