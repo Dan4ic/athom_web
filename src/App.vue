@@ -60,14 +60,6 @@ export default {
 @import 'assets/material_icons.css';
 @import '../node_modules/vuetify/dist/vuetify.min.css';
 
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
 
   #mainmenu a {
     text-decoration: none;

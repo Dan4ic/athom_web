@@ -1,68 +1,64 @@
 <template>
   <v-form v-model="valid" ref="form" lazy-validation>
-    <v-container fluid grid-list-md text-xs-left>
-      <v-layout row wrap>
-        <v-toolbar xs12>
-          <v-toolbar-title>Access point</v-toolbar-title>
-          <v-spacer></v-spacer>
-        </v-toolbar>
-
-        <v-flex xs12>
-          <v-text-field
-                  label="Name"
-                  v-model="ap_ssid"
-                  :rules="[v => !!v || 'Name of SSID is required']"
-                  :counter="32"
-                  required
-          ></v-text-field>
-        </v-flex>
-        <v-flex xs12>
-          <v-text-field
-                  label="Password"
-                  v-model="ap_password"
-                  :counter="32"
-                  required>
-          </v-text-field>
-        </v-flex>
-        <v-toolbar xs12>
-          <v-toolbar-title>Connection to Internet</v-toolbar-title>
-          <v-spacer></v-spacer>
-        </v-toolbar>
-        <v-flex xs12>
-          <v-layout row>
-            <v-flex xs11 tile flat>
-              <v-select
-                      label="Access point"
-                      v-model="sta_ssid"
-                      :items="ap_list"
-                      :rules="[v => !!v || 'Item is required']"
-                      required
-              ></v-select>
-            </v-flex>
-            <v-flex xs1>
-              <v-btn icon @click="doRefreshAPList">
-                <v-icon>refresh</v-icon>
-              </v-btn>
-            </v-flex>
-          </v-layout>
+    <v-card>
+      <v-card-title primary-title>
+        <v-layout row wrap>
+          <h1>Access point</h1>
+          <v-flex xs12>
+            <v-text-field
+                    label="Name"
+                    v-model="ap_ssid"
+                    :rules="[v => !!v || 'Name of SSID is required']"
+                    :counter="32"
+                    required
+            ></v-text-field>
+          </v-flex>
           <v-flex xs12>
             <v-text-field
                     label="Password"
-                    v-model="sta_password"
+                    v-model="ap_password"
                     :counter="32"
                     required>
             </v-text-field>
           </v-flex>
-        </v-flex>
-        <v-flex xs12 text-xs-right>
-          <v-btn @click="submit" :disabled="!valid">submit</v-btn>
-        </v-flex>
-      </v-layout>
-    </v-container>
+          <h1>Connection to Internet</h1>
+          <v-flex xs12>
+            <v-layout row>
+              <v-flex xs11 tile flat>
+                <v-select
+                        label="Access point"
+                        v-model="sta_ssid"
+                        :items="ap_list"
+                        :rules="[v => !!v || 'Item is required']"
+                        required
+                ></v-select>
+              </v-flex>
+              <v-flex xs1 style="padding-top: 12px;">
+                <v-btn icon @click="doRefreshAPList">
+                  <v-icon>refresh</v-icon>
+                </v-btn>
+              </v-flex>
+            </v-layout>
+            <v-flex xs12>
+              <v-text-field
+                      label="Password"
+                      v-model="sta_password"
+                      :counter="32"
+                      required>
+              </v-text-field>
+            </v-flex>
+          </v-flex>
+        </v-layout>
+      </v-card-title>
+      <v-card-actions text-xs-right>
+        <v-btn @click="submit" :disabled="!valid">submit</v-btn>
+      </v-card-actions>
+    </v-card>
   </v-form>
 </template>
 
 <script>
+
 export default {
   name: 'SettingsNetwork',
   methods : {
