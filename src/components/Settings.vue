@@ -33,37 +33,27 @@ export default {
 <style scoped>
 
   .panel {
-    max-width: 29%;
-    width: 100%;
+    width: 29%;
+    min-width: 400px;
     float: left;
     margin-left: 4px;
     margin-right: 4px;
     margin-bottom: 4px;
   }
 
-  @media screen and (max-width: 1300px) {
+  @media (max-width: 1300px) {
     .panel {
-      max-width: 48%;
+      width: 48%;
     }
   }
 
 
-  @media screen and (max-width: 800px) {
+  @media (max-width: 800px) {
     .panel {
-      max-width: 100%;
+      width: 100%;
       float: none;
       margin-left: 0px;
       margin-right: 0px;
-      margin-bottom: 4px;
-    }
-  }
-
-  @media screen and (max-width: 800px) {
-    .panel {
-      max-width: 100%;
-      float: none;
-      margin-left: -20px;
-      margin-right: -10px;
       margin-bottom: 4px;
     }
   }

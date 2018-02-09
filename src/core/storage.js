@@ -5,6 +5,7 @@ import consts from "./consts";
 export default {
     state : {
         display : {
+            lang : "en",
             theme : "dark"
         },
         net : {
@@ -13,6 +14,11 @@ export default {
     },
 
     mutations : {
+
+        //Set theme
+        setLang(state, theme){
+            state.display.lang = theme;
+        },
 
         //Set theme
         setTheme(state, theme){

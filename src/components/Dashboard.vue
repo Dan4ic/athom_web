@@ -1,5 +1,7 @@
 <template>
-  <v-container>{{ msg }}</v-container>
+  <v-container>
+    <router-link :to="{name:'Settings'}">{{ msg }}</router-link>
+  </v-container>
 </template>
 
 <script>
@@ -7,7 +9,7 @@ export default {
   name: 'HelloWorld',
   data () {
     return {
-      msg: 'Hi! I am webpage of SmartTank'
+      msg: 'Жми СЮДА!'
     }
   }
 }

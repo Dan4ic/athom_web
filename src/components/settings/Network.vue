@@ -3,10 +3,10 @@
     <v-card>
       <v-card-title primary-title>
         <v-layout row wrap>
-          <h1>Access point</h1>
+          <h1>{{'ACCESS_POINT' | lang }}</h1>
           <v-flex xs12>
             <v-text-field
-                    label="Name"
+                    :label="'NAME' | lang "
                     v-model="ap_ssid"
                     :rules="[v => !!v || 'Name of SSID is required']"
                     :counter="32"
@@ -15,18 +15,18 @@
           </v-flex>
           <v-flex xs12>
             <v-text-field
-                    label="Password"
+                    :label="'PASSWORD' | lang "
                     v-model="ap_password"
                     :counter="32"
                     required>
             </v-text-field>
           </v-flex>
-          <h1>Connection to Internet</h1>
+          <h1>{{'INTERNET_CONNECTION' | lang }}</h1>
           <v-flex xs12>
             <v-layout row>
               <v-flex xs11 tile flat>
                 <v-select
-                        label="Access point"
+                        :label="'ACCESS_POINT' | lang"
                         v-model="sta_ssid"
                         :items="ap_list"
                         :rules="[v => !!v || 'Item is required']"
@@ -41,7 +41,7 @@
             </v-layout>
             <v-flex xs12>
               <v-text-field
-                      label="Password"
+                      :label="'PASSWORD' | lang "
                       v-model="sta_password"
                       :counter="32"
                       required>
@@ -51,7 +51,7 @@
         </v-layout>
       </v-card-title>
       <v-card-actions text-xs-right>
-        <v-btn @click="submit" :disabled="!valid">submit</v-btn>
+        <v-btn @click="submit" :disabled="!valid">{{'SUBMIT' | lang}}</v-btn>
       </v-card-actions>
     </v-card>
   </v-form>
