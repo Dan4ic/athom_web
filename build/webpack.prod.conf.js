@@ -113,17 +113,8 @@ const webpackConfig = merge(baseWebpackConfig, {
         ? 'index.html'
         : config.build.index,
       template: 'index.html',
-      inject: false,
+      inject: true,
       //Injection source code to HTML
-      app_js: function(){
-        return fs.readFileSync(path.join(__dirname, '../dist/static/js/app.js'), 'utf8');
-      },
-      app_css: function(){
-        return fs.readFileSync(path.join(__dirname, '../dist/static/css/app.css'), 'utf8');
-      },
-      vendor_js: function(){
-        return fs.readFileSync(path.join(__dirname, '../dist/static/js/vendor.js'), 'utf8');
-      },
       minify: {
         removeComments: true,
         collapseWhitespace: true,
