@@ -3,7 +3,7 @@
     <v-container fluid grid-list-md text-xs-left>
       <v-layout row wrap>
         <v-toolbar xs12>
-          <v-toolbar-title>Network</v-toolbar-title>
+          <v-toolbar-title>Access point</v-toolbar-title>
           <v-spacer></v-spacer>
         </v-toolbar>
 
@@ -20,10 +20,14 @@
           <v-text-field
                   label="Password"
                   v-model="ap_password"
-                  :counter="8"
+                  :counter="32"
                   required>
           </v-text-field>
         </v-flex>
+        <v-toolbar xs12>
+          <v-toolbar-title>Connection to Internet</v-toolbar-title>
+          <v-spacer></v-spacer>
+        </v-toolbar>
         <v-flex xs12>
           <v-layout row>
             <v-flex xs11 tile flat>
@@ -41,6 +45,14 @@
               </v-btn>
             </v-flex>
           </v-layout>
+          <v-flex xs12>
+            <v-text-field
+                    label="Password"
+                    v-model="sta_password"
+                    :counter="32"
+                    required>
+            </v-text-field>
+          </v-flex>
         </v-flex>
         <v-flex xs12 text-xs-right>
           <v-btn @click="submit" :disabled="!valid">submit</v-btn>
