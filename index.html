@@ -4,12 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>athom_web</title>
-    <style type="text/css"><%= htmlWebpackPlugin.options.app_css %></style>
+    <style type="text/css"><%= htmlWebpackPlugin.options.app_css() %></style>
   </head>
   <body>
     <div id="app"></div>
     <!-- built files will be auto injected -->
-    <script><%= htmlWebpackPlugin.options.vendor_js %></script>
-    <script><%= htmlWebpackPlugin.options.app_js %></script>
+    <script><%= htmlWebpackPlugin.options.vendor_js() %></script>
+    <script><%= htmlWebpackPlugin.options.app_js() %></script>
   </body>
 </html>

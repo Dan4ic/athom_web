@@ -60,40 +60,6 @@ const webpackConfig = merge(baseWebpackConfig, {
         ? { safe: true, map: { inline: false } }
         : { safe: true }
     }),
-    // generate dist index.html with correct asset hash for caching.
-    // you can customize output by editing /index.html
-    // see https://github.com/ampedandwired/html-webpack-plugin
-    new HtmlWebpackPlugin({
-      filename: process.env.NODE_ENV === 'testing'
-        ? 'index.html'
-        : config.build.index,
-      template: 'index.html',
-      inject: false,
-      //Injection source code to HTML
-      app_js: function(){
-        console.error("app_js");
-        return fs.readFileSync('dist/static/js/app.js', 'utf8');
-      },
-      app_css: function(){
-        console.error("app_css");
-        return fs.readFileSync('dist/static/css/app.css', 'utf8');
-      },
-      vendor_js: function(){
-        console.error("vendor_js");
-        return fs.readFileSync('dist/static/js/vendor.js', 'utf8');
-      },
-      minify: {
-        removeComments: true,
-        collapseWhitespace: true,
-        removeAttributeQuotes: true,
-        minifyCSS: true,
-        minifyJS: true,
-        // more options:
-        // https://github.com/kangax/html-minifier#options-quick-reference
-      },
-      // necessary to consistently work with multiple chunks via CommonsChunkPlugin
-      chunksSortMode: 'dependency'
-    }),
     // keep module.id stable when vendor modules does not change
     new webpack.HashedModuleIdsPlugin(),
     // enable scope hoisting
@@ -137,7 +103,40 @@ const webpackConfig = merge(baseWebpackConfig, {
         to: config.build.assetsSubDirectory,
         ignore: ['.*']
       }
-    ])
+    ]),
+
+    // generate dist index.html with correct asset hash for caching.
+    // you can customize output by editing /index.html
+    // see https://github.com/ampedandwired/html-webpack-plugin
+    new HtmlWebpackPlugin({
+      filename: process.env.NODE_ENV === 'testing'
+        ? 'index.html'
+        : config.build.index,
+      template: 'index.html',
+      inject: false,
+      //Injection source code to HTML
+      app_js: function(){
+        return fs.readFileSync(path.join(__dirname, '../dist/static/js/app.js'), 'utf8');
+      },
+      app_css: function(){
+        return fs.readFileSync(path.join(__dirname, '../dist/static/css/app.css'), 'utf8');
+      },
+      vendor_js: function(){
+        return fs.readFileSync(path.join(__dirname, '../dist/static/js/vendor.js'), 'utf8');
+      },
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        minifyCSS: true,
+        minifyJS: true,
+        // more options:
+        // https://github.com/kangax/html-minifier#options-quick-reference
+      },
+      // necessary to consistently work with multiple chunks via CommonsChunkPlugin
+      chunksSortMode: 'dependency'
+    }),
+
   ]
 })
 
