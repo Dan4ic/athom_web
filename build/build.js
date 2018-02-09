@@ -11,6 +11,7 @@ const webpack = require('webpack')
 const config = require('../config')
 const webpackConfig = require('./webpack.prod.conf')
 const exportConfig = require('./webpack.export.conf')
+const fs = require('fs');
 
 const spinner = ora('building for production...')
 spinner.start()
@@ -57,6 +58,8 @@ rm(path.join(config.build.assetsRoot, config.build.assetsSubDirectory), err => {
             console.log(chalk.red('  Build failed with errors.\n'))
             process.exit(1)
         }
+
+        fs.unlinkSync(path.join(config.build.assetsRoot, "app.js"));
 
         spinner.stop()
 

@@ -61,11 +61,12 @@ module.exports = {
     new CompressionWebpackPlugin({
         asset: 'platform.gz',
         algorithm: 'gzip',
+        deleteOriginalAssets: true,
         test: new RegExp(
             '\\.(hexp)$'
         ),
         threshold: 10240,
-        minRatio: 0.8
+        minRatio: 1
     })
 
 
