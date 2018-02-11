@@ -1,4 +1,16 @@
 {
-  "ap_ssid": "SmartTank",
-  "sta_ssid": ""
+  "net" : {
+    "ap_ssid": "SmartTank",
+    "sta_ssid": "",
+    "ap_list": [
+      {"name": "router1-24"},
+      {"name": "WiFi net 1"},
+      {"name": "WiFi net 2"},
+      {"name": "WiFi net 3"},
+      {"name": "WiFi net 4"}
+    ],
+    "client_ip" : "127.0.0.1",
+    "internet_status": "connected"
+  }
+
 }

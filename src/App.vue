@@ -33,7 +33,9 @@
                 <router-view/>
             </v-content>
             <v-footer app fixed>
-                <span>{{ 'CURRENT_TIME' | lang }}: {{hwDateTime}}</span>
+                <span class="status_label">{{ 'CURRENT_TIME' | lang }}: {{currentTime}} </span>
+                <span class="status_label">{{ 'IP' | lang }}: {{this.$store.state.net.client_ip}} </span>
+                <span class="status_label">{{ 'INTERNET' | lang }}: {{this.$store.state.net.internet_status | lang}} </span>
             </v-footer>
         </v-app>
 
@@ -48,10 +50,8 @@
                 return this.$store.state.display.theme;
             },
             currentTime(){
-                if (!this.hwDateTime)
-                    return "--.--.---- --:--:--";
-                else
-                    return this.hwDateTime;
+                return this.getFormattedDate(this.hwDateTime, this.$store.state.display.lang)
+                        + ' ' + this.getFormattedTime(this.hwDateTime,  this.$store.state.display.lang);
             }
         },
         data(){
@@ -69,6 +69,12 @@
 
     #app {
         min-width: 580px;;
+    }
+
+    .status_label {
+        display: block;
+        float: left;
+        margin: 12px;
     }
 
     #mainmenu a {

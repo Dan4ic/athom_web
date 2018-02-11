@@ -5,7 +5,6 @@ const fs = require('fs')
 const path = require('path')
 
 const virtual_state_data = path.join(__dirname, '/devstorage/state.json');
-const virtual_aplist_data = path.join(__dirname, '/devstorage/apoints.json');
 
 module.exports = function(app){
 
@@ -13,23 +12,36 @@ module.exports = function(app){
 
         console.log('>Get state data ');
         fs.readFile(virtual_state_data, (err, result) => {
+
             if (err) {
                 console.log(err);
-                res.send('');
-            } else
-                res.json(JSON.parse(result));
+                res.send(404, 'Error of open state.json file');
+            } else {
+
+                let response    = JSON.parse(result);
+
+                //Time
+                response.time    = {
+                    //Emulation current time of controller
+                    current : (new Date).getTime() - (new Date).getTimezoneOffset() * 60000
+                };
+
+                res.json(response);
+
+            }
+
         });
 
     });
 
-    app.get('/api/available_ap', function(req, res) {
+    app.get('/api/rescan_net', function(req, res) {
 
         console.log('>Get available access points list');
-        fs.readFile(virtual_aplist_data, (err, result) => {
+        fs.readFile(virtual_state_data, (err, result) => {
             if (err) {
-                res.json({});
+                res.send(404, 'Error of open state.json file');
             } else
-                res.json(JSON.parse(result));
+                res.json(JSON.parse(result).net.ap_list);
         });
 
     });
@@ -37,7 +49,7 @@ module.exports = function(app){
     app.get('/api/time', function(req, res) {
 
         console.log('>Get datetime');
-        res.send(200, (new Date).getTime());
+        res.send(200, (new Date).getTime() - (new Date).getTimezoneOffset() * 60000);
 
     });
 

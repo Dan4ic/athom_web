@@ -1,7 +1,7 @@
 export default {
     REST : {
         STATE : "/api/state",
-        AP_AVAILABLE : "/api/available_ap",
+        AP_AVAILABLE : "/api/rescan_net",
         TIME : "/api/time",
     },
     LANGS : {
@@ -24,7 +24,12 @@ export default {
             SETTINGS : 'Settings',
             DATE_TIME : 'Date and time',
             CURRENT : 'Current',
-            CURRENT_TIME: 'Time'
+            CURRENT_TIME: 'Time',
+            NTP_SYNC: 'Synchronize with the Internet',
+            IP: 'ip',
+            INTERNET: 'Internet',
+            DISCONNECTED : 'Disconnected',
+            CONNECTED: 'Connected'
         },
         ru : {
             DISPLAY_TITLE : 'Экран',
@@ -44,8 +49,13 @@ export default {
             DASHBOARD : 'Рабочий стол',
             SETTINGS : 'Настройки',
             DATE_TIME : 'Дата и время',
-            CURRENT : 'По умолчанию',
-            CURRENT_TIME: 'Время'
+            CURRENT : 'Текущее',
+            CURRENT_TIME: 'Время',
+            NTP_SYNC : "Синхронизировать с Интернет",
+            IP: 'ip',
+            INTERNET: 'Интернет',
+            DISCONNECTED : 'Нет соединения',
+            CONNECTED: 'Подключено'
         }
     }
 }
