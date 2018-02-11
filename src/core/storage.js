@@ -80,10 +80,7 @@ export default {
 
             Axios.get(consts.REST.AP_AVAILABLE).then((response) => {
                 context.commit('setAPAvailable', response.data);
-                setTimeout(function(){
-                    context.commit('setReloadingAPList', false);
-                }, 3000);
-                //context.commit('setReloadingAPList', false);
+                context.commit('setReloadingAPList', false);
             }).catch(function(){
                 context.commit('setReloadingAPList', false);
             });
