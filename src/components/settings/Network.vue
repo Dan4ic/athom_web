@@ -8,17 +8,19 @@
                         <v-text-field
                                 :label="'NAME' | lang "
                                 v-model="ap_ssid"
-                                :rules="[v => !!v || 'Name of SSID is required']"
+                                :rules="[validateAPName]"
                                 :counter="32"
                                 required
                         ></v-text-field>
                     </v-flex>
                     <v-flex xs12>
                         <v-text-field
-                                :label="'PASSWORD' | lang "
+                                :label="lblPassword(ap_password)"
                                 v-model="ap_password"
-                                :counter="32"
-                                required>
+                                :append-icon="show_pswd_ap ? 'visibility' : 'visibility_off'"
+                                :append-icon-cb="() => (show_pswd_ap = !show_pswd_ap)"
+                                :type="!show_pswd_ap ? 'password' : 'text'"
+                                :counter="32">
                         </v-text-field>
                     </v-flex>
                     <h1>{{'INTERNET_CONNECTION' | lang }}</h1>
@@ -30,21 +32,26 @@
                                         v-model="sta_ssid"
                                         :items="ap_list"
                                         :rules="[v => !!v || 'Item is required']"
+                                        :disabled="isAPListReloading"
                                         required
                                 ></v-select>
                             </v-flex>
                             <v-flex xs1 style="padding-top: 12px;">
-                                <v-btn icon @click="doRefreshAPList">
+                                <v-btn v-if="!isAPListReloading" icon @click="doRefreshAPList">
                                     <v-icon>refresh</v-icon>
                                 </v-btn>
+                                <v-progress-circular v-else indeterminate color="primary"></v-progress-circular>
                             </v-flex>
                         </v-layout>
                         <v-flex xs12>
                             <v-text-field
-                                    :label="'PASSWORD' | lang "
+                                    :label="lblPassword(sta_password)"
+                                    type="password"
                                     v-model="sta_password"
-                                    :counter="32"
-                                    required>
+                                    :append-icon="show_pswd_sta ? 'visibility' : 'visibility_off'"
+                                    :append-icon-cb="() => (show_pswd_sta = !show_pswd_sta)"
+                                    :type="!show_pswd_sta ? 'password' : 'text'"
+                                    :counter="32">
                             </v-text-field>
                         </v-flex>
                     </v-flex>
@@ -65,13 +72,35 @@
         name: 'SettingsNetwork',
         extends : template,
         methods: {
+            validateAPName(value){
+
+                if(!value || value.length < 6 || !/[a-zA-Z0-9]/.test(value))
+                    return Vue.filter('lang')('ERROR_AP_NAME');
+                else
+                    return true;
+
+            },
             doRefreshAPList(){
+                this.sta_ssid    = "";
                 this.$store.dispatch('refreshAccessPointsList');
             },
 
             submit(){
-                alert("ok!");
+
+                if (this.$refs.form.validate()){
+                    alert("ok!");
+                }
+            },
+
+            lblPassword(password){
+
+                if(!password || !password.length)
+                    return Vue.filter('lang')('PASSWORD_NO_CHANGE')
+                else
+                    return Vue.filter('lang')('PASSWORD')
+
             }
+
         },
 
         computed: {
@@ -90,7 +119,9 @@
         },
         data () {
             return {
-                valid: false,
+                valid: true,
+                show_pswd_ap: false,
+                show_pswd_sta: false,
                 ap_ssid: "",
                 ap_password: "",
                 sta_ssid: "",

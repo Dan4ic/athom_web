@@ -2,15 +2,15 @@
   <v-container fill-width >
       <v-stepper v-model="step">
           <v-stepper-header>
-              <v-stepper-step step="1" :complete="step > 1" class="step-desc" @click.native="step=1">{{'INTRODUCTION' | lang}}</v-stepper-step>
+              <v-stepper-step step="1" :complete="step > 1" :style="step>1?{cursor: 'pointer'}:{}" @click.native="step>1 ? step=1:null;">{{'INTRODUCTION' | lang}}</v-stepper-step>
               <v-divider></v-divider>
-              <v-stepper-step step="2" :complete="step > 2" class="step-desc" @click.native="step=2">{{'DATE_TIME' | lang}}</v-stepper-step>
+              <v-stepper-step step="2" :complete="step > 2" :style="step>2?{cursor: 'pointer'}:{}" @click.native="step>2 ? step=2:null;">{{'DATE_TIME' | lang}}</v-stepper-step>
               <v-divider></v-divider>
-              <v-stepper-step step="3" :complete="step > 3" class="step-desc" @click.native="step=3">{{'NETWORK' | lang}}</v-stepper-step>
+              <v-stepper-step step="3" :complete="step > 3" :style="step>3?{cursor: 'pointer'}:{}" @click.native="step>3 ? step=3:null;">{{'NETWORK' | lang}}</v-stepper-step>
               <v-divider></v-divider>
-              <v-stepper-step step="4" :complete="step > 4" class="step-desc" @click.native="step=4">{{'DISPLAY_TITLE' | lang}}</v-stepper-step>
+              <v-stepper-step step="4" :complete="step > 4" :style="step>4?{cursor: 'pointer'}:{}" @click.native="step>4 ? step=4:null;">{{'DISPLAY_TITLE' | lang}}</v-stepper-step>
               <v-divider></v-divider>
-              <v-stepper-step step="4" :complete="step == 5" class="step-desc" @click.native="step=5">{{'READY' | lang}}</v-stepper-step>
+              <v-stepper-step step="4" :complete="step == 5" @click.native="step>5 ? step=5:null;">{{'READY' | lang}}</v-stepper-step>
           </v-stepper-header>
           <v-stepper-items>
               <v-stepper-content step="1">

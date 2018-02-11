@@ -42,7 +42,9 @@ export default {
             NETWORK: 'Network',
             BEGIN_WORK : 'Completed',
             READY : 'Ready',
-            CONFIG_HELPER_READY: '<h2>Great work!</h2><br><p>Now I\'m ready. You can always go back to the settings in the "Settings" section. There you can ask again to help you;) <br><br><h2>Начнем?</h2><br>',
+            CONFIG_HELPER_READY : '<h2>Great work!</h2><br><p>Now I\'m ready. You can always go back to the settings in the "Settings" section. There you can ask again to help you;) <br><br><h2>Начнем?</h2><br>',
+            PASSWORD_NO_CHANGE : 'Password [NO CHANGED]',
+            ERROR_AP_NAME : 'Name of SSID is required and at least 6 characters'
         },
         ru : {
             DISPLAY_TITLE : 'Экран',
@@ -78,6 +80,8 @@ export default {
             BEGIN_WORK : 'Начало работы',
             READY : 'Готово',
             CONFIG_HELPER_READY: '<h2>Отличная работа!</h2><br><p>Теперь я готов. Ты всегда сможешь вернуться к настройкам в разделе "Настройки". Там же ты сможешь вновь попросить помочь тебе меня;) <br><br><h2>Начнем?</h2><br>',
+            PASSWORD_NO_CHANGE: 'Пароль [БЕЗ ИЗМЕНЕНИЙ]',
+            ERROR_AP_NAME : 'Не менее 6 символов латиницей'
         }
     }
 }

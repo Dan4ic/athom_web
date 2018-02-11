@@ -78,7 +78,7 @@
     @import '../node_modules/vuetify/dist/vuetify.min.css';
 
     #app {
-        min-width: 580px;;
+        min-width: 600px;;
     }
 
     .status_label {

@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import Axios from 'axios';
 import consts from "./consts";
 
@@ -15,6 +14,7 @@ export default {
             ap_ssid : null,
             sta_ssid : null,
             ap_available : [],
+            is_reloading_ap_list : true,
             client_ip: '0.0.0.0',
             internet_status : 'DISCONNECTED'
         },
@@ -26,6 +26,11 @@ export default {
     },
 
     mutations : {
+
+        //Set flag of reloading process
+        setReloadingAPList(state, value){
+            state.net.is_reloading_ap_list = value;
+        },
 
         //Set theme
         setUserFirstEnter(state, value){
@@ -70,18 +75,33 @@ export default {
 
         //Reload available access point list
         refreshAccessPointsList(context){
+
+            context.commit('setReloadingAPList', true);
+
             Axios.get(consts.REST.AP_AVAILABLE).then((response) => {
                 context.commit('setAPAvailable', response.data);
+                setTimeout(function(){
+                    context.commit('setReloadingAPList', false);
+                }, 3000);
+                //context.commit('setReloadingAPList', false);
+            }).catch(function(){
+                context.commit('setReloadingAPList', false);
             });
 
         },
 
         //Reload available access point list
         reloadState(context){
+
+            context.commit('setReloadingAPList', true);
+
             Axios.get(consts.REST.STATE).then((response) => {
                 context.commit('setTime', +response.data.time.current);
                 context.commit('setAPAvailable', response.data.net.ap_list);
                 context.commit('setClientIP', response.data.net.client_ip);
+                context.commit('setReloadingAPList', false);
+            }).catch(function(){
+                context.commit('setReloadingAPList', false);
             });
         },
 

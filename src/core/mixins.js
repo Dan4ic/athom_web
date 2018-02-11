@@ -57,6 +57,11 @@ export default {
                 return null;
             else
                 return new Date(this.$store.state.datetime.curr_datetime);
+        },
+
+        //Return true if process of reloading access points list is active
+        isAPListReloading: function(){
+            return this.$store.state.net.is_reloading_ap_list ;
         }
 
     }
