@@ -22,7 +22,7 @@
                     </v-flex>
                 </v-layout>
             </v-card-title>
-            <v-card-actions text-xs-right>
+            <v-card-actions text-xs-right v-if="!hideActions" >
                 <v-btn @click="submit">{{'SUBMIT' | lang }}</v-btn>
                 <v-btn @click="submit">{{'RESET' | lang }}</v-btn>
                 <v-btn @click="submit">{{'DEFAULT' | lang }}</v-btn>
@@ -34,9 +34,11 @@
 <script>
 
     import consts from './../../core/consts';
+    import template from './Template.vue'
 
     export default {
         name: 'SettingsNetwork',
+        extends : template,
         computed: {
             themes(){
                 return consts.LANGS[this.$store.state.display.lang].THEMES;

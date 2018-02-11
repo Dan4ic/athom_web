@@ -5,6 +5,10 @@ export default {
         TIME : "/api/time",
     },
     LANGS : {
+        AVAILABLE : [
+            {text: 'English', value: 'en'},
+            {text: 'Русский', value: 'ru'}
+        ],
         en : {
             DISPLAY_TITLE : 'Display',
             THEME: 'Theme',
@@ -29,7 +33,16 @@ export default {
             IP: 'ip',
             INTERNET: 'Internet',
             DISCONNECTED : 'Disconnected',
-            CONNECTED: 'Connected'
+            CONNECTED: 'Connected',
+            CONFIG_HELPER_HELLO: '<h2>Hello!</h2><br><p> I\'m SmartTank<span class="cpr"></span>. Let me help you with the settings. A few simple steps and I will be ready to use. You can:</p> <ul><li>Control me from any device that supports a WEB browser;</li><li>Control me from anywhere in the world;</li><li>Install applications turning me into different devices</li><li>And much more...</li></ul><br><br><h2>Are you ready?</h2>',
+            INTRODUCTION: 'Introduction',
+            CONTINUE: 'Continue',
+            BACK: 'Back',
+            CANCEL: 'Cancel',
+            NETWORK: 'Network',
+            BEGIN_WORK : 'Completed',
+            READY : 'Ready',
+            CONFIG_HELPER_READY: '<h2>Great work!</h2><br><p>Now I\'m ready. You can always go back to the settings in the "Settings" section. There you can ask again to help you;) <br><br><h2>Начнем?</h2><br>',
         },
         ru : {
             DISPLAY_TITLE : 'Экран',
@@ -55,7 +68,16 @@ export default {
             IP: 'ip',
             INTERNET: 'Интернет',
             DISCONNECTED : 'Нет соединения',
-            CONNECTED: 'Подключено'
+            CONNECTED: 'Подключено',
+            CONFIG_HELPER_HELLO: '<h2>Привет!</h2><br><p>Я SmartTank<span class="cpr"></span>. Позволь помочь тебе с настройками. Несколько простых шагов и я буду готов к использованию. Ты сможешь:</p> <ul><li>Управлять мной c любого устройства, поддерживающего браузер;</li><li>Управлять мной из любой точки мира;</li><li>Устанавливать приложения превращая меня в различные устройства;</li><ul>И многое другое...</ul></ul><br><br><h2>Начнем?</h2>',
+            INTRODUCTION: 'Знакомство',
+            CONTINUE: 'Далее',
+            BACK: 'Назад',
+            CANCEL : 'Отмена',
+            NETWORK : 'Сеть',
+            BEGIN_WORK : 'Начало работы',
+            READY : 'Готово',
+            CONFIG_HELPER_READY: '<h2>Отличная работа!</h2><br><p>Теперь я готов. Ты всегда сможешь вернуться к настройкам в разделе "Настройки". Там же ты сможешь вновь попросить помочь тебе меня;) <br><br><h2>Начнем?</h2><br>',
         }
     }
 }

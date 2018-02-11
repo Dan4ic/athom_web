@@ -4,6 +4,9 @@ import consts from "./consts";
 
 export default {
     state : {
+        user: {
+            first_enter : true
+        },
         display : {
             lang : "en",
             theme : "dark"
@@ -23,6 +26,11 @@ export default {
     },
 
     mutations : {
+
+        //Set theme
+        setUserFirstEnter(state, value){
+            state.user.first_enter = value;
+        },
 
         //Set theme
         setLang(state, theme){

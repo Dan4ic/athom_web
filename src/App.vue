@@ -43,8 +43,18 @@
 </template>
 
 <script>
+
     export default {
         name: 'App',
+        mounted(){
+
+            //Detect first enter
+            if($store.state.user.first_enter) {
+                $store.commit('setUserFirstEnter', false);
+                this.$router.push('/config_helper');
+            }
+
+        },
         computed: {
             theme(){
                 return this.$store.state.display.theme;
@@ -80,5 +90,11 @@
     #mainmenu a {
         text-decoration: none;
     }
+
+    .cpr:before{
+        font-size: 10px;
+        line-height: 12px;
+        vertical-align: top;
+        content: '\A9';    }
 
 </style>
