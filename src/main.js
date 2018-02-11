@@ -6,9 +6,11 @@ import router from './router';
 import EventsBus from './core/bus.vue';
 import storage from './core/storage';
 import consts from './core/consts';
+import mixins from './core/mixins';
 
 Vue.use(Vuex);
 Vue.use(Vuetify);
+Vue.mixin(mixins);
 
 window.Vue = Vue;
 

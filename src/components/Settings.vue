@@ -1,5 +1,6 @@
 <template>
   <v-container fill-width >
+      <DateTimeComponent class="panel"></DateTimeComponent>
       <NetworkComponent class="panel"></NetworkComponent>
       <DisplayComponent class="panel"></DisplayComponent>
   </v-container>
@@ -9,12 +10,14 @@
 
 import NetworkComponent from './settings/Network.vue';
 import DisplayComponent from './settings/Display.vue';
+import DateTimeComponent from './settings/DateTime.vue';
 
 export default {
   name: 'Settings',
   components : {
       NetworkComponent : NetworkComponent,
-      DisplayComponent : DisplayComponent
+      DisplayComponent : DisplayComponent,
+      DateTimeComponent : DateTimeComponent
   },
   methods : {
       submit(){
@@ -34,7 +37,7 @@ export default {
 
   .panel {
     width: 29%;
-    min-width: 400px;
+    min-width: 540px;
     float: left;
     margin-left: 4px;
     margin-right: 4px;

@@ -27,11 +27,17 @@ module.exports = function(app){
         console.log('>Get available access points list');
         fs.readFile(virtual_aplist_data, (err, result) => {
             if (err) {
-                console.log(err);
-                res.send('');
+                res.json({});
             } else
                 res.json(JSON.parse(result));
         });
+
+    });
+
+    app.get('/api/time', function(req, res) {
+
+        console.log('>Get datetime');
+        res.send(200, (new Date).getTime());
 
     });
 
