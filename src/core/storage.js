@@ -22,7 +22,8 @@ export default {
         datetime : {
             hw_datetime : null,
             sync_datetime : null,
-            curr_datetime   : null
+            curr_datetime   : null,
+            time_zone_offset : null
         }
     },
 

@@ -4,6 +4,16 @@
             <v-card-title primary-title>
                 <v-layout row wrap>
                     <h1>{{'DATE_TIME' | lang}}</h1>
+                    <v-flex xs12>
+                        <v-select
+                                :label="'TIME_ZONE' | lang"
+                                v-model="time_zone"
+                                :items="time_zones"
+                                :rules="[v => !!v || 'Item is required']"
+                                required
+                        ></v-select>
+                    </v-flex>
+
                     <template v-if="float">
                         <v-flex xs12>
                             <v-date-picker class="float_packer" v-model="curr_date" :landscape="!isMobileScreen"></v-date-picker>
@@ -65,7 +75,34 @@
                 set(value){
                     this.custom_time = value;
                 }
+            },
+
+            time_zones(){
+                return consts.TIME_ZONES;
+            },
+            time_zone:{
+                get(){
+
+                    if(this.new_timezone)
+                        return this.new_timezone;
+
+                    let time_offset = this.$store.state.datetime.time_zone_offset;
+
+                    if(time_offset === null)
+                        time_offset = (new Date).getTimezoneOffset();
+
+                    for(let timezone in consts.TIME_ZONES){
+                        if((+consts.TIME_ZONES[timezone].offset) == (-time_offset))
+                            return consts.TIME_ZONES[timezone].value;
+                    }
+
+                    return null;
+                },
+                set(value){
+                    this.new_timezone = value;
+                }
             }
+
 
         },
         props :{
@@ -78,10 +115,12 @@
             current(){
                 this.custom_date    = this.getFormattedDate(new Date, 'vuetifyjs');
                 this.custom_time    = this.getFormattedTime(new Date, 'vuetifyjs');
+                this.new_timezone   = null;
             },
             reset(){
                 this.custom_date    = null;
                 this.custom_time    = null;
+                this.new_timezone   = null;
             },
             submit(){
 
@@ -91,7 +130,8 @@
             return {
                 custom_date : null,
                 custom_time : null,
-                ntp_sync : true
+                ntp_sync : true,
+                new_timezone : null,
             }
         }
     }
