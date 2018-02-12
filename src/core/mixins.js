@@ -62,7 +62,12 @@ export default {
         //Return true if process of reloading access points list is active
         isAPListReloading: function(){
             return this.$store.state.net.is_reloading_ap_list ;
+        },
+
+        isMobileScreen: function(){
+            return this.$store.state.display.is_mobile;
         }
 
-    }
+    },
+
 }

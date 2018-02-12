@@ -17,7 +17,7 @@
                   <v-card class="mb-5 step-card" style="padding: 24px;">
                       <div v-html="htmlHello"></div>
                       <v-select
-                              style="position: absolute; right: 16px; top:16px; width: 200px;"
+                              style="position: absolute; right: 16px; top:16px; width: 160px;"
                               :label="'LANGUAGE' | lang"
                               v-model="lang"
                               :items="languages"

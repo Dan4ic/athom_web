@@ -54,6 +54,14 @@
                 this.$router.push('/config_helper');
             }
 
+            this.onResize();
+            window.addEventListener('resize', this.onResize, { passive: true });
+
+        },
+        beforeDestroy () {
+            if (typeof window !== 'undefined') {
+                window.removeEventListener('resize', this.onResize, { passive: true })
+            }
         },
         computed: {
             theme(){
@@ -62,6 +70,20 @@
             currentTime(){
                 return this.getFormattedDate(this.hwDateTime, this.$store.state.display.lang)
                         + ' ' + this.getFormattedTime(this.hwDateTime,  this.$store.state.display.lang);
+            }
+        },
+        methods: {
+            onResize () {
+                this.$store.commit('setIsMobile', window.innerWidth < 600);
+            }
+        },
+        watch : {
+            drawer(val){
+
+                setTimeout(function(){
+                    this.$bus.$emit('do-screen-rebuild');
+                }, 150)
+
             }
         },
         data(){
@@ -78,7 +100,7 @@
     @import '../node_modules/vuetify/dist/vuetify.min.css';
 
     #app {
-        min-width: 600px;;
+        /* min-width: 600px; */
     }
 
     .status_label {
@@ -95,6 +117,7 @@
         font-size: 10px;
         line-height: 12px;
         vertical-align: top;
-        content: '\A9';    }
+        content: '\A9';
+    }
 
 </style>

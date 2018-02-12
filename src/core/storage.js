@@ -8,7 +8,8 @@ export default {
         },
         display : {
             lang : "en",
-            theme : "dark"
+            theme : "dark",
+            is_mobile : false,
         },
         net : {
             ap_ssid : null,
@@ -26,6 +27,11 @@ export default {
     },
 
     mutations : {
+
+        //Flag of mobile device
+        setIsMobile(state, value){
+            state.display.is_mobile = value;
+        },
 
         //Set flag of reloading process
         setReloadingAPList(state, value){

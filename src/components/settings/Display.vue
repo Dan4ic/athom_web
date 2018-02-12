@@ -25,7 +25,6 @@
             <v-card-actions text-xs-right v-if="!hideActions" >
                 <v-btn @click="submit">{{'SUBMIT' | lang }}</v-btn>
                 <v-btn @click="submit">{{'RESET' | lang }}</v-btn>
-                <v-btn @click="submit">{{'DEFAULT' | lang }}</v-btn>
             </v-card-actions>
         </v-card>
     </v-form>

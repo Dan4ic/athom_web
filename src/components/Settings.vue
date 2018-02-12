@@ -1,8 +1,8 @@
 <template>
-  <v-container fill-width >
-      <DateTimeComponent class="panel"></DateTimeComponent>
-      <NetworkComponent class="panel"></NetworkComponent>
-      <DisplayComponent class="panel"></DisplayComponent>
+  <v-container>
+      <DateTimeComponent class="panel" :style="panelStyle"></DateTimeComponent>
+      <NetworkComponent class="panel" :style="panelStyle"></NetworkComponent>
+      <DisplayComponent class="panel" :style="panelStyle"></DisplayComponent>
   </v-container>
 </template>
 
@@ -12,6 +12,10 @@ import NetworkComponent from './settings/Network.vue';
 import DisplayComponent from './settings/Display.vue';
 import DateTimeComponent from './settings/DateTime.vue';
 
+let PANEL_WIDTH     = 540;
+let PANEL_PADDING   = 8;
+let APP_PADDING     = 80;
+
 export default {
   name: 'Settings',
   components : {
@@ -19,7 +23,52 @@ export default {
       DisplayComponent : DisplayComponent,
       DateTimeComponent : DateTimeComponent
   },
+  computed:{
+    panelStyle: function(){
+        if(this.isMobileScreen)
+            return {
+                width : '100%'
+            };
+        else {
+
+            this.recalcPanelSize();
+
+            console.log('Panel width=', this.panel_width);
+
+            return {
+                width   : this.panel_width + 'px'
+            };
+
+        }
+    }
+  },
+  mounted(){
+
+      this.$bus.$on('do-screen-rebuild', this.onResize);
+
+  },
   methods : {
+      recalcPanelSize(){
+
+          let app_width = this.$el ? this.$el.offsetWidth - APP_PADDING
+              :this.$vuetify.breakpoint.width
+              - this.$vuetify.application.left
+              - this.$vuetify.application.right
+              - APP_PADDING;
+
+          console.log(app_width);
+
+          let col_count = Math.floor(app_width / (PANEL_WIDTH + PANEL_PADDING));
+          if(col_count < 0)
+              col_count   = 1;
+
+          this.panel_width  = (app_width / col_count );
+
+      },
+
+      onResize(){
+          this.recalcPanelSize();
+      },
       submit(){
           alert("ok!");
       }
@@ -27,6 +76,7 @@ export default {
   data () {
     return {
       valid : false,
+      panel_width : 0,
     }
   }
 }
@@ -36,29 +86,10 @@ export default {
 <style scoped>
 
   .panel {
-    width: 29%;
-    min-width: 540px;
     float: left;
     margin-left: 4px;
     margin-right: 4px;
     margin-bottom: 4px;
-  }
-
-  @media (max-width: 1300px) {
-    .panel {
-      width: 48%;
-    }
-  }
-
-
-  @media (max-width: 800px) {
-    .panel {
-      width: 100%;
-      float: none;
-      margin-left: 0px;
-      margin-right: 0px;
-      margin-bottom: 4px;
-    }
   }
 
 </style>

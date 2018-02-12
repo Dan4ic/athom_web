@@ -6,16 +6,16 @@
                     <h1>{{'DATE_TIME' | lang}}</h1>
                     <template v-if="float">
                         <v-flex xs12>
-                            <v-date-picker class="float_packer" v-model="curr_date" landscape></v-date-picker>
-                            <v-time-picker class="float_packer" v-model="curr_time" landscape format="24hr"></v-time-picker>
+                            <v-date-picker class="float_packer" v-model="curr_date" :landscape="!isMobileScreen"></v-date-picker>
+                            <v-time-picker class="float_packer" v-model="curr_time" :landscape="!isMobileScreen" format="24hr"></v-time-picker>
                         </v-flex>
                     </template>
                     <template v-else>
                         <v-flex xs12>
-                            <v-date-picker v-model="curr_date" landscape></v-date-picker>
+                            <v-date-picker v-model="curr_date" :landscape="!isMobileScreen"></v-date-picker>
                         </v-flex>
                         <v-flex xs12>
-                            <v-time-picker v-model="curr_time" landscape format="24hr"></v-time-picker>
+                            <v-time-picker v-model="curr_time" :landscape="!isMobileScreen" format="24hr"></v-time-picker>
                         </v-flex>
                     </template>
                     <v-flex xs12>
