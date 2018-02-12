@@ -1,5 +1,5 @@
 <template>
-    <v-form ref="form" lazy-validation>
+    <v-form>
         <v-card>
             <v-card-title primary-title>
                 <v-layout row wrap>
@@ -126,12 +126,13 @@
 
             }
         },
+
         data () {
             return {
                 custom_date : null,
                 custom_time : null,
                 ntp_sync : true,
-                new_timezone : null,
+                new_timezone : null
             }
         }
     }

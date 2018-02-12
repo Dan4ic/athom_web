@@ -1,5 +1,5 @@
 <template>
-    <v-form v-model="valid" ref="form" lazy-validation>
+    <v-form v-model="is_valid" :lazy-validation="lazyValidation" ref="form">
         <v-card>
             <v-card-title primary-title>
                 <v-layout row wrap>
@@ -58,7 +58,7 @@
                 </v-layout>
             </v-card-title>
             <v-card-actions v-if="!hideActions" text-xs-right>
-                <v-btn @click="submit" :disabled="!valid">{{'SUBMIT' | lang}}</v-btn>
+                <v-btn @click="submit" :disabled="!is_valid">{{'SUBMIT' | lang}}</v-btn>
             </v-card-actions>
         </v-card>
     </v-form>
@@ -67,6 +67,8 @@
 <script>
 
     import template from './Template.vue'
+
+    let CONST_DISABLE_CONNECT = 'DISABLE';
 
     export default {
         name: 'SettingsNetwork',
@@ -106,9 +108,14 @@
         computed: {
             ap_list(){
 
-                let result = [];
+                let result = [{
+                    value : CONST_DISABLE_CONNECT,
+                    text : Vue.filter('lang')('NO_CONNECT')
+                }];
+
                 this.$store.state.net.ap_available.map(function (item) {
                     result.push({
+                        value : item.name,
                         text: item.name
                     });
                 });
@@ -119,12 +126,12 @@
         },
         data () {
             return {
-                valid: true,
+                is_valid: this.lazyValidation,
                 show_pswd_ap: false,
                 show_pswd_sta: false,
                 ap_ssid: "",
                 ap_password: "",
-                sta_ssid: "",
+                sta_ssid: CONST_DISABLE_CONNECT,
                 sta_password: ""
             }
         }

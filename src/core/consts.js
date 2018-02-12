@@ -82,6 +82,8 @@ export default {
             PASSWORD_NO_CHANGE : 'Password [NO CHANGED]',
             ERROR_AP_NAME : 'Name of SSID is required and at least 6 characters',
             TIME_ZONE : 'Time zone',
+            FIRMWARE : 'Firmware',
+            NO_CONNECT: '[NO CONNECT]'
         },
         ru : {
             DISPLAY_TITLE : 'Экран',
@@ -120,6 +122,8 @@ export default {
             PASSWORD_NO_CHANGE: 'Пароль [БЕЗ ИЗМЕНЕНИЙ]',
             ERROR_AP_NAME : 'Не менее 6 символов латиницей',
             TIME_ZONE : 'Часовой пояс',
+            FIRMWARE : 'Версия системы',
+            NO_CONNECT: '[НЕ ПОДКЛЮЧАТЬ]'
         }
     }
 }

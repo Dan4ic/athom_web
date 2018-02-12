@@ -32,10 +32,22 @@
             <v-content>
                 <router-view/>
             </v-content>
-            <v-footer app fixed>
-                <span class="status_label">{{ 'CURRENT_TIME' | lang }}: {{currentTime}} </span>
-                <span class="status_label">{{ 'IP' | lang }}: {{this.$store.state.net.client_ip}} </span>
-                <span class="status_label">{{ 'INTERNET' | lang }}: {{this.$store.state.net.internet_status | lang}} </span>
+            <v-footer app fixed :style="isMobileScreen?{'display':'table-row'}:{}">
+                <span class="status_label" :style="isMobileScreen?{'display':'table-cell'}:{}">
+                    <template v-if="!isMobileScreen">{{ 'CURRENT_TIME' | lang }}:</template>
+                    {{currentTime}}
+                </span>
+                <span class="status_label" :style="isMobileScreen?{'display':'table-cell'}:{}">
+                    <template v-if="!isMobileScreen">{{ 'IP' | lang }}:</template>
+                    {{this.$store.state.net.client_ip}}
+                </span>
+                <span class="status_label" :style="isMobileScreen?{'display':'table-cell'}:{}">
+                    <template v-if="!isMobileScreen">{{ 'INTERNET' | lang }}:</template>
+                    {{this.$store.state.net.internet_status | lang}}
+                </span>
+                <span v-if="!isMobileScreen" class="status_label">
+                    {{ 'FIRMWARE' | lang }}: {{this.$store.state.system.firmware_v}}
+                </span>
             </v-footer>
         </v-app>
 

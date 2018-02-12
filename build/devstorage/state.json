@@ -11,6 +11,8 @@
     ],
     "client_ip" : "127.0.0.1",
     "internet_status": "connected"
+  },
+  "system" : {
+    "firmware" : "1.0.0"
   }
-
 }

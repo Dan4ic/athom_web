@@ -6,6 +6,9 @@ export default {
         user: {
             first_enter : true
         },
+        system : {
+            firmware_v : null,
+        },
         display : {
             lang : "en",
             theme : "dark",
@@ -32,6 +35,11 @@ export default {
         //Flag of mobile device
         setIsMobile(state, value){
             state.display.is_mobile = value;
+        },
+
+        //Set firmware version
+        setFirmwareVersion(state, value){
+            state.system.firmware_v = value;
         },
 
         //Set flag of reloading process
@@ -103,6 +111,7 @@ export default {
                 context.commit('setTime', +response.data.time.current);
                 context.commit('setAPAvailable', response.data.net.ap_list);
                 context.commit('setClientIP', response.data.net.client_ip);
+                context.commit('setFirmwareVersion', response.data.system.firmware);
                 context.commit('setReloadingAPList', false);
             }).catch(function(){
                 context.commit('setReloadingAPList', false);
