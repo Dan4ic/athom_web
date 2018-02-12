@@ -11,11 +11,11 @@
                         </v-flex>
                     </template>
                     <template v-else>
-                        <v-flex xs12>
-                            <v-date-picker v-model="curr_date" :landscape="!isMobileScreen"></v-date-picker>
+                        <v-flex xs12 class="text-xs-center">
+                            <v-date-picker :style="isMobileScreen ? {width:'100%'} : {}" v-model="curr_date" :landscape="!isMobileScreen"></v-date-picker>
                         </v-flex>
                         <v-flex xs12>
-                            <v-time-picker v-model="curr_time" :landscape="!isMobileScreen" format="24hr"></v-time-picker>
+                            <v-time-picker :style="isMobileScreen ? {width:'100%'} : {}" v-model="curr_time" :landscape="!isMobileScreen" format="24hr"></v-time-picker>
                         </v-flex>
                     </template>
                     <v-flex xs12>
