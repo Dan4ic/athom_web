@@ -1,6 +1,6 @@
 <template>
   <v-container fill-width >
-      <v-stepper v-model="step">
+      <v-stepper v-model="step" style="max-width: 1065px; margin: auto">
           <v-stepper-header>
               <v-stepper-step step="1" :complete="step > 1" :style="step>1?{cursor: 'pointer'}:{}" @click.native="step>1 ? step=1:null;">{{'INTRODUCTION' | lang}}</v-stepper-step>
               <v-divider></v-divider>
