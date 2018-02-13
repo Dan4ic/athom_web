@@ -68,8 +68,8 @@ export default {
         },
 
         //Set theme
-        setLang(state, theme){
-            state.display.lang = theme;
+        setLang(state, lang){
+            state.display.lang = lang;
         },
 
         //Set ip
@@ -164,6 +164,8 @@ export default {
                 context.commit('setAPAvailable', response.data.net.ap_list);
                 context.commit('setClientIP', response.data.net.client_ip);
                 context.commit('setFirmwareVersion', response.data.system.firmware);
+                context.commit('setTheme', response.data.display.theme);
+                context.commit('setLang', response.data.display.lang);
             }).catch(function(){
                 context.commit('decNetPending');
             });

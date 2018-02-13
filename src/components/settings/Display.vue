@@ -24,7 +24,7 @@
             </v-card-title>
             <v-card-actions text-xs-right v-if="!hideActions" >
                 <v-btn @click="submit">{{'SUBMIT' | lang }}</v-btn>
-                <v-btn @click="submit" flat>{{'RESET' | lang }}</v-btn>
+                <v-btn @click="reset" flat>{{'RESET' | lang }}</v-btn>
             </v-card-actions>
         </v-card>
     </v-form>
@@ -61,7 +61,19 @@
             }
         },
         methods: {
+            reset(){
+                this.$store.commit('setLang', (navigator.language || navigator.userLanguage).toLowerCase());
+                this.$store.commit('setTheme', consts.DISPLAY_DEF.theme);
+            },
             submit(){
+                this.$store.dispatch('putConfiguration', {
+                    data : {
+                        display : {
+                            lang : this.$store.state.display.lang,
+                            theme : this.$store.state.display.theme
+                        }
+                    }
+                });
             }
         },
         data () {

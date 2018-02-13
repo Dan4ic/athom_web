@@ -10,6 +10,9 @@ export default {
         ERROR : 'error',
         SUCCESS : 'success'
     },
+    DISPLAY_DEF : {
+        theme : 'dark'
+    },
     REST : {
         STATE : "/api/state",
         CONFIG : "/api/config",
