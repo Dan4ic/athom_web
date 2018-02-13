@@ -21,7 +21,7 @@ export default {
             sta_ssid : null,
             sta_password : null,
             ap_available : [],
-            is_reloading_ap_list : true,
+            is_reloading_ap_list : false,
             client_ip: '0.0.0.0',
             internet_status : 'DISCONNECTED'
         },
@@ -135,6 +135,9 @@ export default {
         //Reload available access point list
         refreshAccessPointsList(context){
 
+            if(context.state.net.is_reloading_ap_list)
+                return;
+
             context.commit('setReloadingAPList', true);
             context.commit('incNetPending');
 
@@ -152,22 +155,17 @@ export default {
         //Reload available access point list
         reloadState(context){
 
-            if(context.state.net.is_reloading_ap_list)
-                return;
-
-            context.commit('setReloadingAPList', true);
             context.commit('incNetPending');
 
             Axios.get(consts.REST.STATE).then((response) => {
                 context.commit('decNetPending');
                 context.commit('setTime', +response.data.time.current);
+                context.commit('setTimezoneOffset', response.data.time.offset);
                 context.commit('setAPAvailable', response.data.net.ap_list);
                 context.commit('setClientIP', response.data.net.client_ip);
                 context.commit('setFirmwareVersion', response.data.system.firmware);
-                context.commit('setReloadingAPList', false);
             }).catch(function(){
                 context.commit('decNetPending');
-                context.commit('setReloadingAPList', false);
             });
         },
 
@@ -189,9 +187,7 @@ export default {
                     },1000);
                 }
 
-                context.dispatch('refreshAccessPointsList');
                 context.dispatch('reloadState');
-
                 context.commit('decNetPending');
 
             });

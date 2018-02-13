@@ -89,10 +89,10 @@
                     let time_offset = this.$store.state.datetime.time_zone_offset;
 
                     if(time_offset === null)
-                        time_offset = (new Date).getTimezoneOffset();
+                        time_offset = -(new Date).getTimezoneOffset();
 
                     for(let timezone in consts.TIME_ZONES){
-                        if((+consts.TIME_ZONES[timezone].offset) == (-time_offset))
+                        if((+consts.TIME_ZONES[timezone].offset) == (+time_offset))
                             return consts.TIME_ZONES[timezone].value;
                     }
 
@@ -106,7 +106,7 @@
             timezoneOffset() {
 
                 for(let timezone in consts.TIME_ZONES){
-                    if(consts.TIME_ZONES[timezone].value == this.time_zone)
+                    if(consts.TIME_ZONES[timezone].value == this.timeZone)
                         return consts.TIME_ZONES[timezone].offset;
                 }
 
@@ -133,9 +133,9 @@
             submit(){
                 this.$store.dispatch('putConfiguration', {
                     data : {
-                        datetime : {
+                        time : {
                             current : (new Date(this.currDate + ' ' +this.currTime)).getTime(),
-                            timezone : this.timezoneOffset
+                            offset : this.timezoneOffset
                         }
                     }
                 });
