@@ -72,59 +72,54 @@
 
     export default {
         name: 'SettingsNetwork',
-        extends : template,
+        extends: template,
         methods: {
-            validateAPName(value){
-
-                if(!value || value.length < 6 || !/[a-zA-Z0-9]/.test(value))
+            validateAPName(value) {
+                if (!value || value.length < 6 || !/[a-zA-Z0-9]/.test(value))
                     return Vue.filter('lang')('ERROR_AP_NAME');
                 else
                     return true;
-
             },
-            doRefreshAPList(){
-                this.sta_ssid    = "";
+            doRefreshAPList() {
+                this.sta_ssid = "";
                 this.$store.dispatch('refreshAccessPointsList');
             },
 
-            submit(){
+            lblPassword(password) {
+                if (!password || !password.length)
+                    return Vue.filter('lang')('PASSWORD_NO_CHANGE')
+                else
+                    return Vue.filter('lang')('PASSWORD')
+            },
 
-                if (this.$refs.form.validate()){
+            submit() {
+                if (this.$refs.form.validate()) {
+
+
+
                     alert("ok!");
                 }
             },
 
-            lblPassword(password){
-
-                if(!password || !password.length)
-                    return Vue.filter('lang')('PASSWORD_NO_CHANGE')
-                else
-                    return Vue.filter('lang')('PASSWORD')
-
-            }
-
         },
-
         computed: {
-            ap_list(){
-
+            ap_list() {
                 let result = [{
-                    value : CONST_DISABLE_CONNECT,
-                    text : Vue.filter('lang')('NO_CONNECT')
+                    value: CONST_DISABLE_CONNECT,
+                    text: Vue.filter('lang')('NO_CONNECT')
                 }];
 
                 this.$store.state.net.ap_available.map(function (item) {
                     result.push({
-                        value : item.name,
+                        value: item.name,
                         text: item.name
                     });
                 });
 
                 return result;
-
-            }
+            },
         },
-        data () {
+        data() {
             return {
                 is_valid: this.lazyValidation,
                 show_pswd_ap: false,

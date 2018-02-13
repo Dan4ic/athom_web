@@ -14,5 +14,9 @@
   },
   "system" : {
     "firmware" : "1.0.0"
+  },
+  "time" : {
+    "current" :  null,
+    "offset" : 180
   }
 }

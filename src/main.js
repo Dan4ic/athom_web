@@ -51,5 +51,5 @@ new Vue({
 window.$store.dispatch('initData');
 
 setTimeout(() => {
-    window.$bus.$emit('application-loaded');
+    window.$bus.$emit(consts.EVENTS.APP_IS_LOADED);
 }, 50)

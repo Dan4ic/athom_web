@@ -11,6 +11,7 @@
 import NetworkComponent from './settings/Network.vue';
 import DisplayComponent from './settings/Display.vue';
 import DateTimeComponent from './settings/DateTime.vue';
+import consts from './../core/consts';
 
 let PANEL_WIDTH     = 540;
 let PANEL_PADDING   = 8;
@@ -44,7 +45,7 @@ export default {
   },
   mounted(){
 
-      this.$bus.$on('do-screen-rebuild', this.onResize);
+      this.$bus.$on(consts.EVENTS.DO_SCREEN_REBUILD, this.onResize);
 
   },
   methods : {

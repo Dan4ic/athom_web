@@ -23,7 +23,8 @@ module.exports = function(app){
                 //Time
                 response.time    = {
                     //Emulation current time of controller
-                    current : (new Date).getTime() - (new Date).getTimezoneOffset() * 60000
+                    current : (new Date).getTime() - (new Date).getTimezoneOffset() * 60000,
+                    offset : response.time.offset
                 };
 
                 res.json(response);

@@ -1,8 +1,22 @@
 export default {
+    EVENTS : {
+        APP_IS_LOADED : 'application-loaded',
+        DO_SCREEN_REBUILD : 'do-screen-rebuild',
+        PUT_CONFIG_ERROR : 'put-config-error',
+        PUT_CONFIG_SUCCESS : 'put-config-success',
+    },
     REST : {
         STATE : "/api/state",
+        CONFIG : "/api/config",
         AP_AVAILABLE : "/api/rescan_net",
         TIME : "/api/time",
+    },
+    STATE_SECTIONS : {
+        NET : "net",
+        SYSTEM : "system",
+        DISPLAY : "display",
+        USER : "user",
+        DATETIME : "datetime"
     },
     TIME_ZONES : [
         {"value":"1","offset":"-720","text":"(GMT-12:00) International Date Line West"},

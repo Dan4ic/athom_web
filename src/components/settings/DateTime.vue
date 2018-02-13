@@ -7,8 +7,8 @@
                     <v-flex xs12>
                         <v-select
                                 :label="'TIME_ZONE' | lang"
-                                v-model="time_zone"
-                                :items="time_zones"
+                                v-model="timeZone"
+                                :items="timeZones"
                                 :rules="[v => !!v || 'Item is required']"
                                 required
                         ></v-select>
@@ -16,16 +16,16 @@
 
                     <template v-if="float">
                         <v-flex xs12>
-                            <v-date-picker class="float_packer" v-model="curr_date" :landscape="!isMobileScreen"></v-date-picker>
-                            <v-time-picker class="float_packer" v-model="curr_time" :landscape="!isMobileScreen" format="24hr"></v-time-picker>
+                            <v-date-picker class="float_packer" v-model="currDate" :landscape="!isMobileScreen"></v-date-picker>
+                            <v-time-picker class="float_packer" v-model="currTime" :landscape="!isMobileScreen" format="24hr"></v-time-picker>
                         </v-flex>
                     </template>
                     <template v-else>
                         <v-flex xs12 class="text-xs-center">
-                            <v-date-picker :style="isMobileScreen ? {width:'100%'} : {}" v-model="curr_date" :landscape="!isMobileScreen"></v-date-picker>
+                            <v-date-picker :style="isMobileScreen ? {width:'100%'} : {}" v-model="currDate" :landscape="!isMobileScreen"></v-date-picker>
                         </v-flex>
                         <v-flex xs12>
-                            <v-time-picker :style="isMobileScreen ? {width:'100%'} : {}" v-model="curr_time" :landscape="!isMobileScreen" format="24hr"></v-time-picker>
+                            <v-time-picker :style="isMobileScreen ? {width:'100%'} : {}" v-model="currTime" :landscape="!isMobileScreen" format="24hr"></v-time-picker>
                         </v-flex>
                     </template>
                     <v-flex xs12>
@@ -34,10 +34,10 @@
                     </v-flex>
                 </v-layout>
             </v-card-title>
-            <v-card-actions v-if="!hideActions" text-xs-right style="margin-top: -28px;">
-                <v-btn @click="submit">{{'SUBMIT' | lang }}</v-btn>
-                <v-btn @click="reset">{{'RESET' | lang }}</v-btn>
-                <v-btn @click="current">{{'CURRENT' | lang }}</v-btn>
+            <v-card-actions text-xs-right style="margin-top: -28px;">
+                <v-btn v-if="!hideActions" @click="submit">{{'SUBMIT' | lang }}</v-btn>
+                <v-btn @click="reset" flat>{{'RESET' | lang }}</v-btn>
+                <v-btn @click="current" flat>{{'CURRENT' | lang }}</v-btn>
             </v-card-actions>
         </v-card>
     </v-form>
@@ -49,11 +49,11 @@
     import template from './Template.vue'
 
     export default {
-        name: 'SettingsNetwork',
+        name: 'SettingsDatetime',
         extends : template,
         computed: {
 
-            curr_date : {
+            currDate : {
                 get(){
                     if(this.custom_date)
                         return this.custom_date
@@ -65,7 +65,7 @@
                 }
             },
 
-            curr_time : {
+            currTime : {
                 get(){
                     if(this.custom_time)
                         return this.custom_time
@@ -77,10 +77,10 @@
                 }
             },
 
-            time_zones(){
+            timeZones(){
                 return consts.TIME_ZONES;
             },
-            time_zone:{
+            timeZone : {
                 get(){
 
                     if(this.new_timezone)
@@ -101,9 +101,17 @@
                 set(value){
                     this.new_timezone = value;
                 }
+            },
+
+            timezoneOffset() {
+
+                for(let timezone in consts.TIME_ZONES){
+                    if(consts.TIME_ZONES[timezone].value == this.time_zone)
+                        return consts.TIME_ZONES[timezone].offset;
+                }
+
+                return 0;
             }
-
-
         },
         props :{
             float: {
@@ -123,7 +131,14 @@
                 this.new_timezone   = null;
             },
             submit(){
-
+                this.$store.dispatch('putConfiguration', {
+                    data : {
+                        datetime : {
+                            current : (new Date(this.currDate + ' ' +this.currTime)).getTime(),
+                            timezone : this.timezoneOffset
+                        }
+                    }
+                });
             }
         },
 

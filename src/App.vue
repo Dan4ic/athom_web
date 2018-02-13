@@ -49,12 +49,21 @@
                     {{ 'FIRMWARE' | lang }}: {{this.$store.state.system.firmware_v}}
                 </span>
             </v-footer>
+
+            <v-progress-linear
+                    v-if="$store.state.is_net_dending"
+                    style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 5px; margin: 0px;"
+                    :indeterminate="true">
+
+            </v-progress-linear>
         </v-app>
 
     </div>
 </template>
 
 <script>
+
+    import consts from './core/consts';
 
     export default {
         name: 'App',
@@ -93,7 +102,7 @@
             drawer(val){
 
                 setTimeout(function(){
-                    this.$bus.$emit('do-screen-rebuild');
+                    this.$bus.$emit(consts.EVENTS.DO_SCREEN_REBUILD);
                 }, 150)
 
             }

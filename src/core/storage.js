@@ -3,6 +3,7 @@ import consts from "./consts";
 
 export default {
     state : {
+        is_net_dending : 1,
         user: {
             first_enter : true
         },
@@ -16,21 +17,35 @@ export default {
         },
         net : {
             ap_ssid : null,
+            ap_password : null,
             sta_ssid : null,
+            sta_password : null,
             ap_available : [],
             is_reloading_ap_list : true,
             client_ip: '0.0.0.0',
             internet_status : 'DISCONNECTED'
         },
         datetime : {
-            hw_datetime : null,
-            sync_datetime : null,
-            curr_datetime   : null,
-            time_zone_offset : null
+            hw_datetime : null,                 //Original time from controller
+            sync_datetime : null,               //Moment when hw_date was recived
+            curr_datetime   : null,             //Visible date and time
+            time_zone_offset : null             //Timezone
         }
     },
 
     mutations : {
+
+        //Increment count of active sockets
+        incNetPending(state){
+            state.is_net_dending++;
+        },
+
+        //Decrement count of active sockets
+        decNetPending(state){
+            if(state.is_net_dending > 0)
+                state.is_net_dending--;
+        },
+
 
         //Flag of mobile device
         setIsMobile(state, value){
@@ -79,6 +94,11 @@ export default {
             state.datetime.curr_datetime    = time;
         },
 
+        //Set timezone offset
+        setTimezoneOffset(state, offset){
+            state.datetime.time_zone_offset = offset;
+        },
+
         //Update current hardware time after recalculation
         updateCurrentTime(state, time){
             state.datetime.curr_datetime    = (new Date).getTime();
@@ -88,15 +108,41 @@ export default {
 
     actions : {
 
+        //Put configuration to controller
+        putConfiguration(context, config){
+
+            context.commit('incNetPending');
+            Axios.put(consts.REST.CONFIG, config.data).then((response) => {
+                context.commit('decNetPending');
+
+                if('success' in config)
+                    config['success'](config, this);
+
+                this.$bus.$emit(consts.EVENTS.PUT_CONFIG_ERROR);
+
+            }).catch(() => {
+                context.commit('decNetPending');
+
+                if('error' in config)
+                    config['error'](config, this);
+
+                this.$bus.$emit(consts.EVENTS.PUT_CONFIG_SUCCESS);
+            });
+
+        },
+
         //Reload available access point list
         refreshAccessPointsList(context){
 
             context.commit('setReloadingAPList', true);
+            context.commit('incNetPending');
 
             Axios.get(consts.REST.AP_AVAILABLE).then((response) => {
+                context.commit('decNetPending');
                 context.commit('setAPAvailable', response.data);
                 context.commit('setReloadingAPList', false);
             }).catch(function(){
+                context.commit('decNetPending');
                 context.commit('setReloadingAPList', false);
             });
 
@@ -105,15 +151,21 @@ export default {
         //Reload available access point list
         reloadState(context){
 
+            if(context.state.net.is_reloading_ap_list)
+                return;
+
             context.commit('setReloadingAPList', true);
+            context.commit('incNetPending');
 
             Axios.get(consts.REST.STATE).then((response) => {
+                context.commit('decNetPending');
                 context.commit('setTime', +response.data.time.current);
                 context.commit('setAPAvailable', response.data.net.ap_list);
                 context.commit('setClientIP', response.data.net.client_ip);
                 context.commit('setFirmwareVersion', response.data.system.firmware);
                 context.commit('setReloadingAPList', false);
             }).catch(function(){
+                context.commit('decNetPending');
                 context.commit('setReloadingAPList', false);
             });
         },
@@ -124,7 +176,7 @@ export default {
             context.commit('setLang', (navigator.language || navigator.userLanguage).toLowerCase());
 
             //Loading available access points
-            this.$bus.$on('application-loaded', (messages) => {
+            this.$bus.$on(consts.EVENTS.APP_IS_LOADED, (messages) => {
 
                 //Init current time refresher
                 if(!('hwDateTimeTimer' in window)){
@@ -138,6 +190,8 @@ export default {
 
                 context.dispatch('refreshAccessPointsList');
                 context.dispatch('reloadState');
+
+                context.commit('decNetPending');
 
             });
 

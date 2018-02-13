@@ -24,7 +24,7 @@
             </v-card-title>
             <v-card-actions text-xs-right v-if="!hideActions" >
                 <v-btn @click="submit">{{'SUBMIT' | lang }}</v-btn>
-                <v-btn @click="submit">{{'RESET' | lang }}</v-btn>
+                <v-btn @click="submit" flat>{{'RESET' | lang }}</v-btn>
             </v-card-actions>
         </v-card>
     </v-form>
