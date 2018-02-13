@@ -4,6 +4,11 @@ export default {
         DO_SCREEN_REBUILD : 'do-screen-rebuild',
         PUT_CONFIG_ERROR : 'put-config-error',
         PUT_CONFIG_SUCCESS : 'put-config-success',
+        ALERT: 'alert',
+    },
+    ALERT_TYPE :{
+        ERROR : 'error',
+        SUCCESS : 'success'
     },
     REST : {
         STATE : "/api/state",
@@ -97,7 +102,9 @@ export default {
             ERROR_AP_NAME : 'Name of SSID is required and at least 6 characters',
             TIME_ZONE : 'Time zone',
             FIRMWARE : 'Firmware',
-            NO_CONNECT: '[NO CONNECT]'
+            NO_CONNECT: '[NO CONNECT]',
+            CLOSE: 'Close',
+            NETWORK_ERROR : 'Network error. Please check your connection and try again.'
         },
         ru : {
             DISPLAY_TITLE : 'Экран',
@@ -137,7 +144,9 @@ export default {
             ERROR_AP_NAME : 'Не менее 6 символов латиницей',
             TIME_ZONE : 'Часовой пояс',
             FIRMWARE : 'Версия системы',
-            NO_CONNECT: '[НЕ ПОДКЛЮЧАТЬ]'
+            NO_CONNECT: '[НЕ ПОДКЛЮЧАТЬ]',
+            CLOSE: 'Закрыть',
+            NETWORK_ERROR : 'Ошибка сети. Проверьте подключение и повторите попытку.'
         }
     }
 }

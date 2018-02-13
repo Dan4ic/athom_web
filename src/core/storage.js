@@ -118,7 +118,7 @@ export default {
                 if('success' in config)
                     config['success'](config, this);
 
-                this.$bus.$emit(consts.EVENTS.PUT_CONFIG_ERROR);
+                this.$bus.$emit(consts.EVENTS.PUT_CONFIG_SUCCESS);
 
             }).catch(() => {
                 context.commit('decNetPending');
@@ -126,7 +126,8 @@ export default {
                 if('error' in config)
                     config['error'](config, this);
 
-                this.$bus.$emit(consts.EVENTS.PUT_CONFIG_SUCCESS);
+                this.$bus.$emit(consts.EVENTS.PUT_CONFIG_ERROR);
+                this.$bus.$emit(consts.EVENTS.ALERT, consts.ALERT_TYPE.ERROR, Vue.filter('lang')('NETWORK_ERROR'));
             });
 
         },

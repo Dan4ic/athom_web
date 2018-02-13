@@ -56,6 +56,23 @@
                     :indeterminate="true">
 
             </v-progress-linear>
+
+            <v-alert v-if="alerts.length"
+                    :type="alerts[0].type"
+                    :value="true"
+                    transition="scale-transition"
+                    style="position: fixed; right: 16px; top: 16px; width: 400px; max-width: 80%; z-index: 2000"
+            >
+                <span v-html="alerts[0].message"></span>
+                <v-btn
+                        flat
+                        @click="alerts = alerts.slice(1)"
+                        style="float: right; margin-left: 4px; margin-right: 0;margin-top: 0;"
+                >
+                    {{'CLOSE' | lang }}
+                </v-btn>
+            </v-alert>
+
         </v-app>
 
     </div>
@@ -77,6 +94,16 @@
 
             this.onResize();
             window.addEventListener('resize', this.onResize, { passive: true });
+
+            //Loading available access points
+            this.$bus.$on(consts.EVENTS.ALERT, (type, messages) => {
+
+                this.alerts.push({
+                    type : type,
+                    message : messages
+                });
+
+            });
 
         },
         beforeDestroy () {
@@ -109,7 +136,8 @@
         },
         data(){
             return {
-                drawer: null
+                drawer: null,
+                alerts : []
             }
         }
     }
