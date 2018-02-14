@@ -85,7 +85,11 @@ module.exports = function(app){
     app.put('/api/config', function(req, res) {
         try {
 
-            let state = Object.assign(getActualState(), req.body);
+            let origin = getActualState();
+
+            let state = Object.assign(Object.assign({}, origin), req.body);
+
+            state.net.ap_list   = origin.net.ap_list;
 
             if('time' in state){
                 state.time.delta    = (new Date).getTime() - state.time.current;

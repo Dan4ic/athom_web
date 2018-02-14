@@ -48,6 +48,7 @@
                                     :label="lblPassword(sta_password)"
                                     type="password"
                                     v-model="sta_password"
+                                    :disabled="staSSID=='DISABLE'"
                                     :append-icon="show_pswd_sta ? 'visibility' : 'visibility_off'"
                                     :append-icon-cb="() => (show_pswd_sta = !show_pswd_sta)"
                                     :type="!show_pswd_sta ? 'password' : 'text'"
@@ -97,8 +98,8 @@
 
                     let data = {
                         net : {
-                            ap_ssid : this.ap_ssid,
-                            sta_ssid : this.sta_ssid,
+                            ap_ssid : this.apSSID,
+                            sta_ssid : this.staSSID,
                         }
                     };
 
