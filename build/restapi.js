@@ -6,6 +6,7 @@ const path = require('path')
 var bodyParser = require('body-parser')
 
 const virtual_state_data = path.join(__dirname, '/devstorage/state.json');
+const virtual_ap_list_data = path.join(__dirname, '/devstorage/ap_list.json');
 
 module.exports = function(app){
 
@@ -19,9 +20,17 @@ module.exports = function(app){
             //Time
             state.time    = {
                 //Emulation current time of controller
-                current : (new Date).getTime() - (new Date).getTimezoneOffset() * 60000,
+                current : (new Date).getTime() - (state.time.delta ? state.time.delta : 0),
                 offset : state.time.offset
             };
+
+            //Access point list
+            try {
+                state.net.ap_list   = JSON.parse(fs.readFileSync(virtual_ap_list_data));
+            }catch (e){
+                console.warn("Can not load ap_list.json file. ap_list will be empty");
+                state.net.ap_list   = [];
+            }
 
             return state;
 
@@ -74,11 +83,13 @@ module.exports = function(app){
     });
 
     app.put('/api/config', function(req, res) {
-
-
         try {
 
             let state = Object.assign(getActualState(), req.body);
+
+            if('time' in state){
+                state.time.delta    = (new Date).getTime() - state.time.current;
+            }
 
             fs.writeFileSync(virtual_state_data, JSON.stringify(state));
 
@@ -88,7 +99,6 @@ module.exports = function(app){
             console.log('Error write state.json file', e);
             res.send(500);
         }
-
     });
 
 

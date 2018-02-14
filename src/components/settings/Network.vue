@@ -7,7 +7,7 @@
                     <v-flex xs12>
                         <v-text-field
                                 :label="'NAME' | lang "
-                                v-model="ap_ssid"
+                                v-model="apSSID"
                                 :rules="[validateAPName]"
                                 :counter="32"
                                 required
@@ -29,7 +29,7 @@
                             <v-flex xs11 tile flat>
                                 <v-select
                                         :label="'ACCESS_POINT' | lang"
-                                        v-model="sta_ssid"
+                                        v-model="staSSID"
                                         :items="ap_list"
                                         :rules="[v => !!v || 'Item is required']"
                                         :disabled="isAPListReloading"
@@ -95,9 +95,20 @@
             submit() {
                 if (this.$refs.form.validate()) {
 
+                    let data = {
+                        net : {
+                            ap_ssid : this.ap_ssid,
+                            sta_ssid : this.sta_ssid,
+                        }
+                    };
 
+                    if(this.ap_password && this.ap_password.length)
+                        data.net.ap_password    = this.ap_password;
 
-                    alert("ok!");
+                    if(this.sta_password && this.sta_password.length)
+                        data.net.sta_password   = this.sta_password;
+
+                    this.$store.dispatch('putConfiguration', {data : data});
                 }
             },
 
@@ -118,15 +129,38 @@
 
                 return result;
             },
+            apSSID : {
+                get(){
+                    if(!this.ap_ssid)
+                        return this.$store.state.net.ap_ssid;
+                    else
+                        return this.ap_ssid;
+                },
+                set(value){
+                    this.ap_ssid    = value;
+                }
+            },
+            staSSID : {
+                get(){
+                    if(!this.sta_ssid)
+                        return this.$store.state.net.sta_ssid;
+                    else
+                        return this.sta_ssid;
+                },
+                set(value){
+                    this.sta_ssid   = value;
+                }
+            }
+
         },
         data() {
             return {
                 is_valid: this.lazyValidation,
                 show_pswd_ap: false,
                 show_pswd_sta: false,
-                ap_ssid: "",
+                ap_ssid: null,
                 ap_password: "",
-                sta_ssid: CONST_DISABLE_CONNECT,
+                sta_ssid: null,
                 sta_password: ""
             }
         }

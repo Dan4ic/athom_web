@@ -35,6 +35,16 @@ export default {
 
     mutations : {
 
+        //Set own access point name
+        setAPSSID(state, value){
+            state.net.ap_ssid   = value;
+        },
+
+        //Set access point for connection
+        setSTASSID(state, value){
+            state.net.sta_ssid  = value;
+        },
+
         //Increment count of active sockets
         incNetPending(state){
             state.is_net_dending++;
@@ -101,19 +111,20 @@ export default {
 
         //Update current hardware time after recalculation
         updateCurrentTime(state, time){
-            state.datetime.curr_datetime    = (new Date).getTime();
+            state.datetime.curr_datetime    = time;
         }
 
     },
 
     actions : {
-
         //Put configuration to controller
         putConfiguration(context, config){
 
             context.commit('incNetPending');
             Axios.put(consts.REST.CONFIG, config.data).then((response) => {
                 context.commit('decNetPending');
+
+                context.dispatch('applyState', response.data);
 
                 if('success' in config)
                     config['success'](config, this);
@@ -152,6 +163,19 @@ export default {
 
         },
 
+        //Apply new control state to store
+        applyState(context, state){
+            context.commit('setTime', +state.time.current);
+            context.commit('setTimezoneOffset', state.time.offset);
+            context.commit('setAPAvailable', state.net.ap_list);
+            context.commit('setClientIP', state.net.client_ip);
+            context.commit('setFirmwareVersion', state.system.firmware);
+            context.commit('setTheme', state.display.theme);
+            context.commit('setLang', state.display.lang);
+            context.commit('setAPSSID', state.net.ap_ssid);
+            context.commit('setSTASSID', state.net.sta_ssid);
+        },
+
         //Reload available access point list
         reloadState(context){
 
@@ -159,18 +183,13 @@ export default {
 
             Axios.get(consts.REST.STATE).then((response) => {
                 context.commit('decNetPending');
-                context.commit('setTime', +response.data.time.current);
-                context.commit('setTimezoneOffset', response.data.time.offset);
-                context.commit('setAPAvailable', response.data.net.ap_list);
-                context.commit('setClientIP', response.data.net.client_ip);
-                context.commit('setFirmwareVersion', response.data.system.firmware);
-                context.commit('setTheme', response.data.display.theme);
-                context.commit('setLang', response.data.display.lang);
+                context.dispatch('applyState', response.data);
             }).catch(function(){
                 context.commit('decNetPending');
             });
         },
 
+        //Initiation function
         initData(context){
 
             //Autodetect language

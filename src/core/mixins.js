@@ -55,8 +55,9 @@ export default {
         hwDateTime: function () {
             if(!this.$store.state.datetime.curr_datetime)
                 return null;
-            else
-                return new Date(this.$store.state.datetime.curr_datetime);
+            else {
+                return new Date(this.$store.state.datetime.curr_datetime + (new Date).getTimezoneOffset() * 60000);
+            }
         },
 
         //Return true if process of reloading access points list is active

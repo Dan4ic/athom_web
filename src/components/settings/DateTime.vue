@@ -123,7 +123,14 @@
             current(){
                 this.custom_date    = this.getFormattedDate(new Date, 'vuetifyjs');
                 this.custom_time    = this.getFormattedTime(new Date, 'vuetifyjs');
-                this.new_timezone   = null;
+
+                let current_offset  = -(new Date).getTimezoneOffset();
+
+                for(let timezone in consts.TIME_ZONES){
+                    if(consts.TIME_ZONES[timezone].offset == current_offset)
+                        this.new_timezone = consts.TIME_ZONES[timezone].value;
+                }
+
             },
             reset(){
                 this.custom_date    = null;
@@ -131,10 +138,13 @@
                 this.new_timezone   = null;
             },
             submit(){
+                let curr_moment = (new Date(this.currDate + ' ' +this.currTime));
+                curr_moment = curr_moment.getTime() - curr_moment.getTimezoneOffset() * 60000;
+
                 this.$store.dispatch('putConfiguration', {
                     data : {
                         time : {
-                            current : (new Date(this.currDate + ' ' +this.currTime)).getTime(),
+                            current : curr_moment,
                             offset : this.timezoneOffset
                         }
                     }
