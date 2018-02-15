@@ -130,7 +130,6 @@
                     if(consts.TIME_ZONES[timezone].offset == current_offset)
                         this.new_timezone = consts.TIME_ZONES[timezone].value;
                 }
-
             },
             reset(){
                 this.custom_date    = null;
