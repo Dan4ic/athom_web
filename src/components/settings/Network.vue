@@ -143,9 +143,12 @@
             },
             staSSID : {
                 get(){
-                    if(!this.sta_ssid)
-                        return this.$store.state.net.sta_ssid;
-                    else
+                    if(!this.sta_ssid){
+                        if(this.$store.state.net.sta_ssid && this.$store.state.net.sta_ssid.length)
+                            return this.$store.state.net.sta_ssid;
+                        else
+                            return CONST_DISABLE_CONNECT;
+                    } else
                         return this.sta_ssid;
                 },
                 set(value){

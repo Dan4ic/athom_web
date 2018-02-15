@@ -23,7 +23,9 @@ export default {
             ap_available : [],
             is_reloading_ap_list : false,
             client_ip: '0.0.0.0',
-            internet_status : 'DISCONNECTED'
+            internet_status : 'DISCONNECTED',
+            commit : null,
+            sync_with_ntp: true,
         },
         datetime : {
             hw_datetime : null,                 //Original time from controller
@@ -34,6 +36,21 @@ export default {
     },
 
     mutations : {
+
+        //Set flag of synchronize with NTP server
+        setSyncWithNTP(state, value){
+            state.net.sync_with_ntp = value;
+        },
+
+        //Set Internet status
+        setInternetStatus(state, value){
+            state.net.internet_status = value;
+        },
+
+        //Set client IP (when connected to access point)
+        setIP(state, value){
+            state.net.client_ip = value;
+        },
 
         //Set own access point name
         setAPSSID(state, value){
@@ -165,20 +182,34 @@ export default {
 
         //Apply new control state to store
         applyState(context, state){
-            context.commit('setTime', +state.time.current);
-            context.commit('setTimezoneOffset', state.time.offset);
-            context.commit('setAPAvailable', state.net.ap_list);
-            context.commit('setClientIP', state.net.client_ip);
-            context.commit('setFirmwareVersion', state.system.firmware);
-            context.commit('setTheme', state.display.theme);
-            context.commit('setLang', state.display.lang);
-            context.commit('setAPSSID', state.net.ap_ssid);
-            context.commit('setSTASSID', state.net.sta_ssid);
+            try {
+                context.commit('setTime', +state.time.current);
+                context.commit('setTimezoneOffset', state.time.offset);
+                context.commit('setAPAvailable', state.net.ap_list);
+                context.commit('setClientIP', state.net.client_ip);
+                context.commit('setFirmwareVersion', state.system.firmware);
+
+                if(state.display.theme && state.display.theme.length)
+                    context.commit('setTheme', state.display.theme);
+
+                if(state.display.lang && state.display.lang.length)
+                    context.commit('setLang', state.display.lang);
+
+                context.commit('setAPSSID', state.net.ap_ssid);
+                context.commit('setSTASSID', state.net.sta_ssid);
+                context.commit('setInternetStatus', state.net.internet_status);
+                context.commit('setIP', state.net.ip);
+                context.commit('setSyncWithNTP', !!state.net.sync_with_ntp);
+
+                console.info('Firmware ', state.system.firmware, ' commit ', state.system.commit);
+            } catch (e) {
+                this.$bus.$emit(consts.EVENTS.ALERT, consts.ALERT_TYPE.ERROR, Vue.filter('lang')('STATE_ERROR'));
+                console.log(e);
+            }
         },
 
         //Reload available access point list
         reloadState(context){
-
             context.commit('incNetPending');
 
             Axios.get(consts.REST.STATE).then((response) => {

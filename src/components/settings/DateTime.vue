@@ -144,8 +144,8 @@
                 this.$store.dispatch('putConfiguration', {
                     data : {
                         time : {
-                            current : curr_moment,
-                            offset : this.timezoneOffset
+                            current : "" + curr_moment,
+                            offset : "" + this.timezoneOffset
                         }
                     }
                 });

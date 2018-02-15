@@ -14,8 +14,8 @@ export default {
         theme : 'dark'
     },
     REST : {
-        STATE : "/api/state",
-        CONFIG : "/api/config",
+        STATE : "http://192.168.1.96/api/state",
+        CONFIG : "http://192.168.1.96/api/config",
         AP_AVAILABLE : "/api/rescan_net",
         TIME : "/api/time",
     },
@@ -107,7 +107,8 @@ export default {
             FIRMWARE : 'Firmware',
             NO_CONNECT: '[NO CONNECT]',
             CLOSE: 'Close',
-            NETWORK_ERROR : 'Network error. Please check your connection and try again.'
+            NETWORK_ERROR : 'Network error. Please check your connection and try again.',
+            STATE_ERROR : 'Error of loading state file',
         },
         ru : {
             DISPLAY_TITLE : 'Экран',
@@ -149,7 +150,8 @@ export default {
             FIRMWARE : 'Версия системы',
             NO_CONNECT: '[НЕ ПОДКЛЮЧАТЬ]',
             CLOSE: 'Закрыть',
-            NETWORK_ERROR : 'Ошибка сети. Проверьте подключение и повторите попытку.'
+            NETWORK_ERROR : 'Ошибка сети. Проверьте подключение и повторите попытку.',
+            STATE_ERROR : 'Ошибка чтения статуса контроллера',
         }
     }
 }
