@@ -125,7 +125,7 @@
                         data.net.ap_ssid    = this.apSSID;
 
                     if(this.staSSID != this.$store.state.net.sta_ssid)
-                        data.net.sta_ssid    = this.staSSID;
+                        data.net.sta_ssid    = this.staSSID == 'DISCONNECTED'? "" : this.staSSID;
 
                     if(this.ap_password && this.ap_password.length)
                         data.net.ap_password    = this.ap_password;
