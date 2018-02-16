@@ -133,7 +133,8 @@
                     if(this.sta_password && this.sta_password.length)
                         data.net.sta_password   = this.sta_password;
 
-                    this.$store.dispatch('putConfiguration', {data : data});
+                    if(data.net.length)
+                        this.$store.dispatch('putConfiguration', {data : data});
                 }
             },
 
@@ -152,14 +153,23 @@
 
                 result.push({
                     value: CONST_DISABLE_CONNECT,
-                        text: Vue.filter('lang')('NO_CONNECT')
+                    text: Vue.filter('lang')('NO_CONNECT')
                 });
 
-                this.$store.state.net.ap_available.map(function (item) {
+                if(this.$store.state.net.sta_ssid && this.$store.state.net.sta_ssid.length){
                     result.push({
-                        value: item.name,
-                        text: item.name
+                        value: this.$store.state.net.sta_ssid,
+                        text: this.$store.state.net.sta_ssid
                     });
+                }
+
+                this.$store.state.net.ap_available.map((item) => {
+                    if(item.name != this.$store.state.net.sta_ssid){
+                        result.push({
+                            value: item.name,
+                            text: item.name
+                        });
+                    }
                 });
 
                 return result;

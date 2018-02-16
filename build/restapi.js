@@ -87,7 +87,14 @@ module.exports = function(app){
 
             let origin = getActualState();
 
-            let state = Object.assign(Object.assign({}, origin), req.body);
+            let state = Object.assign({}, origin);
+
+            if('net' in req.body)
+                state.net       =  Object.assign(state.net, req.body.net);
+            if('display' in req.body)
+                state.display   =  Object.assign(state.display, req.body.display);
+            if('time' in req.body)
+                state.time      =  Object.assign(state.time, req.body.time);
 
             state.net.ap_list   = origin.net.ap_list;
 
