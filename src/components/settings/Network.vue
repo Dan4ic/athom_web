@@ -33,6 +33,8 @@
                                         :items="ap_list"
                                         :rules="[v => !!v || 'Item is required']"
                                         :disabled="isAPListReloading"
+                                        autocomplete
+                                        :filter="customFilter"
                                         required
                                 ></v-select>
                             </v-flex>
@@ -93,15 +95,37 @@
                     return Vue.filter('lang')('PASSWORD')
             },
 
+            customFilter(item, queryText, itemText){
+
+                for(let f in this.ap_list){
+
+                    if(queryText && this.ap_list[f].value.substr(0, queryText.length) == queryText) {
+                        if(!this.sta_ssid_custom)
+                            this.sta_ssid_custom    = null;
+                        return true;
+                    }
+
+                }
+
+                if(queryText && queryText.length){
+                    this.sta_ssid_custom    = queryText;
+                    this.sta_ssid           = queryText;
+                }
+
+                return true;
+
+            },
+
             submit() {
                 if (this.$refs.form.validate()) {
 
-                    let data = {
-                        net : {
-                            ap_ssid : this.apSSID,
-                            sta_ssid : this.staSSID,
-                        }
-                    };
+                    let data    = {net:{}};
+
+                    if(this.apSSID != this.$store.state.net.ap_ssid)
+                        data.net.ap_ssid    = this.apSSID;
+
+                    if(this.staSSID != this.$store.state.net.sta_ssid)
+                        data.net.sta_ssid    = this.staSSID;
 
                     if(this.ap_password && this.ap_password.length)
                         data.net.ap_password    = this.ap_password;
@@ -116,10 +140,20 @@
         },
         computed: {
             ap_list() {
-                let result = [{
+
+                let result = [];
+
+                if(this.sta_ssid_custom){
+                    result.push({
+                        value: this.sta_ssid_custom,
+                        text: this.sta_ssid_custom
+                    });
+                }
+
+                result.push({
                     value: CONST_DISABLE_CONNECT,
-                    text: Vue.filter('lang')('NO_CONNECT')
-                }];
+                        text: Vue.filter('lang')('NO_CONNECT')
+                });
 
                 this.$store.state.net.ap_available.map(function (item) {
                     result.push({
@@ -164,6 +198,7 @@
                 show_pswd_sta: false,
                 ap_ssid: null,
                 ap_password: "",
+                sta_ssid_custom : null,
                 sta_ssid: null,
                 sta_password: ""
             }

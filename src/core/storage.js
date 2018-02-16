@@ -198,7 +198,7 @@ export default {
                 context.commit('setAPSSID', state.net.ap_ssid);
                 context.commit('setSTASSID', state.net.sta_ssid);
                 context.commit('setInternetStatus', state.net.internet_status);
-                context.commit('setIP', state.net.ip);
+                context.commit('setIP', state.net.client_ip);
                 context.commit('setSyncWithNTP', !!state.net.sync_with_ntp);
 
                 console.info('Firmware ', state.system.firmware, ' commit ', state.system.commit);

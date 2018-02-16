@@ -14,8 +14,8 @@ export default {
         theme : 'dark'
     },
     REST : {
-        STATE : "http://192.168.1.96/api/state",
-        CONFIG : "http://192.168.1.96/api/config",
+        STATE : "/api/state",
+        CONFIG : "/api/config",
         AP_AVAILABLE : "/api/rescan_net",
         TIME : "/api/time",
     },
