@@ -140,6 +140,8 @@
                 let curr_moment = (new Date(this.currDate + ' ' +this.currTime));
                 curr_moment = curr_moment.getTime() - curr_moment.getTimezoneOffset() * 60000;
 
+                this.$bus.$emit(consts.EVENTS.UBUS_MESSAGE, "SET CURRENT TIME");
+
                 this.$store.dispatch('putConfiguration', {
                     data : {
                         time : {
