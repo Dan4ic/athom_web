@@ -4,6 +4,9 @@ export default {
         RECONNECT_TIMEOUT : 1000,
         DISTRIB_MESSAGE_INTERNAL : 'internal',
     },
+    UBUS : {
+        CURRENT_TIME : 'sys-current-time',
+    },
     EVENTS : {
         APP_IS_LOADED : 'application-loaded',
         DO_SCREEN_REBUILD : 'do-screen-rebuild',

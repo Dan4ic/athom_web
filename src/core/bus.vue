@@ -8,7 +8,7 @@ import consts from './consts'
 export default {
 
     created(){
-        this.$on(consts.EVENTS.UBUS_MESSAGE, (messages, distrib) => {
+        this.$on(consts.EVENTS.UBUS_MESSAGE, (action, messages, distrib) => {
             if(!distrib || distrib != consts.WEBSOCKET.DISTRIB_MESSAGE_INTERNAL)
                 this.websocket.send(messages);
         });
@@ -39,7 +39,8 @@ export default {
             };
 
             this.websocket.onmessage = (evt) => {
-                this.$emit(consts.EVENTS.UBUS_MESSAGE, evt.data, consts.WEBSOCKET.DISTRIB_MESSAGE_INTERNAL);
+                let struct  = evt.data.split(';');
+                this.$emit(consts.EVENTS.UBUS_MESSAGE, struct[0], struct[1], consts.WEBSOCKET.DISTRIB_MESSAGE_INTERNAL);
             };
 
             this.websocket.onerror = () => {
