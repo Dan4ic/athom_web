@@ -227,6 +227,12 @@ export default {
             context.commit('setLang', (navigator.language || navigator.userLanguage).toLowerCase());
 
             //Loading available access points
+            this.$bus.$on(consts.EVENTS.UBUS_MESSAGE, (action, content) => {
+                if(action == consts.UBUS.CURRENT_TIME)
+                    context.commit('setTime', +atob(content) * 1000);
+            });
+
+            //Loading available access points
             this.$bus.$on(consts.EVENTS.APP_IS_LOADED, (messages) => {
 
                 //Init current time refresher

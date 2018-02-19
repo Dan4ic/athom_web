@@ -1,10 +1,23 @@
 export default {
+    WEBSOCKET : {
+        ADDRESS : "ws://192.168.0.105:8080",
+        RECONNECT_TIMEOUT : 1000,
+        DISTRIB_MESSAGE_INTERNAL : 'internal',
+    },
+    UBUS : {
+        CURRENT_TIME : 'sys-current-time',
+    },
     EVENTS : {
         APP_IS_LOADED : 'application-loaded',
         DO_SCREEN_REBUILD : 'do-screen-rebuild',
         PUT_CONFIG_ERROR : 'put-config-error',
         PUT_CONFIG_SUCCESS : 'put-config-success',
         ALERT: 'alert',
+        WS_STARTING : 'ws-starting',
+        WS_STARTED : 'ws-started',
+        WS_ERROR : 'ws-error',
+        WS_CLOSED : 'ws-closed',
+        UBUS_MESSAGE : 'ubus-message',
     },
     ALERT_TYPE :{
         ERROR : 'error',
