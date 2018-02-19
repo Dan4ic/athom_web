@@ -1,11 +1,12 @@
 export default {
     WEBSOCKET : {
-        ADDRESS : "ws://192.168.0.105:8080",
-        RECONNECT_TIMEOUT : 1000,
+        ADDRESS : "ws://192.168.1.96:8080",
+        RECONNECT_TIMEOUT : 5000,
         DISTRIB_MESSAGE_INTERNAL : 'internal',
     },
     UBUS : {
-        CURRENT_TIME : 'sys-current-time',
+        CURRENT_TIME : '$-current-time',
+        SUBSCRIBE : '$-subscribe',
     },
     EVENTS : {
         APP_IS_LOADED : 'application-loaded',

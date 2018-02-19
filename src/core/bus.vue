@@ -13,11 +13,10 @@ export default {
                 this.websocket.send(messages);
         });
 
-        this.$on(consts.EVENTS.WS_CLOSED, () => {
-            setTimeout(()=> {
+        setInterval(()=>{
+            if(!this.websocket) //IS CLOSED
                 this.startWebsocket();
-            }, consts.WEBSOCKET.RECONNECT_TIMEOUT);
-        });
+        }, 1000);
 
         setTimeout(()=>{
             this.startWebsocket();
@@ -31,7 +30,9 @@ export default {
                 return false;
             }
 
-            this.websocket = new WebSocket(consts.WEBSOCKET.ADDRESS);
+            if(!this.websocket)
+                this.websocket = new WebSocket(consts.WEBSOCKET.ADDRESS);
+
             this.$emit(consts.EVENTS.WS_STARTING);
 
             this.websocket.onopen = () => {
@@ -44,13 +45,19 @@ export default {
             };
 
             this.websocket.onerror = () => {
+                try {
+                    let ws  = this.websocket;
+                    this.websocket  = null;
+                    ws.close();
+                } catch(e){
+                }
                 this.$emit(consts.EVENTS.WS_ERROR);
                 this.$emit(consts.EVENTS.WS_CLOSED);
             };
 
             this.websocket.onclose = () => {
                 this.$emit(consts.EVENTS.WS_CLOSED);
-
+                this.websocket  = null;
             };
         }
     },
