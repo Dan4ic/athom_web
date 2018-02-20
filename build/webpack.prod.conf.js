@@ -10,6 +10,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const fs = require('fs')
 
 const env = process.env.NODE_ENV === 'testing'
   ? require('../config/test.env')
@@ -63,10 +64,20 @@ const webpackConfig = merge(baseWebpackConfig, {
     new webpack.HashedModuleIdsPlugin(),
     // enable scope hoisting
     new webpack.optimize.ModuleConcatenationPlugin(),
+    /*
+    //Applications
+    new webpack.optimize.CommonsChunkPlugin({
+        name: 'lucerna',
+        filename : 'apps/lucerna.js',
+        children: true,
+    }),
+    */
+
     // split vendor js into its own file
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
       minChunks (module) {
+        //console.log('VENDOR:', module.resource);
         // any required modules inside node_modules are extracted to vendor
         return (
           module.resource &&
@@ -147,6 +158,22 @@ if (config.build.productionGzip) {
     })
   )
 }
+
+//Applications
+const apps_path = path.resolve(__dirname, '../src/applications/');
+
+fs.readdirSync(apps_path).forEach(file => {
+  if(fs.lstatSync(path.resolve(apps_path, file)).isDirectory()){
+    webpackConfig.plugins.push(
+      new webpack.optimize.CommonsChunkPlugin({
+          name: file,
+          filename : 'apps/'+file+'.js',
+          children: true,
+      })
+    );
+  }
+});
+
 
 if (config.build.bundleAnalyzerReport) {
   const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin

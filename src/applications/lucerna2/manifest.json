@@ -1,0 +1,19 @@
+{
+
+  "components" : {
+    "mainpage" : {
+      "intent_filter" : [
+        {
+          "action"    : "smarttank.intent.action.MAIN",
+          "category"  : "smarttank.intent.category.LAUNCHER"
+        }
+
+      ]
+    }
+  },
+
+  "permissions" : {
+
+  }
+
+}

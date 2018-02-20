@@ -4,7 +4,7 @@
             <template v-if="is_app_ready">
                 <v-navigation-drawer id="mainmenu" clipped fixed v-model="drawer" app>
                     <v-list dense>
-                        <router-link :to="{name:'Dashboard'}">
+                        <router-link :to="{name:'Lazyload'}">
                             <v-list-tile @click="">
                                 <v-list-tile-action>
                                     <v-icon>dashboard</v-icon>

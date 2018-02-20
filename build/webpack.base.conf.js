@@ -3,6 +3,7 @@ const path = require('path')
 const utils = require('./utils')
 const config = require('../config')
 const vueLoaderConfig = require('./vue-loader.conf')
+const fs = require('fs')
 
 function resolve (dir) {
   return path.join(__dirname, '..', dir)
@@ -36,6 +37,7 @@ module.exports = {
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
       '@': resolve('src'),
+      'consts' : resolve('src/core/consts.js'),
     }
   },
   module: {
@@ -90,3 +92,11 @@ module.exports = {
     child_process: 'empty'
   }
 }
+
+//Applications
+const apps_path = path.resolve(__dirname, '../src/applications/');
+
+fs.readdirSync(apps_path).forEach(file => {
+    if(fs.lstatSync(path.resolve(apps_path, file)).isDirectory())
+        module.exports.entry[file] = path.resolve(apps_path, file, "index.js");
+});

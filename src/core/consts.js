@@ -123,6 +123,7 @@ export default {
             CLOSE: 'Close',
             NETWORK_ERROR : 'Network error. Please check your connection and try again.',
             STATE_ERROR : 'Error of loading state file',
+            ERROR_LOAD_APP : 'Error of loading application',
         },
         ru : {
             DISPLAY_TITLE : 'Экран',
@@ -166,6 +167,7 @@ export default {
             CLOSE: 'Закрыть',
             NETWORK_ERROR : 'Ошибка сети. Проверьте подключение и повторите попытку.',
             STATE_ERROR : 'Ошибка чтения статуса контроллера',
+            ERROR_LOAD_APP : 'Ошибка загрузки приложения',
         }
     }
 }
