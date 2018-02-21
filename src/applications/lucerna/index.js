@@ -1,3 +1,3 @@
 import App from './App.vue';
 
-$registerApplication('lucerna', App);
+$exportComponent('lucerna-app', App);

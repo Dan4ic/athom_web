@@ -7,7 +7,7 @@ import EventsBus from './core/bus.vue';
 import storage from './core/storage';
 import consts from './core/consts';
 import mixins from './core/mixins';
-import apps from './core/applications';
+import Apps from './core/applications';
 
 Vue.use(Vuex);
 Vue.use(Vuetify);
@@ -21,12 +21,13 @@ Vue.prototype.$bus          = theBus;
 Vuex.Store.prototype.$bus   = theBus;
 window.Vue.$bus             = theBus;
 
-window.$store   = new Vuex.Store(storage);
-window.$bus     = theBus;
-window.$consts  = consts;
-window.$registerApplication = apps.registerApplication;
+window.$store           = new Vuex.Store(storage);
+window.$bus             = theBus;
+window.$consts          = consts;
+window.$exportComponent = Apps.exportComponent;
+window.$protocomponents = [];
 
-//Application component storage
+//Loaded application components storage
 window.$applications    = {};
 
 Vue.config.productionTip = false;

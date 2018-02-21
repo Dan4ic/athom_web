@@ -1,19 +1,13 @@
 {
-
+  "name" : "Lucerna",
   "components" : {
-    "mainpage" : {
+    "lucerna-app" : {
       "intent_filter" : [
         {
           "action"    : "smarttank.intent.action.MAIN",
           "category"  : "smarttank.intent.category.LAUNCHER"
         }
-
       ]
     }
-  },
-
-  "permissions" : {
-
   }
-
 }

@@ -1,25 +1,23 @@
 import consts from 'consts';
 
 export default {
-    registerApplication(appname, object){
-        window.$applications[appname]   = object;
+    exportComponent(component, object){
+        window.$protocomponents[component]  = object;
     },
-    loadApplication(appname) {
-        return new Promise((resolve, reject) => {
 
-            if(appname in window.$applications) {
-                resolve(window.$applications[appname]);
+    makePromisLoadComponent(url, component){
+        return function(resolve, reject) {
+            if(component in window.$protocomponents) {
+                resolve(window.$protocomponents[component]);
                 return;
             }
 
             const script = document.createElement("script");
-            const tempGlobal = "__tempModuleLoadingVariable" + Math.random().toString(32).substring(2);
-            let url = `http://localhost:8080/${appname}.js`;
-            script.src  = `http://localhost:8080/${appname}.js`;
+            script.src  = url;
 
             script.onload = () => {
-                if(appname in window.$applications)
-                    resolve(window.$applications[appname]);
+                if(component in window.$protocomponents)
+                    resolve(window.$protocomponents[component]);
                 else {
                     window.$bus.$emit(consts.EVENTS.ALERT, consts.ALERT_TYPE.ERROR, Vue.filter('lang')('ERROR_LOAD_APP'));
                     script.remove();
@@ -35,6 +33,6 @@ export default {
             };
 
             document.documentElement.appendChild(script);
-        })
-    }
+        }
+    },
 }

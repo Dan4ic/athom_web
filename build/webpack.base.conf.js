@@ -96,7 +96,11 @@ module.exports = {
 //Applications
 const apps_path = path.resolve(__dirname, '../src/applications/');
 
-fs.readdirSync(apps_path).forEach(file => {
-    if(fs.lstatSync(path.resolve(apps_path, file)).isDirectory())
-        module.exports.entry[file] = path.resolve(apps_path, file, "index.js");
+fs.readdirSync(apps_path).forEach(dir => {
+
+  if(fs.lstatSync(path.resolve(apps_path, dir)).isDirectory()) {
+      let manifest  = require(path.resolve(apps_path, dir, "manifest.json"));
+      module.exports.entry[dir] = path.resolve(apps_path, dir, "index.js");
+  }
+
 });

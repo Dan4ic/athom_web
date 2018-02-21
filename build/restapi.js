@@ -9,7 +9,6 @@ const virtual_state_data = path.join(__dirname, '/devstorage/state.json');
 const virtual_ap_list_data = path.join(__dirname, '/devstorage/ap_list.json');
 
 module.exports = function(app){
-
     app.use(bodyParser.json());
 
     let getActualState = function(){
@@ -32,19 +31,29 @@ module.exports = function(app){
                 state.net.ap_list   = [];
             }
 
+            //Applications
+            const apps_path = path.resolve(__dirname, '../src/applications/');
+
+            state.profiles  = [];
+
+            fs.readdirSync(apps_path).forEach(dir => {
+
+                if(fs.lstatSync(path.resolve(apps_path, dir)).isDirectory()) {
+                    let manifest    = require(path.resolve(apps_path, dir, "manifest.json"));
+                    manifest.url    = `http://localhost:8080/${dir}.js`;
+                    state.profiles.push(manifest);
+                }
+
+            });
+
             return state;
-
         } catch (e){
-
             console.log('No found state.json file', e);
             return null;
-
         }
-
     };
 
     app.get('/api/state', function(req, res) {
-
         console.log('>Get state data ');
         fs.readFile(virtual_state_data, (err, result) => {
 
@@ -64,7 +73,6 @@ module.exports = function(app){
     });
 
     app.get('/api/rescan_net', function(req, res) {
-
         console.log('>Get available access points list');
         fs.readFile(virtual_state_data, (err, result) => {
             if (err) {
@@ -72,19 +80,15 @@ module.exports = function(app){
             } else
                 res.json(JSON.parse(result).net.ap_list);
         });
-
     });
 
     app.get('/api/time', function(req, res) {
-
         console.log('>Get datetime');
         res.send(200, (new Date).getTime() - (new Date).getTimezoneOffset() * 60000);
-
     });
 
     app.put('/api/config', function(req, res) {
         try {
-
             let origin = getActualState();
 
             let state = Object.assign({}, origin);
@@ -105,13 +109,11 @@ module.exports = function(app){
             fs.writeFileSync(virtual_state_data, JSON.stringify(state));
 
             res.json(state);
-
         } catch (e) {
             console.log('Error write state.json file', e);
             res.send(500);
         }
     });
-
 
     app.put('/api/netconfig', function(req, res) {
 
@@ -121,5 +123,4 @@ module.exports = function(app){
         res.end();
 
     });
-
 }

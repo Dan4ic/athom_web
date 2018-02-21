@@ -1,6 +1,7 @@
 <template>
   <v-container>
     <router-link :to="{name:'Settings'}">{{ msg }}</router-link>
+    <lucerna-app></lucerna-app>
   </v-container>
 </template>
 
