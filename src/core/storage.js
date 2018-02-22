@@ -30,7 +30,7 @@ export default {
         },
         datetime: {
             hw_datetime: null,                  //Original time from controller
-            sync_datetime: null,                //Moment when hw_date was recived
+            sync_datetime: null,                //Moment when hw_date was received
             curr_datetime: null,                //Visible date and time
             time_zone_offset: null              //Timezone
         },

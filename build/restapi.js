@@ -37,13 +37,22 @@ module.exports = function(app){
             state.profiles  = [];
 
             fs.readdirSync(apps_path).forEach(dir => {
-
                 if(fs.lstatSync(path.resolve(apps_path, dir)).isDirectory()) {
-                    let manifest    = require(path.resolve(apps_path, dir, "manifest.json"));
+                    let app_path    = path.resolve(apps_path, dir);
+                    let manifest    = require(path.resolve(app_path, "manifest.json"));
+
                     manifest.url    = `http://localhost:8080/${dir}.js`;
+
+                    if(fs.existsSync(path.resolve(app_path, "favicon.png"))) {
+                        manifest.favicon    = 'data:image/png;base64,'
+                            + new Buffer(fs.readFileSync(path.resolve(app_path, "favicon.png"))).toString('base64');
+                    } else if(fs.existsSync(path.resolve(app_path, "favicon.svg"))) {
+                        manifest.favicon    = 'data:image/svg+xml;utf8,'
+                            + fs.readFileSync(path.resolve(app_path, "favicon.svg"));
+                    }
+
                     state.profiles.push(manifest);
                 }
-
             });
 
             return state;
