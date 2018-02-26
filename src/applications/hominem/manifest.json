@@ -1,0 +1,13 @@
+{
+  "name" : "SmartTank",
+  "components" : {
+    "launcher" : {
+      "intent_filter" : [
+        {
+          "action"    : "smarttank.intent.action.MAIN",
+          "category"  : "smarttank.intent.category.LAUNCHER"
+        }
+      ]
+    }
+  }
+}

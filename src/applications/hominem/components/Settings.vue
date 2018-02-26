@@ -11,7 +11,7 @@
 import NetworkComponent from './settings/Network.vue';
 import DisplayComponent from './settings/Display.vue';
 import DateTimeComponent from './settings/DateTime.vue';
-import consts from './../core/consts';
+import consts from 'consts';
 
 let PANEL_WIDTH     = 540;
 let PANEL_PADDING   = 8;
@@ -31,22 +31,16 @@ export default {
                 width : '100%'
             };
         else {
-
             this.recalcPanelSize();
-
-            console.log('Panel width=', this.panel_width);
 
             return {
                 width   : this.panel_width + 'px'
             };
-
         }
     }
   },
   mounted(){
-
       this.$bus.$on(consts.EVENTS.DO_SCREEN_REBUILD, this.onResize);
-
   },
   methods : {
       recalcPanelSize(){
@@ -56,8 +50,6 @@ export default {
               - this.$vuetify.application.left
               - this.$vuetify.application.right
               - APP_PADDING;
-
-          console.log(app_width);
 
           let col_count = Math.floor(app_width / (PANEL_WIDTH + PANEL_PADDING));
           if(col_count < 0)

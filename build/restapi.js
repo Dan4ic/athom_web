@@ -31,36 +31,43 @@ module.exports = function(app){
                 state.net.ap_list   = [];
             }
 
-            //Applications
-            const apps_path = path.resolve(__dirname, '../src/applications/');
-
-            state.profiles  = [];
-
-            fs.readdirSync(apps_path).forEach(dir => {
-                if(fs.lstatSync(path.resolve(apps_path, dir)).isDirectory()) {
-                    let app_path    = path.resolve(apps_path, dir);
-                    let manifest    = require(path.resolve(app_path, "manifest.json"));
-
-                    manifest.url    = `http://localhost:8080/${dir}.js`;
-
-                    if(fs.existsSync(path.resolve(app_path, "favicon.png"))) {
-                        manifest.favicon    = 'data:image/png;base64,'
-                            + new Buffer(fs.readFileSync(path.resolve(app_path, "favicon.png"))).toString('base64');
-                    } else if(fs.existsSync(path.resolve(app_path, "favicon.svg"))) {
-                        manifest.favicon    = 'data:image/svg+xml;utf8,'
-                            + fs.readFileSync(path.resolve(app_path, "favicon.svg"));
-                    }
-
-                    state.profiles.push(manifest);
-                }
-            });
-
             return state;
         } catch (e){
             console.log('No found state.json file', e);
             return null;
         }
     };
+
+
+    app.get('/api/profile', function(req, res) {
+        console.log('>Get profile data ');
+
+        const apps_path = path.resolve(__dirname, '../src/applications/');
+
+        let profile = [];
+
+        fs.readdirSync(apps_path).forEach(dir => {
+            if(fs.lstatSync(path.resolve(apps_path, dir)).isDirectory()) {
+                let app_path    = path.resolve(apps_path, dir);
+                let manifest    = require(path.resolve(app_path, "manifest.json"));
+
+                manifest.url    = `http://localhost:8080/${dir}.js`;
+
+                if(fs.existsSync(path.resolve(app_path, "favicon.png"))) {
+                    manifest.favicon    = 'data:image/png;base64,'
+                        + new Buffer(fs.readFileSync(path.resolve(app_path, "favicon.png"))).toString('base64');
+                } else if(fs.existsSync(path.resolve(app_path, "favicon.svg"))) {
+                    manifest.favicon    = 'data:image/svg+xml;utf8,'
+                        + fs.readFileSync(path.resolve(app_path, "favicon.svg"));
+                }
+
+                profile.push(manifest);
+            }
+        });
+
+        res.json(profile);
+
+    });
 
     app.get('/api/state', function(req, res) {
         console.log('>Get state data ');

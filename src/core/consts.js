@@ -9,7 +9,7 @@ export default {
         SUBSCRIBE : '$-subscribe',
     },
     EVENTS : {
-        APP_IS_LOADED : 'application-loaded',
+        CORE_IS_LOADED : 'core-loaded',
         DO_SCREEN_REBUILD : 'do-screen-rebuild',
         PUT_CONFIG_ERROR : 'put-config-error',
         PUT_CONFIG_SUCCESS : 'put-config-success',
@@ -29,6 +29,7 @@ export default {
     },
     REST : {
         STATE : "/api/state",
+        PROFILE : "/api/profile",
         CONFIG : "/api/config",
         AP_AVAILABLE : "/api/rescan_net",
         TIME : "/api/time",

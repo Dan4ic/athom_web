@@ -9,6 +9,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
+const CompressionWebpackPlugin = require('compression-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const fs = require('fs')
 
@@ -171,6 +172,35 @@ fs.readdirSync(apps_path).forEach(file => {
           children: true,
       })
     );
+
+    webpackConfig.plugins.push(
+      new CompressionWebpackPlugin({
+        asset: `apps/${file}_js.gz`,
+        filename(asset){
+          console.log(asset);
+          return asset;
+        },
+        algorithm: 'gzip',
+        deleteOriginalAssets: true,
+        test: new RegExp(`${file}\.js`),
+        minRatio: 1
+      })
+    );
+
+    webpackConfig.plugins.push(
+        new CompressionWebpackPlugin({
+          asset: `apps/${file}_css.gz`,
+          filename(asset){
+            console.log(asset);
+            return asset;
+          },
+          algorithm: 'gzip',
+          deleteOriginalAssets: true,
+          test: new RegExp(`${file}\.css`),
+          minRatio: 1
+        })
+    );
+
   }
 });
 

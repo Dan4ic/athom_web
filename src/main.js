@@ -1,13 +1,13 @@
 import Vue from 'vue';
 import Vuetify from 'vuetify';
 import Vuex from 'vuex';
-import App from './App';
 import router from './router';
 import EventsBus from './core/bus.vue';
 import storage from './core/storage';
 import consts from './core/consts';
 import mixins from './core/mixins';
 import Apps from './core/applications';
+import Root from './Root.vue';
 
 Vue.use(Vuex);
 Vue.use(Vuetify);
@@ -20,12 +20,11 @@ let theBus  = new Vue(EventsBus);
 Vue.prototype.$bus          = theBus;
 Vuex.Store.prototype.$bus   = theBus;
 window.Vue.$bus             = theBus;
-
-window.$store           = new Vuex.Store(storage);
-window.$bus             = theBus;
-window.$consts          = consts;
-window.$exportComponent = Apps.exportComponent;
-window.$protocomponents = [];
+window.$store               = new Vuex.Store(storage);
+window.$bus                 = theBus;
+window.$consts              = consts;
+window.$exportComponent     = Apps.exportComponent;
+window.$protocomponents     = [];
 
 //Loaded application components storage
 window.$applications    = {};
@@ -46,16 +45,10 @@ Vue.filter('lang', function (value) {
     }
 })
 
-new Vue({
+window.$store.dispatch('initData');
+
+new Vue(Object.assign({
     el: '#app',
     router,
     store : window.$store,
-    components: { App },
-    template: '<App/>'
-});
-
-window.$store.dispatch('initData');
-
-setTimeout(() => {
-    window.$bus.$emit(consts.EVENTS.APP_IS_LOADED);
-}, 50)
+}, Root));

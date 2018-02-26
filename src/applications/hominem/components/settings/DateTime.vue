@@ -45,7 +45,7 @@
 
 <script>
 
-    import consts from './../../core/consts';
+    import consts from 'consts';
     import template from './Template.vue'
 
     export default {

@@ -1,1 +1,3 @@
-console.log('TEST LUCERNA');
+import App from './App.vue';
+
+$exportComponent('lucerna-app', App);

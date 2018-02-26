@@ -59,7 +59,7 @@
 import NetworkComponent from './settings/Network.vue';
 import DisplayComponent from './settings/Display.vue';
 import DateTimeComponent from './settings/DateTime.vue';
-import Consts from './../core/consts'
+import Consts from 'consts'
 
 export default {
   name: 'Settings',

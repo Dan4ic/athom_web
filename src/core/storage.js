@@ -35,7 +35,7 @@ export default {
             time_zone_offset: null              //Timezone
         },
         apps: {
-            profiles: []                        //Profiles of applications
+            profiles: null                      //Profiles of applications
         }
     },
 
@@ -147,7 +147,7 @@ export default {
         //Update current hardware time after recalculation
         updateCurrentTime(state, time) {
             state.datetime.curr_datetime = time;
-        }
+        },
 
     },
 
@@ -198,6 +198,11 @@ export default {
 
         },
 
+        //Apply new profile of applications
+        applyProfile(context, profile) {
+            context.commit('setProfiles', profile);
+        },
+
         //Apply new control state to store
         applyState(context, state) {
             try {
@@ -219,15 +224,27 @@ export default {
                 context.commit('setIP', state.net.client_ip);
                 context.commit('setSyncWithNTP', !!state.net.sync_with_ntp);
 
-                context.commit('setProfiles', state.profiles);
-
                 console.info('Firmware ', state.system.firmware, ' commit ', state.system.commit);
             } catch (e) {
                 this.$bus.$emit(consts.EVENTS.ALERT, consts.ALERT_TYPE.ERROR, Vue.filter('lang')('STATE_ERROR'));
-                console.log(e);
+                console.error(e);
             }
         },
 
+        //Reload profile of applications
+        reloadProfile(context) {
+            context.commit('incNetPending');
+
+            Axios.get(consts.REST.PROFILE).then((response) => {
+                context.commit('decNetPending');
+                context.dispatch('applyProfile', response.data);
+                context.dispatch('reloadState');
+            }).catch(function () {
+                context.commit('decNetPending');
+                console.error('Error of loading profile');
+            });
+        },
+        
         //Reload available access point list
         reloadState(context) {
             context.commit('incNetPending');
@@ -253,7 +270,7 @@ export default {
             });
 
             //Loading available access points
-            this.$bus.$on(consts.EVENTS.APP_IS_LOADED, (messages) => {
+            this.$bus.$on(consts.EVENTS.CORE_IS_LOADED, (messages) => {
 
                 //Init current time refresher
                 if (!('hwDateTimeTimer' in window)) {
@@ -265,7 +282,7 @@ export default {
                     }, 1000);
                 }
 
-                context.dispatch('reloadState');
+                context.dispatch('reloadProfile');
                 context.commit('decNetPending');
 
             });
