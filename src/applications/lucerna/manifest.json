@@ -8,6 +8,15 @@
           "category"  : "smarttank.intent.category.LAUNCHER"
         }
       ]
+    },
+    "lucerna-scheduller" : {},
+    "lucerna-preferences" : {
+      "intent_filter" : [
+        {
+          "action"    : "smarttank.intent.action.MAIN",
+          "category"  : "smarttank.intent.category.PREFERENCE"
+        }
+      ]
     }
   }
 }

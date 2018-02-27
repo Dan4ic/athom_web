@@ -25,6 +25,8 @@ window.$bus                 = theBus;
 window.$consts              = consts;
 window.$exportComponent     = Apps.exportComponent;
 window.$protocomponents     = [];
+window.$getComponentBy      = Apps.getComponentBy;
+window.$includeLang         = Apps.includeLang;
 
 //Loaded application components storage
 window.$applications    = {};

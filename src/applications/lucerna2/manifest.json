@@ -1,7 +1,7 @@
 {
 
   "components" : {
-    "mainpage" : {
+    "lucerna2-app" : {
       "intent_filter" : [
         {
           "action"    : "smarttank.intent.action.MAIN",

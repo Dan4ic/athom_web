@@ -1,12 +1,49 @@
 import consts from 'consts';
 
 export default {
+
+    //Include application lang constants
+    includeLang(consts){
+        for(let lng in consts)
+            Object.assign(window.$consts.LANGS[lng], consts[lng]);
+    },
+
+    //Return registered components by category or category & action
+    getComponentBy(category, action){
+        let result  = [];
+
+        window.$store.state.apps.profiles.map(function(profile){
+            for(let name in profile.components) {
+                let component   = profile.components[name];
+                if(component.intent_filter)
+                    for(let f=0; f < component.intent_filter.length; f++){
+                        if(
+                            component.intent_filter[f].category
+                            && category === component.intent_filter[f].category
+                            && (
+                                (!action
+                                    || (
+                                        component.intent_filter[f].action
+                                        && action === component.intent_filter[f].action
+                                    )
+                                )
+                            )
+                        ) result.push(name);
+                    }
+            }
+        });
+
+        return result;
+    },
+
+    //Register pubic component
     exportComponent(component, object){
         window.$protocomponents[component]  = object;
     },
 
     makePromisLoadComponent(url, component){
         return function(resolve, reject) {
+
             if(component in window.$protocomponents) {
                 resolve(window.$protocomponents[component]);
                 return;

@@ -36,7 +36,7 @@
     import template from './Template.vue'
 
     export default {
-        name: 'SettingsNetwork',
+        name: 'SettingsDisplay',
         extends : template,
         computed: {
             themes(){

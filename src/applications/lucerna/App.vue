@@ -1,28 +1,26 @@
 <template>
-    <v-expansion-panel>
-        <v-expansion-panel-content v-for="(item,i) in 5" :key="i">
-            <div slot="header">Item</div>
-            <v-card>
-                <v-card-text>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                    {{message}}
-                </v-card-text>
-            </v-card>
-        </v-expansion-panel-content>
-    </v-expansion-panel>
+    <div>
+    <lucerna-scheduller
+            :intervalWidth="interval.width"
+    ></lucerna-scheduller>
+    </div>
 </template>
 
 <script>
 
     export default {
-        name: 'Lucerna',
+        name: 'Lucerna2',
         mounted(){
             console.log('Mounted application');
         },
         beforeDestroy () {
             console.log('Destroy application');
         },
-
+        computed : {
+            interval(){
+                return this.$store.state.lucerna.interval;
+            }
+        },
         data() {
             return {
                 message : $consts.WEBSOCKET.ADDRESS

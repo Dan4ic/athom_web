@@ -3,6 +3,13 @@
       <DateTimeComponent class="panel" :style="panelStyle"></DateTimeComponent>
       <NetworkComponent class="panel" :style="panelStyle"></NetworkComponent>
       <DisplayComponent class="panel" :style="panelStyle"></DisplayComponent>
+      <component
+              v-for="(pref_comp_name) in customPrefs"
+              class="panel"
+              :is="pref_comp_name"
+              :key="pref_comp_name"
+              :style="panelStyle"
+      ></component>
   </v-container>
 </template>
 
@@ -25,7 +32,10 @@ export default {
       DateTimeComponent : DateTimeComponent
   },
   computed:{
-    panelStyle: function(){
+    customPrefs() {
+        return $getComponentBy('smarttank.intent.category.PREFERENCE', 'smarttank.intent.action.MAIN');
+    },
+    panelStyle(){
         if(this.isMobileScreen)
             return {
                 width : '100%'
@@ -58,13 +68,9 @@ export default {
           this.panel_width  = (app_width / col_count );
 
       },
-
       onResize(){
           this.recalcPanelSize();
       },
-      submit(){
-          alert("ok!");
-      }
   },
   data () {
     return {
