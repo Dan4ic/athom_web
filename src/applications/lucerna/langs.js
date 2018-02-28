@@ -1,10 +1,12 @@
 export default {
     en : {
-        PREFS_TITLE : 'Light preferences',
-        DAYS_COUNT: 'Days on schedule'
+        PREFS_TITLE : 'Light',
+        DAYS_NUMBER: 'Days on schedule',
+        CHANNELS_NUMBER: 'Number of channels',
     },
     ru : {
-        PREFS_TITLE : 'Параметры освещения',
-        DAYS_COUNT : 'Кол-во дней на графике'
+        PREFS_TITLE : 'Освещение',
+        DAYS_NUMBER : 'Кол-во дней на графике',
+        CHANNELS_NUMBER: 'Количество каналов',
     }
 }

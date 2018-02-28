@@ -16,13 +16,6 @@
 
     export default {
         name: 'Lucerna',
-        mounted(){
-            console.log('Mounted application');
-        },
-        beforeDestroy () {
-            console.log('Destroy application');
-        },
-
         data() {
             return {
                 message : $consts.WEBSOCKET.ADDRESS

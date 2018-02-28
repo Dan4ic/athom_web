@@ -105,7 +105,7 @@
                             v-for="dot in dots"
                             v-if="isDotVisible(dot)"
                             :class="['dot', {'selected' : dot.selected}]"
-                            r="10"
+                            :r="dotRadius"
                             :cx="rebaseX(getChartX(dot))"
                             :cy="rebaseY(getChartY(dot))"
                             @mousedown="onDotMouseDown(dot)"
@@ -117,7 +117,6 @@
 
         </svg>
 
-        <!--
         <ul>
             <li>isDragging = {{draggingDot.isDragging}}</li>
             <li>offsetX = {{draggingDot.offsetX }}</li>
@@ -126,8 +125,8 @@
             <li>dpi = {{dpi}}</li>
             <li>exposition = {{exposition}}</li>
             <li>interval.offset = {{interval.offset}}</li>
+            <li>koofScreenX = {{koofScreenX}}</li>
         </ul>
-        -->
 
     </div>
 
@@ -144,6 +143,10 @@
         },
         destroyed () {
             window.removeEventListener('mousewheel', this.proxyScrollEvent);
+        },
+        mounted(){
+            this.clientWidth = this.$el.clientWidth;
+            this.clientHeight = this.$el.clientHeight;
         },
         props: {
             intervalWidth: {
@@ -261,6 +264,8 @@
 
 
             let data    = {
+                clientWidth : null,
+                clientHeight : null,
                 event : {
                     dot : null,
                 },
@@ -793,13 +798,18 @@
 
             //Коэфициент преобразования реальных точек во внутренние по ширине
             koofScreenX(){
-                return this.width / this.$el.clientWidth;
+                return this.width / this.clientWidth;
             },
 
             //Коэфициент преобразования реальных точек во внутренние по высоте
             koofScreenY(){
-                return this.height / this.$el.clientHeight;
+                return this.height / this.clientHeight;
             },
+
+            //Радиус точек на графике
+            dotRadius(){
+                return 10 * this.koofScreenX;
+            }
 
         },
 
