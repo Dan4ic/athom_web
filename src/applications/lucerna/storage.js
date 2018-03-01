@@ -3,13 +3,13 @@ export default {
     state: {
         channels    : [
             {
-                color   : '#f00',
+                color   : '#ff0000',
             },
             {
-                color   : '#0f0',
+                color   : '#00ff00',
             },
             {
-                color   : '#00f',
+                color   : '#0000ff',
             },
         ],            //Light channels array
         interval    : {
@@ -27,19 +27,11 @@ export default {
         },
 
         //Update current hardware time after recalculation
-        setChannelsNumber(state, number) {
-
-            if(+number < 1)
-                number = 1;
-
-            if(+number < state.channels.length)
-                state.channels.slice(0, +number - 1);
-            else (+number > state.channels.length)
-                for(let f=state.channels.length; f < +number; f++)
-                    state.channels.push({
-                        color   : '#f0f',
-                    });
-
+        setChannelsParams(state, channels) {
+            state.channels  = [];
+            channels.map((channel) => {
+                state.channels.push(Object.assign({}, channel));
+            });
         },
 
     },
