@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container style="min-height: 100%; position: relative">
     <lucerna-app></lucerna-app>
   </v-container>
 </template>

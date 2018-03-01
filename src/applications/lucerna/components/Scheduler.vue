@@ -1,135 +1,117 @@
 <template>
-    <div>
-        <svg class="light-schedule"
-             :view-box.camel="[0, 0, width, height]"
-             @mousedown.prevent="onMouseDown"
-             @mousemove.prevent="onMouseMove"
-             @mouseup.prevent="onMouseUp"
-             @mouseleave.prevent="onMouseUp"
-        >
+    <svg class="light-schedule"
+         :view-box.camel="[0, 0, width, height]"
+         @mousedown.prevent="onMouseDown"
+         @mousemove.prevent="onMouseMove"
+         @mouseup.prevent="onMouseUp"
+         @mouseleave.prevent="onMouseUp"
+    >
 
-            <g :transform="['translate(' + chart.offset.left, chart.offset.top + ')']">
+        <g :transform="['translate(' + chart.offset.left, chart.offset.top + ')']">
 
-                <g>
-                    <rect class="current-time-box" :width="currentTimeX" :height="chart.height"></rect>
-                    <line class="current-time-line" :x1="currentTimeX" :x2="currentTimeX" :y2="chart.height"></line>
-                    <text :x="currentTimeX" y="-12" dy=".32em" style="text-anchor: middle;">
-                        {{ currentTime | time}}
+            <g>
+                <rect class="current-time-box" :width="currentTimeX" :height="chart.height"></rect>
+                <line class="current-time-line" :x1="currentTimeX" :x2="currentTimeX" :y2="chart.height"></line>
+                <text :x="currentTimeX" y="-12" dy=".32em" style="text-anchor: middle;">
+                    {{ currentTime | time}}
+                </text>
+            </g>
+
+            <g class="grid-days">
+
+                <rect class="axis-border" :width="chart.width" :height="chart.height"></rect>
+
+                <g
+                        v-for="percent in axisY"
+                        :transform="['translate(0', percent.y + ')']"
+                >
+                    <line :x2="chart.width" y2="0" class="axis-y"></line>
+                    <text
+                            v-if="chart.showPercents"
+                            x="-20"
+                            dy=".32em"
+                            style="text-anchor: end;"
+                    >
+                        {{percent.percent | percent}}
                     </text>
                 </g>
 
-                <g class="grid-days">
-
-                    <rect class="axis-border" :width="chart.width" :height="chart.height"></rect>
-
-                    <g
-                            v-for="percent in axisY"
-                            :transform="['translate(0', percent.y + ')']"
-                    >
-                        <line :x2="chart.width" y2="0" class="axis-y"></line>
-                        <text
-                                v-if="chart.showPercents"
-                                x="-20"
-                                dy=".32em"
-                                style="text-anchor: end;"
-                        >
-                            {{percent.percent | percent}}
-                        </text>
-                    </g>
+                <g
+                        v-if="showDaysXAxis"
+                >
 
                     <g
-                            v-if="showDaysXAxis"
+                            v-for="(xDay, index) in axisXDays"
+                            :class="['axis-days', {'even' : !(xDay.number % 2)}]"
+                            :transform="['translate(' + xDay.x, '0)']"
+                            :key="xDay.number"
+
                     >
+
+                        <clipPath :id="'clipDay' + xDay.number">
+                            <rect :width="xDay.width" :height="chart.height"/>
+                        </clipPath>
 
                         <g
-                                v-for="(xDay, index) in axisXDays"
-                                :class="['axis-days', {'even' : !(xDay.number % 2)}]"
-                                :transform="['translate(' + xDay.x, '0)']"
-                                :key="xDay.number"
-
+                                :clip-path="['url(#clipDay'+xDay.number+')']"
                         >
 
-                            <clipPath :id="'clipDay' + xDay.number">
-                                <rect :width="xDay.width" :height="chart.height"/>
-                            </clipPath>
+                            <text
+                                    :y="chart.height / 2"
+                                    :x="xDay.width / 2"
 
-                            <g
-                                    :clip-path="['url(#clipDay'+xDay.number+')']"
                             >
-
-                                <text
-                                        :y="chart.height / 2"
-                                        :x="xDay.width / 2"
-
-                                >
-                                    {{xDay.number + 1}}
-                                </text>
-
-                            </g>
-
-                            <line
-                                    v-if="index > 0"
-                                    :y2="chart.height"
-                                    :style="{'stroke-width' : dayBorderWidth + 'px'}"
-                            ></line>
-
-                            <rect :width="xDay.width" :height="chart.height" opacity="0" @dblclick="expandDay(xDay)"/>
+                                {{xDay.number + 1}}
+                            </text>
 
                         </g>
 
-                    </g>
+                        <line
+                                v-if="index > 0"
+                                :y2="chart.height"
+                                :style="{'stroke-width' : dayBorderWidth + 'px'}"
+                        ></line>
 
-                    <g
-                            v-for="time in axisX"
-                            :transform="['translate(' + time.x, '0)']"
-                            :key="time.time"
-                    >
-                        <line :y2="chart.height" x2="0" class="axis-x"></line>
-                        <text
-                                v-if="chart.showTimes"
-                                :y="chart.height + 20"
-                                dy=".32em"
-                                style="text-anchor: middle;"
-                        >
-                            {{time.time | time}}
-                        </text>
+                        <rect :width="xDay.width" :height="chart.height" opacity="0" @dblclick="expandDay(xDay)"/>
+
                     </g>
 
                 </g>
 
-                <path class="schedulePath" :d="schedulePath"></path>
-
-                <g class="dots">
-
-                    <circle
-                            v-for="dot in dots"
-                            v-if="isDotVisible(dot)"
-                            :class="['dot', {'selected' : dot.selected}]"
-                            :r="dotRadius"
-                            :cx="rebaseX(getChartX(dot))"
-                            :cy="rebaseY(getChartY(dot))"
-                            @mousedown="onDotMouseDown(dot)"
-                    ></circle>
-
+                <g
+                        v-for="time in axisX"
+                        :transform="['translate(' + time.x, '0)']"
+                        :key="time.time"
+                >
+                    <line :y2="chart.height" x2="0" class="axis-x"></line>
+                    <text
+                            v-if="chart.showTimes"
+                            :y="chart.height + 20"
+                            dy=".32em"
+                            style="text-anchor: middle;"
+                    >
+                        {{time.time | time}}
+                    </text>
                 </g>
 
             </g>
 
-        </svg>
+            <path class="schedulePath" :d="schedulePath"></path>
 
-        <ul>
-            <li>isDragging = {{draggingDot.isDragging}}</li>
-            <li>offsetX = {{draggingDot.offsetX }}</li>
-            <li>offsetY = {{draggingDot.offsetY }}</li>
-            <li>zoom = {{zoom.value}}</li>
-            <li>dpi = {{dpi}}</li>
-            <li>exposition = {{exposition}}</li>
-            <li>interval.offset = {{interval.offset}}</li>
-            <li>koofScreenX = {{koofScreenX}}</li>
-        </ul>
+            <g class="dots">
 
-    </div>
-
+                <circle
+                        v-for="dot in dots"
+                        v-if="isDotVisible(dot)"
+                        :class="['dot', {'selected' : dot.selected}]"
+                        :r="dotRadius"
+                        :cx="rebaseX(getChartX(dot))"
+                        :cy="rebaseY(getChartY(dot))"
+                        @mousedown="onDotMouseDown(dot)"
+                ></circle>
+            </g>
+        </g>
+    </svg>
 </template>
 
 <script>
@@ -147,6 +129,9 @@
         mounted(){
             this.clientWidth = this.$el.clientWidth;
             this.clientHeight = this.$el.clientHeight;
+            this.height = this.clientWidth ? this.$el.clientHeight / this.clientWidth * this.width : 0;
+            this.chart.height = this.height - 90;
+
         },
         props: {
             intervalWidth: {
@@ -849,8 +834,8 @@
 
     .light-schedule {
 
-        width: 100%;
-        height: auto;
+        /* width: 100%; */
+        /* height: auto; */
 
         .current-time-box {
             stroke: none;
