@@ -535,7 +535,7 @@
         computed: {
 
             currentTime(){
-                return this.hwDateTime % this.interval.width;
+                return (this.hwDateTime / 1000) % this.interval.width;
             },
 
             //Вычисляет толщину линии перехода между днями
