@@ -9,7 +9,7 @@
 
         <g :transform="['translate(' + chart.offset.left, chart.offset.top + ')']">
 
-            <g>
+            <g v-if="currentTimeX > 0">
                 <rect class="current-time-box" :width="currentTimeX" :height="chart.height"></rect>
                 <line class="current-time-line" :x1="currentTimeX" :x2="currentTimeX" :y2="chart.height"></line>
                 <text :x="currentTimeX" y="-12" dy=".32em" style="text-anchor: middle;">
@@ -25,7 +25,7 @@
                         v-for="percent in axisY"
                         :transform="['translate(0', percent.y + ')']"
                 >
-                    <line :x2="chart.width" y2="0" class="axis-y"></line>
+                    <line :x2="chart.width" y2="0" class="axis-y" opacity="0.1"></line>
                     <text
                             v-if="chart.showPercents"
                             x="-20"
@@ -70,6 +70,7 @@
                                 v-if="index > 0"
                                 :y2="chart.height"
                                 :style="{'stroke-width' : dayBorderWidth + 'px'}"
+                                opacity="0"
                         ></line>
 
                         <rect :width="xDay.width" :height="chart.height" opacity="0" @dblclick="expandDay(xDay)"/>
@@ -83,7 +84,7 @@
                         :transform="['translate(' + time.x, '0)']"
                         :key="time.time"
                 >
-                    <line :y2="chart.height" x2="0" class="axis-x"></line>
+                    <line :y2="chart.height" x2="0" class="axis-x" opacity="0.1"></line>
                     <text
                             v-if="chart.showTimes"
                             :y="chart.height + 20"
@@ -122,16 +123,19 @@
 
         created () {
             window.addEventListener('mousewheel', this.proxyScrollEvent);
+            window.addEventListener('resize', this.onResize)
         },
+
         destroyed () {
             window.removeEventListener('mousewheel', this.proxyScrollEvent);
+            window.removeEventListener('resize', this.onResize)
         },
         mounted(){
-            this.clientWidth = this.$el.clientWidth;
-            this.clientHeight = this.$el.clientHeight;
-            this.height = this.clientWidth ? this.$el.clientHeight / this.clientWidth * this.width : 0;
-            this.chart.height = this.height - 90;
-
+            this.onResize();
+            this.zoom.value = this.interval.width / this.interval.resolution;
+            if(this.intervalStartOffset === null) {
+                this.interval.offset = this.currentTime - this.currentTime % this.interval.resolution;
+            }
         },
         props: {
             intervalWidth: {
@@ -142,12 +146,11 @@
             intervalResolution: {
                 type: Number,
                 required: false,
-                default: 1800
+                default: 86400
             },
             intervalStartOffset: {
-                type: Number,
                 required: false,
-                default: 0
+                default: null
             },
         },
 
@@ -277,7 +280,7 @@
                 interval    : {
                     width       : this.intervalWidth,
                     resolution  : this.intervalResolution,
-                    offset      : this.intervalStartOffset     //Смещение графика слева
+                    offset      : this.intervalStartOffset ? +this.intervalStartOffset : 0      //Смещение графика слева
                 },
                 dots : dots,
                 chart: {
@@ -299,6 +302,13 @@
         },
 
         methods : {
+
+            onResize(){
+                this.clientWidth = this.$el.clientWidth;
+                this.clientHeight = this.$el.clientHeight;
+                this.height = this.clientWidth ? this.$el.clientHeight / this.clientWidth * this.width : 0;
+                this.chart.height = this.height - 90;
+            },
 
             onZoom(delta, event){
 
@@ -430,28 +440,19 @@
 
             //Фокусировка на выбранном дне по dblclick
             expandDay(xDay){
-
-                this.interval.offset    = xDay.number * 86400;
-                this.zoom.value         = this.interval.width / 86400 ;
-
-                console.log(xDay);
-
+                this.interval.offset    = xDay.number * this.interval.resolution;
+                this.zoom.value         = this.interval.width / this.interval.resolution;
             },
 
             cleanSelectedDots(){
-
                 this.dots.map(function(dot){
                     dot.selected    = false;
                 });
-
             },
 
             isDotVisible(dot){
-
                 let realX   = this.getChartX(dot);
-
                 return realX >= 0 && realX <= this.chart.width;
-
             },
 
             rebaseOffset(offset){
@@ -586,29 +587,32 @@
                 let result  = [];
 
                 for(
-                        let day = parseInt(this.interval.offset / 86400);
-                        day <= parseInt((this.interval.offset + this.exposition) / 86400);
+                        let day = parseInt(this.interval.offset / this.interval.resolution);
+                        day <= parseInt((this.interval.offset + this.exposition) / this.interval.resolution);
                         day ++){
 
                     let xDay = {
                         number  : day,
-                        x       : (day * 86400 - this.interval.offset) * this.dpi,
-                        width   :  86400 * this.dpi
+                        x       : (day * this.interval.resolution - this.interval.offset) * this.dpi,
+                        width   :  this.interval.resolution * this.dpi
                     };
 
-                    if(day * 86400 <= this.interval.offset) {
+                    if(day * this.interval.resolution <= this.interval.offset) {
 
-                        xDay.width  = (day * 86400 + 86400 - this.interval.offset) * this.dpi;
+                        xDay.width  = (day * this.interval.resolution + this.interval.resolution - this.interval.offset) * this.dpi;
                         xDay.x      = 0;
 
-                    } else if(day * 86400 + 86400 > this.interval.offset + this.exposition) {
+                    } else if(day * this.interval.resolution + this.interval.resolution > this.interval.offset + this.exposition) {
 
-                        xDay.width  = this.interval.offset + this.exposition - day * 86400;
+                        xDay.width  = this.interval.offset + this.exposition - day * this.interval.resolution;
 
                     }
 
                     if(xDay.x + xDay.width > this.chart.width)
                         xDay.width  = this.chart.width - xDay.x;
+
+                    if(xDay.width < 0)
+                        xDay.width  = 0;
 
                     result.push(xDay);
 
@@ -777,13 +781,13 @@
 
             showDaysXAxis(){
 
-                return this.interval.width > 86400;
+                return this.interval.width > this.interval.resolution;
 
             },
 
             //Коэфициент преобразования реальных точек во внутренние по ширине
             koofScreenX(){
-                return this.width / this.clientWidth;
+                return (+this.clientWidth) !=0 ? this.width / this.clientWidth : 0;
             },
 
             //Коэфициент преобразования реальных точек во внутренние по высоте
@@ -793,7 +797,7 @@
 
             //Радиус точек на графике
             dotRadius(){
-                return 10 * this.koofScreenX;
+                return this.koofScreenX > 0 ? 10 * this.koofScreenX : 1;
             }
 
         },

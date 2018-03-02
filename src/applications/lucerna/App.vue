@@ -33,9 +33,9 @@
 <style>
 
     .scheduler {
-        min-height: 5cm;
+        min-height: 350px;
         height: 100%;
-        max-width: 100%;
+        width: 100%;
     }
 
 </style>
