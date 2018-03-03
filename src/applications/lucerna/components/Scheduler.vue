@@ -104,13 +104,22 @@
                 <circle
                         v-for="dot in dots"
                         v-if="isDotVisible(dot)"
-                        :class="['dot', {'selected' : dot.selected}]"
+                        :class="['dot', {'selected' : dot.selected || isInSelBox(dot)}]"
                         :r="dotRadius"
                         :cx="rebaseX(getChartX(dot))"
                         :cy="rebaseY(getChartY(dot))"
                         @mousedown="onDotMouseDown(dot)"
                 ></circle>
             </g>
+
+            <rect
+                    class="selection-box"
+                    v-if="selectionBox.isSelectionBox"
+                    :x="selBox.x"
+                    :y="selBox.y"
+                    :width="selBox.width"
+                    :height="selBox.height"
+            />
         </g>
     </svg>
 </template>
@@ -133,7 +142,7 @@
         mounted(){
             this.onResize();
             this.zoom.value = this.interval.width / this.interval.resolution;
-            if(this.intervalStartOffset === null) {
+            if (this.intervalStartOffset === null) {
                 this.interval.offset = this.currentTime - this.currentTime % this.interval.resolution;
             }
         },
@@ -154,7 +163,7 @@
             },
         },
 
-        watch : {
+        watch: {
             intervalWidth(value){
                 this.interval.width = value;
             },
@@ -166,123 +175,121 @@
             intervalStartOffset(value) {
                 this.interval.offset = value;
             }
-
         },
 
         data() {
-
-            const example_dots  = [
+            const example_dots = [
                 {
-                    selected    : false,
-                    time        : 23760,
-                    brightness  : 0.01,
-                    spectrum      : {
-                        0 : 0.1,
-                        1 : 0.2,
-                        2 : 0.1,
-                        3 : 0.6,
-                        4 : 1,
-                        5 : 0.2,
-                        6 : 0.1,
-                        7 : 0.2
+                    selected: false,
+                    time: 23760,
+                    brightness: 0.01,
+                    spectrum: {
+                        0: 0.1,
+                        1: 0.2,
+                        2: 0.1,
+                        3: 0.6,
+                        4: 1,
+                        5: 0.2,
+                        6: 0.1,
+                        7: 0.2
                     }
                 },
                 {
-                    selected    : false,
-                    time        : 38880,
-                    brightness  : 0.9,
-                    spectrum      : {
-                        0 : 0.3,
-                        1 : 0.2,
-                        2 : 0.2,
-                        3 : 0.1,
-                        4 : 0.6,
-                        5 : 0.7,
-                        6 : 0.1,
-                        7 : 0.9
+                    selected: false,
+                    time: 38880,
+                    brightness: 0.9,
+                    spectrum: {
+                        0: 0.3,
+                        1: 0.2,
+                        2: 0.2,
+                        3: 0.1,
+                        4: 0.6,
+                        5: 0.7,
+                        6: 0.1,
+                        7: 0.9
                     }
                 },
                 {
-                    selected    : false,
-                    time        : 52560,
-                    brightness  : 0.9,
-                    spectrum      : {
-                        0 : 0.3,
-                        1 : 0.2,
-                        2 : 0.2,
-                        3 : 0.1,
-                        4 : 0.6,
-                        5 : 0.7,
-                        6 : 0.1,
-                        7 : 0.9
+                    selected: false,
+                    time: 52560,
+                    brightness: 0.9,
+                    spectrum: {
+                        0: 0.3,
+                        1: 0.2,
+                        2: 0.2,
+                        3: 0.1,
+                        4: 0.6,
+                        5: 0.7,
+                        6: 0.1,
+                        7: 0.9
                     }
                 },
                 {
-                    selected    : false,
-                    time        : 67620,
-                    brightness  : 0.01,
-                    spectrum      : {
-                        0 : 1,
-                        1 : 0.5,
-                        2 : 0.4,
-                        3 : 0.3,
-                        4 : 0.2,
-                        5 : 0.1,
-                        6 : 0.1,
-                        7 : 0.1
+                    selected: false,
+                    time: 67620,
+                    brightness: 0.01,
+                    spectrum: {
+                        0: 1,
+                        1: 0.5,
+                        2: 0.4,
+                        3: 0.3,
+                        4: 0.2,
+                        5: 0.1,
+                        6: 0.1,
+                        7: 0.1
                     }
                 },
             ];
 
-            let dots    = [];
+            let dots = [];
 
-            for(let day=0; day<10; day++) {
-
-                example_dots.map(function(element){
-
+            for (let day = 0; day < 10; day++) {
+                example_dots.map(function (element) {
                     let new_dot = Object.assign({}, element);
-
-                    new_dot.time    += day * 86400;
-
+                    new_dot.time += day * 86400;
                     dots.push(new_dot);
-
                 });
-
             }
 
-
-            let data    = {
-                clientWidth : null,
-                clientHeight : null,
-                event : {
-                    dot : null,
+            let data = {
+                clientWidth: null,
+                clientHeight: null,
+                event: {
+                    dot: null,
                 },
-                draggingDot  : {
-                    isDragging  : false,
-                    offsetX     : 0,
-                    offsetY     : 0,
-                    clientX     : 0,
-                    clientY     : 0
+                draggingDot: {
+                    isDragging: false,
+                    offsetX: 0,
+                    offsetY: 0,
+                    clientX: 0,
+                    clientY: 0
                 },
-                scrolling   :{
-                    isScrolling : false,
-                    clientX     : 0,
+                scrolling: {
+                    isScrolling: false,
+                    clientX: 0,
                 },
-                width       : 1000,
-                height      : 350,
-                zoom        : {
-                    value       : 1,    //Текущий зум
-                    step        : 1.1,  //K преращение зума
+                selectionBox : {
+                    isSelectionBox  : false,
+                    timeStart : null,
+                    timeEnd : null,
+                    top : null,
+                    bottom : null
+                },
+                width: 1000,
+                height: 350,
+                zoom: {
+                    value: 1,    //Текущий зум
+                    step: 1.1,  //K преращение зума
                     //Возможные дискретности времени на оси Х
-                    time_parts  : [1, 10, 30, 60, 300, 600, 1800, 3600, 7200, 14400, 43200, 86400],
-                    max_parts   : 12
+                    time_parts: [1, 10, 30, 60, 300, 600, 1800, 3600, 7200, 14400, 43200, 86400],
+                    max_parts: 12
                 },
-                interval    : {
-                    width       : this.intervalWidth,
-                    resolution  : this.intervalResolution,
-                    offset      : this.intervalStartOffset ? +this.intervalStartOffset : 0      //Смещение графика слева
+                interval: {
+                    width: this.intervalWidth,
+                    resolution: this.intervalResolution,
+                    offset: this.intervalStartOffset ? +this.intervalStartOffset : 0      //Смещение графика слева
                 },
-                dots : dots,
+                dots: dots,
                 chart: {
                     showPercents: true,
                     showTimes: true,
@@ -301,7 +308,13 @@
 
         },
 
-        methods : {
+        methods: {
+
+            isInSelBox(dot) {
+                return this.selectionBox.isSelectionBox
+                    && this.rebaseX(this.getChartX(dot)) >= this.selBox.x && this.rebaseX(this.getChartX(dot)) <= this.selBox.x + this.selBox.width
+                    && this.rebaseY(this.getChartY(dot)) >= this.selBox.y && this.rebaseY(this.getChartY(dot)) <= this.selBox.y + this.selBox.height;
+            },
 
             onResize(){
                 this.clientWidth = this.$el.clientWidth;
@@ -311,10 +324,9 @@
             },
 
             onZoom(delta, event){
+                let old_exposition = this.exposition;
 
-                let old_exposition  = this.exposition;
-
-                switch(delta){
+                switch (delta) {
                     case -1:
                         this.zoom.value = this.rebaseZoom(this.zoom.value / this.zoom.step);
                         break;
@@ -323,216 +335,225 @@
                         break;
                 }
 
-                if(this.zoom.value <= 1)
-                    this.zoom.value  = 1;
+                if (this.zoom.value <= 1)
+                    this.zoom.value = 1;
 
-                this.interval.offset    = this.rebaseOffset(this.interval.offset + (old_exposition - this.exposition) / 2);
-
+                this.interval.offset = this.rebaseOffset(this.interval.offset + (old_exposition - this.exposition) / 2);
             },
 
             //Первичный обработчик событий для реализации события zoom
             proxyScrollEvent(event){
+                let e = window.event || event;
+                let delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
 
-                let e       = window.event || event;
-                let delta   = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
-
-                if(e.path.indexOf(this.$el)>=0) {
+                if (e.path.indexOf(this.$el) >= 0) {
 
                     this.onZoom(delta, e);
                     e.preventDefault();
 
                 }
-
             },
 
             onDotMouseDown(dot){
-
                 this.draggingDot.isDragging = true;
-                this.draggingDot.offsetX    = 0;
-                this.draggingDot.offsetY    = 0;
+                this.draggingDot.offsetX = 0;
+                this.draggingDot.offsetY = 0;
 
-                this.event.dot      = dot;
-                this.event.isShift  = window.event.shiftKey;
-
+                this.event.dot = dot;
+                this.event.isShift = window.event.shiftKey;
             },
 
             onMouseUp(){
+                if (this.draggingDot.isDragging && this.draggingDot.offsetX == 0 && this.draggingDot.offsetY == 0) {
+                    if (!this.event.isShift)
+                        this.cleanSelectedDots();
 
-                if(this.draggingDot.isDragging && this.draggingDot.offsetX == 0 && this.draggingDot.offsetY == 0) {
-
-                    if(!this.event.isShift)
-                            this.cleanSelectedDots();
-
-                    this.event.dot.selected    = !this.event.dot.selected;
-
+                    this.event.dot.selected = !this.event.dot.selected;
                 }
 
-                this.dots.map(function(dot){
+                this.dots.map(function (dot) {
+                    if(this.selectionBox.isSelectionBox && this.isInSelBox(dot))
+                        dot.selected = true;
 
-                    if(dot.selected) {
-
+                    if (dot.selected) {
                         dot.brightness = (this.chart.height - this.rebaseY(this.getChartY(dot))) / this.chart.height;
-
-                        dot.time     = this.interval.offset + this.rebaseX(this.getChartX(dot)) /  this.dpi;
-
+                        dot.time = this.interval.offset + this.rebaseX(this.getChartX(dot)) / this.dpi;
                     }
-
                 }.bind(this));
 
                 this.draggingDot.isDragging = false;
-                this.draggingDot.offsetX    = 0;
-                this.draggingDot.offsetY    = 0;
+                this.draggingDot.offsetX = 0;
+                this.draggingDot.offsetY = 0;
 
-                this.scrolling.isScrolling  = false;
-
+                this.scrolling.isScrolling = false;
+                this.selectionBox.isSelectionBox    = false;
             },
 
             onMouseDown(event) {
+                this.draggingDot.clientX = event.clientX;
+                this.draggingDot.clientY = event.clientY;
 
-                this.draggingDot.clientX    = event.clientX;
-                this.draggingDot.clientY    = event.clientY;
+                this.scrolling.clientX = event.clientX;
 
-                this.scrolling.clientX      = event.clientX;
+                if (!this.draggingDot.isDragging) {
+                    if(!!window.event.shiftKey) {
+                        this.selectionBox.isSelectionBox    = true;
+                        this.selectionBox.timeStart         = this.interval.offset
+                                + this.rebaseX(event.offsetX * this.koofScreenX - this.chart.offset.left) / this.dpi;
+                        this.selectionBox.timeEnd           = this.selectionBox.timeStart;
 
-                if(!this.draggingDot.isDragging) {
+                        this.selectionBox.top               = event.offsetY * this.koofScreenY - this.chart.offset.top;
+                        if(this.selectionBox.top < 0)
+                            this.selectionBox.top           = 0;
 
-                    this.cleanSelectedDots();
-
-                    this.scrolling.isScrolling  = true;
-
+                        this.selectionBox.bottom            = this.selectionBox.top;
+                    } else {
+                        this.cleanSelectedDots();
+                        this.scrolling.isScrolling = true;
+                    }
                 }
 
                 return true;
-
             },
 
             onMouseMove() {
+                if (this.draggingDot.isDragging) {
+                    this.draggingDot.offsetX += (this.draggingDot.clientX - event.clientX) * this.koofScreenX;
+                    this.draggingDot.offsetY += (this.draggingDot.clientY - event.clientY) * this.koofScreenY;
 
-                if(this.draggingDot.isDragging) {
+                    if (!this.event.dot.selected) {
 
-                    this.draggingDot.offsetX    += (this.draggingDot.clientX - event.clientX) * this.koofScreenX;
-                    this.draggingDot.offsetY    += (this.draggingDot.clientY - event.clientY) * this.koofScreenY;
-
-                    if(!this.event.dot.selected) {
-
-                        if(!this.event.isShift)
+                        if (!this.event.isShift)
                             this.cleanSelectedDots();
 
                         this.event.dot.selected = this.draggingDot.offsetX != 0 || this.draggingDot.offsetY != 0;
                     }
                 }
 
-                if(this.scrolling.isScrolling) {
-
-                    this.interval.offset    = this.rebaseOffset(
-                            this.interval.offset + (this.scrolling.clientX - event.clientX) / this.dpi);
-
+                if (this.scrolling.isScrolling) {
+                    this.interval.offset = this.rebaseOffset(
+                            this.interval.offset + (this.scrolling.clientX - event.clientX) / this.dpi
+                    );
                 }
 
-                this.draggingDot.clientX    = event.clientX;
-                this.draggingDot.clientY    = event.clientY;
+                if (this.selectionBox.isSelectionBox) {
+                    this.selectionBox.timeEnd           = this.interval.offset
+                            + this.rebaseX(event.offsetX  * this.koofScreenX - this.chart.offset.left) / this.dpi;
+                    if(this.selectionBox.timeEnd < this.interval.offset)
+                        this.selectionBox.timeEnd = this.interval.offset;
 
-                this.scrolling.clientX      = event.clientX;
+                    this.selectionBox.bottom            = event.offsetY * this.koofScreenY - this.chart.offset.top;
+                    if(this.selectionBox.bottom > this.chart.height)
+                        this.selectionBox.bottom    = this.chart.height;
+                    else if(this.selectionBox.bottom < 0)
+                        this.selectionBox.bottom    = 0;
+                }
+
+                this.draggingDot.clientX = event.clientX;
+                this.draggingDot.clientY = event.clientY;
+
+                this.scrolling.clientX = event.clientX;
 
                 return true;
-
             },
 
             //Фокусировка на выбранном дне по dblclick
             expandDay(xDay){
-                this.interval.offset    = xDay.number * this.interval.resolution;
-                this.zoom.value         = this.interval.width / this.interval.resolution;
+                this.interval.offset = xDay.number * this.interval.resolution;
+                this.zoom.value = this.interval.width / this.interval.resolution;
             },
 
             cleanSelectedDots(){
-                this.dots.map(function(dot){
-                    dot.selected    = false;
+                this.dots.map(function (dot) {
+                    dot.selected = false;
                 });
             },
 
             isDotVisible(dot){
-                let realX   = this.getChartX(dot);
+                let realX = this.getChartX(dot);
                 return realX >= 0 && realX <= this.chart.width;
             },
 
             rebaseOffset(offset){
-
-                if(offset < 0)
-                    offset  = 0;
-                else if(offset > this.interval.width - this.exposition)
-                    offset  = this.interval.width - this.exposition;
+                if (offset < 0)
+                    offset = 0;
+                else if (offset > this.interval.width - this.exposition)
+                    offset = this.interval.width - this.exposition;
 
                 return offset;
-
             },
 
             rebaseX(x){
-
                 return x;
-
             },
 
             rebaseY(y){
-
                 return y > this.chart.height ? this.chart.height : (y < 0 ? 0 : y);
-
             },
 
             rebaseZoomByParams(params, zoom){
+                let max_part = params.zoom.time_parts[params.zoom.time_parts.length - 1];
+                let min_zoom = params.interval.width / (max_part * params.zoom.max_parts);
 
-                let max_part    = params.zoom.time_parts[params.zoom.time_parts.length -1];
-                let min_zoom    = params.interval.width / (max_part * params.zoom.max_parts);
-
-                return  zoom < min_zoom ? min_zoom : zoom;
-
+                return zoom < min_zoom ? min_zoom : zoom;
             },
 
             rebaseZoom(zoom){
-
-                return  this.rebaseZoomByParams(this, zoom);
-
+                return this.rebaseZoomByParams(this, zoom);
             },
 
             getChartXByTime(timestamp){
-
-                timestamp   = timestamp < 0
-                              ? this.interval.width + (timestamp % this.interval.width)
-                              : timestamp % this.interval.width;
+                timestamp = timestamp < 0
+                        ? this.interval.width + (timestamp % this.interval.width)
+                        : timestamp % this.interval.width;
 
                 return (timestamp - this.interval.offset) * this.dpi;
-
             },
 
             getChartX(dot){
-
                 return this.getChartXByTime(dot.time - (dot.selected ? this.draggingDot.offsetX : 0) / this.dpi);
-
             },
 
             getChartY(dot){
-
                 return (this.chart.height - this.chart.height * dot.brightness)
                         - (dot.selected ? this.draggingDot.offsetY : 0);
-
             },
 
             //вычисляет Y точки перехода для границ графика
             //  border  - X перехода
             //  point1, point2 - точки
             calcTransition(border, point1, point2){
-
-                let leftShoulder    = border - Math.min(point1.x, point2.x);
-                let width           = Math.abs(point1.x - point2.x);
-                let koof            = leftShoulder / width;
-                let height          = point1.y - point2.y;
+                let leftShoulder = border - Math.min(point1.x, point2.x);
+                let width = Math.abs(point1.x - point2.x);
+                let koof = leftShoulder / width;
+                let height = point1.y - point2.y;
 
                 return point1.y - height * koof;
-
             },
-
         },
 
         computed: {
+
+            //Calc selection box
+            selBox(){
+
+                let result = {
+                    x   : (
+                        (this.selectionBox.timeStart < this.selectionBox.timeEnd ? this.selectionBox.timeStart : this.selectionBox.timeEnd)
+                        - this.interval.offset
+                        ) * this.dpi,
+                    y   : this.selectionBox.top < this.selectionBox.bottom ? this.selectionBox.top : this.selectionBox.bottom,
+                    width : Math.abs(this.selectionBox.timeStart - this.selectionBox.timeEnd) * this.dpi,
+                    height : Math.abs(this.selectionBox.top - this.selectionBox.bottom)
+                };
+
+                console.log(result);
+
+                if(result.y + result.height > this.chart.height)
+                    result.height   = this.chart.height - result.y;
+
+                return result;
+            },
 
             currentTime(){
                 return (this.hwDateTime / 1000) % this.interval.width;
@@ -540,16 +561,14 @@
 
             //Вычисляет толщину линии перехода между днями
             dayBorderWidth(){
+                let width = 3 * (this.zoom.value / 10);
 
-                let width   = 3 * (this.zoom.value / 10);
-
-                if(width < 3)
-                    width   = 3;
-                else if(width > 10)
-                    width   = 10;
+                if (width < 3)
+                    width = 3;
+                else if (width > 10)
+                    width = 10;
 
                 return width;
-
             },
 
             //Количество точек на секунду с учетом зума
@@ -559,142 +578,128 @@
 
             //Экспозиция времени отображаемая на графике с учетом зума
             exposition(){
-
                 return 1 * (this.chart.width / this.dpi).toFixed(5);
-
             },
 
             axisY(){
+                let step = 20;
+                let result = [];
 
-                let step    = 20;
-                let result  = [];
-
-                for(let percent = 100; percent >= 0; percent -= step){
+                for (let percent = 100; percent >= 0; percent -= step) {
 
                     result.push({
-                        y       : (100-percent) * (this.chart.height / 100),
-                        percent : percent
+                        y: (100 - percent) * (this.chart.height / 100),
+                        percent: percent
                     });
 
                 }
 
                 return result;
-
             },
 
             axisXDays(){
+                let result = [];
 
-                let result  = [];
-
-                for(
+                for (
                         let day = parseInt(this.interval.offset / this.interval.resolution);
                         day <= parseInt((this.interval.offset + this.exposition) / this.interval.resolution);
-                        day ++){
+                        day++) {
 
                     let xDay = {
-                        number  : day,
-                        x       : (day * this.interval.resolution - this.interval.offset) * this.dpi,
-                        width   :  this.interval.resolution * this.dpi
+                        number: day,
+                        x: (day * this.interval.resolution - this.interval.offset) * this.dpi,
+                        width: this.interval.resolution * this.dpi
                     };
 
-                    if(day * this.interval.resolution <= this.interval.offset) {
+                    if (day * this.interval.resolution <= this.interval.offset) {
 
-                        xDay.width  = (day * this.interval.resolution + this.interval.resolution - this.interval.offset) * this.dpi;
-                        xDay.x      = 0;
+                        xDay.width = (day * this.interval.resolution + this.interval.resolution - this.interval.offset) * this.dpi;
+                        xDay.x = 0;
 
-                    } else if(day * this.interval.resolution + this.interval.resolution > this.interval.offset + this.exposition) {
+                    } else if (day * this.interval.resolution + this.interval.resolution > this.interval.offset + this.exposition) {
 
-                        xDay.width  = this.interval.offset + this.exposition - day * this.interval.resolution;
+                        xDay.width = this.interval.offset + this.exposition - day * this.interval.resolution;
 
                     }
 
-                    if(xDay.x + xDay.width > this.chart.width)
-                        xDay.width  = this.chart.width - xDay.x;
+                    if (xDay.x + xDay.width > this.chart.width)
+                        xDay.width = this.chart.width - xDay.x;
 
-                    if(xDay.width < 0)
-                        xDay.width  = 0;
+                    if (xDay.width < 0)
+                        xDay.width = 0;
 
                     result.push(xDay);
-
                 }
 
                 return result;
-
             },
 
             axisX() {
+                let time_part = null;
+                let parts_number = null;
+                let result = [];
 
-                let time_part       = null;
-                let parts_number    = null;
-                let result          = [];
+                this.zoom.time_parts.map(function (candidate) {
+                    let candidate_parts_number = this.exposition / candidate;
 
-                this.zoom.time_parts.map(function(candidate){
-
-                    let candidate_parts_number  = this.exposition / candidate;
-
-                    if(
+                    if (
                             (parts_number == null || candidate_parts_number > parts_number)
                             && candidate_parts_number <= this.zoom.max_parts
                     ) {
 
-                        time_part       = candidate;
-                        parts_number    = candidate_parts_number;
+                        time_part = candidate;
+                        parts_number = candidate_parts_number;
 
                     }
-
                 }.bind(this));
 
-                if(!time_part)
-                    time_part   = this.zoom.time_parts[this.zoom.time_parts.length - 1] || 1;
+                if (!time_part)
+                    time_part = this.zoom.time_parts[this.zoom.time_parts.length - 1] || 1;
 
-                for(
-                        let moment  = this.interval.offset - (this.interval.offset % time_part);
+                for (
+                        let moment = this.interval.offset - (this.interval.offset % time_part);
                         moment < this.interval.offset + this.exposition;
-                        moment  += time_part
-                ){
+                        moment += time_part
+                ) {
 
-                    if(moment <= this.interval.offset)
+                    if (moment <= this.interval.offset)
                         continue;
 
                     result.push({
-                        x       : (moment - this.interval.offset) * this.dpi,
-                        time    : moment
+                        x: (moment - this.interval.offset) * this.dpi,
+                        time: moment
                     });
 
                 }
 
                 return result;
-
             },
 
             currentTimeX() {
-
                 return this.getChartXByTime(this.currentTime);
-
             },
 
             schedulePath() {
+                let rebaseMap = [];
 
-                let rebaseMap   = [];
+                this.dots.map(function (dot) {
 
-                this.dots.map(function(dot){
-
-                    let x   = this.rebaseX(this.getChartX(dot));
-                    let y   = this.rebaseY(this.getChartY(dot));
+                    let x = this.rebaseX(this.getChartX(dot));
+                    let y = this.rebaseY(this.getChartY(dot));
 
                     rebaseMap.push({
-                        x   : x,
-                        y   : y,
-                        dot : dot
+                        x: x,
+                        y: y,
+                        dot: dot
                     });
 
                 }.bind(this));
 
-                rebaseMap.sort(function(a, b){
+                rebaseMap.sort(function (a, b) {
 
-                    if(a.x > b.x )
+                    if (a.x > b.x)
                         return 1;
-                    else if(a.x < b.x )
+                    else if (a.x < b.x)
                         return -1;
 
                     return 0;
@@ -703,71 +708,71 @@
 
                 //Вычисляем основное тело пути
                 //за одно находим точки перехода между границами
-                let body      = '';
+                let body = '';
 
                 //Точки перехода слева
-                let outside_left    = null;
-                let inside_left     = null;
+                let outside_left = null;
+                let inside_left = null;
 
                 //Точки перехода справа
-                let outside_right   = null;
-                let inside_right    = null;
+                let outside_right = null;
+                let inside_right = null;
 
-                rebaseMap.forEach(function(dot){
+                rebaseMap.forEach(function (dot) {
 
-                    if(this.getChartX(dot.dot) < 0)
-                        outside_left    = dot;
-                    else if(this.getChartX(dot.dot) > (this.chart.width)) {
+                    if (this.getChartX(dot.dot) < 0)
+                        outside_left = dot;
+                    else if (this.getChartX(dot.dot) > (this.chart.width)) {
                         outside_right = !outside_right ? dot : outside_right;
                     } else {
 
-                        if(!inside_left)
-                            inside_left     = dot;
+                        if (!inside_left)
+                            inside_left = dot;
                         else
-                            inside_right    = dot;
+                            inside_right = dot;
 
                         body += 'L' + dot.x + ',' + dot.y;
                     }
 
                 }.bind(this));
 
-                let prefix  = "";
+                let prefix = "";
                 let postfix = "";
 
                 //Если точек нет, то все просто - график на нуле
-                if(!rebaseMap.length) {
+                if (!rebaseMap.length) {
 
-                    prefix  = 'M0,0';
+                    prefix = 'M0,0';
                     postfix = 'L' + this.chart.width + ',0';
 
                 } else {
 
-                    if(!outside_left)
-                        outside_left    = {
-                            x   : - (this.chart.width * this.zoom.value - rebaseMap[rebaseMap.length-1].x),
-                            y   : rebaseMap[rebaseMap.length - 1].y,
-                            dot : rebaseMap[rebaseMap.length - 1]
+                    if (!outside_left)
+                        outside_left = {
+                            x: -(this.chart.width * this.zoom.value - rebaseMap[rebaseMap.length - 1].x),
+                            y: rebaseMap[rebaseMap.length - 1].y,
+                            dot: rebaseMap[rebaseMap.length - 1]
                         };
 
-                    if(!outside_right)
-                        outside_right   = {
-                            x   : this.chart.width * this.zoom.value + this.interval.offset * this.dpi + rebaseMap[0].x,
-                            y   : rebaseMap[0].y,
-                            dot : rebaseMap[0]
+                    if (!outside_right)
+                        outside_right = {
+                            x: this.chart.width * this.zoom.value + this.interval.offset * this.dpi + rebaseMap[0].x,
+                            y: rebaseMap[0].y,
+                            dot: rebaseMap[0]
                         };
 
-                    inside_left     = inside_left || inside_right;
-                    inside_right    = inside_right || inside_left;
+                    inside_left = inside_left || inside_right;
+                    inside_right = inside_right || inside_left;
 
-                    if(!inside_left && !inside_right){
+                    if (!inside_left && !inside_right) {
 
-                        prefix  = 'M0,' + this.calcTransition(0, outside_left, outside_right);
+                        prefix = 'M0,' + this.calcTransition(0, outside_left, outside_right);
                         postfix = 'L' + this.chart.width + ','
                                 + this.calcTransition(this.chart.width, outside_left, outside_right);
 
                     } else {
 
-                        prefix  = 'M0,' + this.calcTransition(0, outside_left, inside_left);
+                        prefix = 'M0,' + this.calcTransition(0, outside_left, inside_left);
                         postfix = 'L' + this.chart.width + ','
                                 + this.calcTransition(this.chart.width, inside_right, outside_right);
 
@@ -776,18 +781,15 @@
                 }
 
                 return prefix + body + postfix;
-
             },
 
             showDaysXAxis(){
-
                 return this.interval.width > this.interval.resolution;
-
             },
 
             //Коэфициент преобразования реальных точек во внутренние по ширине
             koofScreenX(){
-                return (+this.clientWidth) !=0 ? this.width / this.clientWidth : 0;
+                return (+this.clientWidth) != 0 ? this.width / this.clientWidth : 0;
             },
 
             //Коэфициент преобразования реальных точек во внутренние по высоте
@@ -805,32 +807,25 @@
         filters: {
 
             day(timestamp) {
-
                 return (timestamp - timestamp % 86400) / 86400 + 1;
-
             },
 
             time(timestamp) {
-
-                let hours   = (timestamp % 86400 - timestamp % 3600) / 3600;
-                let mins    = (timestamp % 3600 - timestamp % 60) / 60;
-                let secs    = timestamp % 60;
+                let hours = (timestamp % 86400 - timestamp % 3600) / 3600;
+                let mins = (timestamp % 3600 - timestamp % 60) / 60;
+                let secs = timestamp % 60;
 
 
                 return ''
                         + ('0' + hours).slice(-2)
                         + ':' + ('0' + mins).slice(-2);
-                        //+ (inc_sec ? ':' + ('0' + secs).slice(-2) : '');
-
+                //+ (inc_sec ? ':' + ('0' + secs).slice(-2) : '');
             },
 
             percent(value) {
-                return ''+value+'%';
+                return '' + value + '%';
             }
-
-
         }
-
     }
 </script>
 
@@ -841,6 +836,12 @@
         /* width: 100%; */
         /* height: auto; */
 
+        .selection-box {
+            stroke: none;
+            fill: #000;
+            opacity: 0.2;
+        }
+
         .current-time-box {
             stroke: none;
             fill: #000;
@@ -849,7 +850,7 @@
 
         .current-time-line {
 
-            stroke: rgb(0,0,255);
+            stroke: rgb(0, 0, 255);
             stroke-width: 1;
             stroke-opacity: 0.3;
 
@@ -887,7 +888,6 @@
         }
 
         .axis-days.even {
-
 
         }
 
