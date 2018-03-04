@@ -5,18 +5,11 @@
          @mousemove.prevent="onMouseMove"
          @mouseup.prevent="onMouseUp"
          @mouseleave.prevent="onMouseUp"
+         @touchstart.prevent="onTouch"
+         @touchmove.prevent="onTouch"
+         @touchend.prevent="onTouch"
+         @touchcancel.prevent="onTouch"
     >
-        <g :transform="['translate(' + toolbar.left +','+ toolbar.top + ')']">
-            <circle
-                    class="dot"
-                    :r="dotRadius"
-                    :cx="dotRadius + dotRadius / 2"
-                    :cy="dotRadius + dotRadius / 2"
-                    @mousedown.prevent="onMouseDownNewDot"
-                    @mouseup.prevent="onMouseUpNewDot"
-            ></circle>
-        </g>
-
         <g :transform="['translate(' + chart.offset.left, chart.offset.top + ')']">
 
             <g v-if="currentTimeX > 0">
@@ -144,6 +137,16 @@
                 :cx="draggingNewDot.x"
                 :cy="draggingNewDot.y"
         />
+        <g :transform="['translate(' + toolbar.left +','+ toolbar.top + ')']">
+            <circle
+                    class="dot"
+                    :r="dotRadius"
+                    :cx="dotRadius + dotRadius / 2"
+                    :cy="dotRadius + dotRadius / 2"
+                    @mousedown.prevent="onMouseDownNewDot"
+                    @mouseup.prevent="onMouseUpNewDot"
+            ></circle>
+        </g>
     </svg>
 </template>
 
@@ -374,6 +377,37 @@
                 );
             },
 
+            onTouch(evt) {
+                evt.preventDefault();
+                if (evt.touches.length > 1 || (evt.type == "touchend" && evt.touches.length > 0))
+                    return;
+
+                var newEvt = document.createEvent("MouseEvents");
+                var type = null;
+                var touch = null;
+
+                switch (evt.type) {
+                    case "touchstart":
+                        type = "mousedown";
+                        touch = evt.changedTouches[0];
+                        break;
+                    case "touchmove":
+                        type = "mousemove";
+                        touch = evt.changedTouches[0];
+                        break;
+                    case "touchend":
+                        type = "mouseup";
+                        touch = evt.changedTouches[0];
+                        break;
+                }
+
+                newEvt.initMouseEvent(type, true, true, document.defaultView, 0,
+                        touch.screenX, touch.screenY, touch.clientX, touch.clientY,
+                        evt.ctrlKey, evt.altKey, evt.shiftKey, evt.metaKey, 0, null);
+
+                evt.target.dispatchEvent(newEvt);
+            },
+
             onMouseDownNewDot(event){
                 this.draggingNewDot.isDragging = true;
                 this.draggingNewDot.x   = event.offsetX * this.koofScreenX;
@@ -394,7 +428,7 @@
                 this.clientWidth = this.$el.clientWidth;
                 this.clientHeight = this.$el.clientHeight;
                 this.height = this.clientWidth ? this.$el.clientHeight / this.clientWidth * this.width : 0;
-                this.chart.offset.top = this.dotRadius * 4;
+                this.chart.offset.top = this.dotRadius * 3 + this.fontHeight;
                 this.chart.height = this.height - this.chart.offset.top - 70;
             },
 
@@ -524,7 +558,7 @@
 
                 if (this.scrolling.isScrolling) {
                     this.interval.offset = this.rebaseOffset(
-                            this.interval.offset + (this.scrolling.clientX - event.clientX) / this.dpi
+                            this.interval.offset + (this.scrolling.clientX - event.clientX)* this.koofScreenX  / this.dpi
                     );
                 }
 
@@ -893,7 +927,7 @@
 
             //Радиус точек на графике
             dotRadius(){
-                return this.koofScreenX > 0 ? 10 * this.koofScreenX : 1;
+                return this.koofScreenX > 0 ? (this.isMobileScreen ? 20 : 10) * this.koofScreenX : 1;
             },
 
             fontHeight(){

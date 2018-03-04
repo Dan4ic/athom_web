@@ -35,6 +35,7 @@
         right: 0;
         bottom: 0;
         padding : 8px;
+        min-height: 80vh;
     }
 
     .scheduler {
