@@ -6,13 +6,23 @@
          @mouseup.prevent="onMouseUp"
          @mouseleave.prevent="onMouseUp"
     >
+        <g :transform="['translate(' + toolbar.left +','+ toolbar.top + ')']">
+            <circle
+                    class="dot"
+                    :r="dotRadius"
+                    :cx="dotRadius + dotRadius / 2"
+                    :cy="dotRadius + dotRadius / 2"
+                    @mousedown.prevent="onMouseDownNewDot"
+                    @mouseup.prevent="onMouseUpNewDot"
+            ></circle>
+        </g>
 
         <g :transform="['translate(' + chart.offset.left, chart.offset.top + ')']">
 
             <g v-if="currentTimeX > 0">
                 <rect class="current-time-box" :width="currentTimeX" :height="chart.height"></rect>
                 <line class="current-time-line" :x1="currentTimeX" :x2="currentTimeX" :y2="chart.height"></line>
-                <text :x="currentTimeX" y="-12" dy=".32em" style="text-anchor: middle;">
+                <text :x="currentTimeX" :y="-dotRadius * 1" dy=".32em" style="text-anchor: middle;" :font-size="fontHeight">
                     {{ currentTime | time}}
                 </text>
             </g>
@@ -28,9 +38,11 @@
                     <line :x2="chart.width" y2="0" class="axis-y" opacity="0.1"></line>
                     <text
                             v-if="chart.showPercents"
-                            x="-20"
-                            dy=".32em"
-                            style="text-anchor: end;"
+                            :x="isMobileScreen? 0 : -10"
+                            :dy="isMobileScreen? fontSizeAxisY : fontSizeAxisY / 2"
+                            :style="{'text-anchor' : isMobileScreen ? 'middle' : 'end'}"
+                            :font-size="fontSizeAxisY"
+                            :transform="[isMobileScreen ? 'rotate(90)' : '']"
                     >
                         {{percent.percent | percent}}
                     </text>
@@ -59,6 +71,8 @@
                             <text
                                     :y="chart.height / 2"
                                     :x="xDay.width / 2"
+                                    :font-size="fontHeight * 5"
+                                    :dy="fontHeight"
 
                             >
                                 {{xDay.number + 1}}
@@ -90,6 +104,7 @@
                             :y="chart.height + 20"
                             dy=".32em"
                             style="text-anchor: middle;"
+                            :font-size="fontSizeAxisX"
                     >
                         {{time.time | time}}
                     </text>
@@ -120,7 +135,15 @@
                     :width="selBox.width"
                     :height="selBox.height"
             />
+
         </g>
+        <circle
+                v-if="draggingNewDot.isDragging"
+                class="dot"
+                :r="dotRadius"
+                :cx="draggingNewDot.x"
+                :cy="draggingNewDot.y"
+        />
     </svg>
 </template>
 
@@ -132,7 +155,11 @@
 
         created () {
             window.addEventListener('mousewheel', this.proxyScrollEvent);
-            window.addEventListener('resize', this.onResize)
+            window.addEventListener('resize', this.onResize);
+
+            this.$bus.$on(consts.EVENTS.DO_SCREEN_REBUILD, (type, messages) => {
+                this.onResize();
+            });
         },
 
         destroyed () {
@@ -179,6 +206,7 @@
 
         data() {
             const example_dots = [
+                    /*
                 {
                     selected: false,
                     time: 23760,
@@ -239,6 +267,7 @@
                         7: 0.1
                     }
                 },
+                */
             ];
 
             let dots = [];
@@ -275,6 +304,11 @@
                     top : null,
                     bottom : null
                 },
+                draggingNewDot : {
+                    isDragging : false,
+                    x   : 0,
+                    y   : 0
+                },
                 width: 1000,
                 height: 350,
                 zoom: {
@@ -290,13 +324,17 @@
                     offset: this.intervalStartOffset ? +this.intervalStartOffset : 0      //Смещение графика слева
                 },
                 dots: dots,
+                toolbar : {
+                    top : 0,
+                    left : 60,
+                },
                 chart: {
                     showPercents: true,
                     showTimes: true,
                     height: 260,
                     width: 940,
                     offset: {
-                        top: 20,
+                        top: 36,
                         left: 60
                     }
                 }
@@ -310,6 +348,42 @@
 
         methods: {
 
+            createDot(time, brightness, selected){
+                return {
+                    selected: !!selected,
+                    time: time,
+                    brightness: brightness,
+                    spectrum: {
+                        0: 0.1,
+                        1: 0.2,
+                        2: 0.1,
+                        3: 0.6,
+                        4: 1,
+                        5: 0.2,
+                        6: 0.1,
+                        7: 0.2
+                    }
+                }
+            },
+
+            createDroppedDot(isSelected){
+                return this.createDot(
+                        this.interval.offset + this.rebaseX(this.draggingNewDot.x - this.chart.offset.left) / this.dpi,
+                        (this.chart.height - this.rebaseY(this.draggingNewDot.y - this.chart.offset.top)) / this.chart.height,
+                        isSelected
+                );
+            },
+
+            onMouseDownNewDot(event){
+                this.draggingNewDot.isDragging = true;
+                this.draggingNewDot.x   = event.offsetX * this.koofScreenX;
+                this.draggingNewDot.y   = event.offsetY * this.koofScreenY;
+            },
+
+            onMouseUpNewDot(event){
+                this.draggingDot.isDragging = false;
+            },
+
             isInSelBox(dot) {
                 return this.selectionBox.isSelectionBox
                     && this.rebaseX(this.getChartX(dot)) >= this.selBox.x && this.rebaseX(this.getChartX(dot)) <= this.selBox.x + this.selBox.width
@@ -320,7 +394,8 @@
                 this.clientWidth = this.$el.clientWidth;
                 this.clientHeight = this.$el.clientHeight;
                 this.height = this.clientWidth ? this.$el.clientHeight / this.clientWidth * this.width : 0;
-                this.chart.height = this.height - 90;
+                this.chart.offset.top = this.dotRadius * 4;
+                this.chart.height = this.height - this.chart.offset.top - 70;
             },
 
             onZoom(delta, event){
@@ -338,7 +413,11 @@
                 if (this.zoom.value <= 1)
                     this.zoom.value = 1;
 
-                this.interval.offset = this.rebaseOffset(this.interval.offset + (old_exposition - this.exposition) / 2);
+                this.interval.offset = this.rebaseOffset(
+                        this.interval.offset
+                        + (old_exposition - this.exposition)
+                        * ((event.offsetX * this.koofScreenX - this.chart.offset.left) / this.chart.width)
+                );
             },
 
             //Первичный обработчик событий для реализации события zoom
@@ -364,6 +443,12 @@
             },
 
             onMouseUp(){
+
+                if(this.draggingNewDot.isDragging){
+                    this.dots.push(this.createDroppedDot(true));
+                    this.draggingNewDot.isDragging = false;
+                }
+
                 if (this.draggingDot.isDragging && this.draggingDot.offsetX == 0 && this.draggingDot.offsetY == 0) {
                     if (!this.event.isShift)
                         this.cleanSelectedDots();
@@ -417,6 +502,13 @@
             },
 
             onMouseMove() {
+
+                if(this.draggingNewDot.isDragging) {
+                    this.draggingNewDot.x   = event.offsetX  * this.koofScreenX;
+                    this.draggingNewDot.y   = event.offsetY  * this.koofScreenY;
+                    return;
+                }
+
                 if (this.draggingDot.isDragging) {
                     this.draggingDot.offsetX += (this.draggingDot.clientX - event.clientX) * this.koofScreenX;
                     this.draggingDot.offsetY += (this.draggingDot.clientY - event.clientY) * this.koofScreenY;
@@ -546,8 +638,6 @@
                     width : Math.abs(this.selectionBox.timeStart - this.selectionBox.timeEnd) * this.dpi,
                     height : Math.abs(this.selectionBox.top - this.selectionBox.bottom)
                 };
-
-                console.log(result);
 
                 if(result.y + result.height > this.chart.height)
                     result.height   = this.chart.height - result.y;
@@ -681,8 +771,12 @@
 
             schedulePath() {
                 let rebaseMap = [];
+                let dots = Object.assign([], this.dots);
 
-                this.dots.map(function (dot) {
+                if(this.draggingNewDot.isDragging)
+                    dots.push(this.createDroppedDot());
+
+                dots.map(function (dot) {
 
                     let x = this.rebaseX(this.getChartX(dot));
                     let y = this.rebaseY(this.getChartY(dot));
@@ -794,12 +888,24 @@
 
             //Коэфициент преобразования реальных точек во внутренние по высоте
             koofScreenY(){
-                return this.height / this.clientHeight;
+                return (+this.height) !=0 ?  this.height / this.clientHeight : 0;
             },
 
             //Радиус точек на графике
             dotRadius(){
                 return this.koofScreenX > 0 ? 10 * this.koofScreenX : 1;
+            },
+
+            fontHeight(){
+                return this.koofScreenY > 0 ? 16 * this.koofScreenY : 16;
+            },
+
+            fontSizeAxisY(){
+                return this.fontHeight < (this.chart.offset.left / 6) ? this.chart.offset.left / 6 : this.fontHeight;
+            },
+
+            fontSizeAxisX(){
+                return this.fontHeight > (this.clientWidth / 16) ? this.clientWidth / 16 : this.fontHeight;
             }
 
         },
@@ -875,7 +981,6 @@
             text {
                 opacity: 0.2;
                 text-anchor: middle;
-                font-size: 48px;
                 stroke: #333;
                 cursor: default;
             }
@@ -891,20 +996,16 @@
 
         }
 
-        .dots {
+        .dot {
+            fill: #0000F5;
+            stroke: #FFF;
+            cursor: normal;
+        }
 
-            .dot {
-                fill: #0000F5;
-                stroke: #FFF;
-                cursor: normal;
-            }
-
-            .dot:hover, .dot.selected {
-                border: 3px;
-                border-color: #FF0000;
-                fill: #F50000;
-            }
-
+        .dot:hover, .dot.selected {
+            border: 3px;
+            border-color: #FF0000;
+            fill: #F50000;
         }
 
         .schedulePath {

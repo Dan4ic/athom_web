@@ -1,9 +1,9 @@
 <template>
-    <div style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; padding: 8px;">
-    <lucerna-scheduller
-            class="scheduler"
-            :intervalWidth="interval.width"
-    ></lucerna-scheduller>
+    <div class="desk">
+        <lucerna-scheduller draggable="true"
+                class="scheduler"
+                :intervalWidth="interval.width"
+        ></lucerna-scheduller>
     </div>
 </template>
 
@@ -11,11 +11,7 @@
 
     export default {
         name: 'Lucerna2',
-        mounted(){
-            console.log('Mounted application');
-        },
-        beforeDestroy () {
-            console.log('Destroy application');
+        methods : {
         },
         computed : {
             interval(){
@@ -31,6 +27,15 @@
 </script>
 
 <style>
+
+    .desk {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        padding : 8px;
+    }
 
     .scheduler {
         min-height: 350px;

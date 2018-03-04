@@ -182,11 +182,8 @@ fs.readdirSync(apps_path).forEach(file => {
                 minRatio: 1
             })
         );
-
     }
 });
-
-
 
 if (config.build.bundleAnalyzerReport) {
     const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
