@@ -15,7 +15,15 @@
             <g v-if="currentTimeX > 0">
                 <rect class="current-time-box" :width="currentTimeX" :height="chart.height"></rect>
                 <line class="current-time-line" :x1="currentTimeX" :x2="currentTimeX" :y2="chart.height"></line>
-                <text :x="currentTimeX" :y="-dotRadius * 1" dy=".32em" style="text-anchor: middle;" :font-size="fontHeight">
+                <text
+                        :x="currentTimeX"
+                        :y="dotRadius * 1"
+                        :dy="!isMobileScreen? 8 * koofScreenY : -fontHeight / 2 + 4"
+                        :dx="chart.width / 2 < currentTimeX ? -2 : 2"
+                        :style="{'text-anchor' : chart.width / 2 < currentTimeX ? 'end' : 'start'}"
+                        :font-size="fontHeight"
+                        opacity="0.3"
+                >
                     {{ currentTime | time}}
                 </text>
             </g>
@@ -94,8 +102,7 @@
                     <line :y2="chart.height" x2="0" class="axis-x" opacity="0.1"></line>
                     <text
                             v-if="chart.showTimes"
-                            :y="chart.height + 20"
-                            dy=".32em"
+                            :y="chart.height + fontSizeAxisX"
                             style="text-anchor: middle;"
                             :font-size="fontSizeAxisX"
                     >
@@ -137,7 +144,7 @@
                 :cx="draggingNewDot.x"
                 :cy="draggingNewDot.y"
         />
-        <g :transform="['translate(' + toolbar.left +','+ toolbar.top + ')']">
+        <g class="toolbar" :transform="['translate(' + toolbar.left +','+ toolbar.top + ')']">
             <circle
                     class="dot"
                     :r="dotRadius"
@@ -146,6 +153,27 @@
                     @mousedown.prevent="onMouseDownNewDot"
                     @mouseup.prevent="onMouseUpNewDot"
             ></circle>
+            <text
+                    :y="dotRadius * 2"
+                    :x="dotRadius * 3 + dotRadius / 2"
+                    :dy="dotRadius"
+                    class="button ico"
+                    :font-size="dotRadius * 3"
+                    @mousedown.prevent="onDelete"
+            >
+                clear
+            </text>
+            <text
+                    :y="dotRadius * 2"
+                    :x="dotRadius * 7 + dotRadius / 2"
+                    :dy="dotRadius / 2"
+                    class="button ico"
+                    :font-size="dotRadius * 2"
+                    @mousedown.stop="onCopy"
+            >
+                content_copy
+            </text>
+
         </g>
     </svg>
 </template>
@@ -168,6 +196,7 @@
         destroyed () {
             window.removeEventListener('mousewheel', this.proxyScrollEvent);
             window.removeEventListener('resize', this.onResize)
+            clearInterval(this.scrolling.inertTimer);
         },
         mounted(){
             this.onResize();
@@ -298,6 +327,15 @@
                 },
                 scrolling: {
                     isScrolling: false,
+                    power : 0,
+                    inertTimer : setInterval(()=>{
+                        if(Math.abs(this.scrolling.power) > 1) {
+                            this.interval.offset = this.rebaseOffset(
+                                this.interval.offset + this.scrolling.power  / this.dpi
+                            );
+                            this.scrolling.power    /= 1.04;
+                        }
+                    }, 20),
                     clientX: 0,
                 },
                 selectionBox : {
@@ -382,9 +420,9 @@
                 if (evt.touches.length > 1 || (evt.type == "touchend" && evt.touches.length > 0))
                     return;
 
-                var newEvt = document.createEvent("MouseEvents");
-                var type = null;
-                var touch = null;
+                let newEvt = document.createEvent("MouseEvents");
+                let type = null;
+                let touch = null;
 
                 switch (evt.type) {
                     case "touchstart":
@@ -428,8 +466,8 @@
                 this.clientWidth = this.$el.clientWidth;
                 this.clientHeight = this.$el.clientHeight;
                 this.height = this.clientWidth ? this.$el.clientHeight / this.clientWidth * this.width : 0;
-                this.chart.offset.top = this.dotRadius * 3 + this.fontHeight;
-                this.chart.height = this.height - this.chart.offset.top - 70;
+                this.chart.offset.top = this.dotRadius * 3;
+                this.chart.height = this.height - this.chart.offset.top - this.fontSizeAxisX * 1.5;
             },
 
             onZoom(delta, event){
@@ -479,7 +517,13 @@
             onMouseUp(){
 
                 if(this.draggingNewDot.isDragging){
-                    this.dots.push(this.createDroppedDot(true));
+                    if(
+                        (this.draggingNewDot.y >= this.chart.offset.top)
+                        && (this.draggingNewDot.y <= this.chart.offset.top + this.chart.height)
+                        && (this.draggingNewDot.x >= this.chart.offset.left)
+                        && (this.draggingNewDot.x <= this.chart.offset.left + this.chart.width)
+                    )
+                        this.dots.push(this.createDroppedDot(true));
                     this.draggingNewDot.isDragging = false;
                 }
 
@@ -490,7 +534,7 @@
                     this.event.dot.selected = !this.event.dot.selected;
                 }
 
-                this.dots.map(function (dot) {
+                this.dots.map((dot) => {
                     if(this.selectionBox.isSelectionBox && this.isInSelBox(dot))
                         dot.selected = true;
 
@@ -498,7 +542,7 @@
                         dot.brightness = (this.chart.height - this.rebaseY(this.getChartY(dot))) / this.chart.height;
                         dot.time = this.interval.offset + this.rebaseX(this.getChartX(dot)) / this.dpi;
                     }
-                }.bind(this));
+                });
 
                 this.draggingDot.isDragging = false;
                 this.draggingDot.offsetX = 0;
@@ -513,6 +557,8 @@
                 this.draggingDot.clientY = event.clientY;
 
                 this.scrolling.clientX = event.clientX;
+
+                this.scrolling.power = 0;
 
                 if (!this.draggingDot.isDragging) {
                     if(!!window.event.shiftKey) {
@@ -557,8 +603,9 @@
                 }
 
                 if (this.scrolling.isScrolling) {
+                    this.scrolling.power = (this.scrolling.clientX - event.clientX)* this.koofScreenX;
                     this.interval.offset = this.rebaseOffset(
-                            this.interval.offset + (this.scrolling.clientX - event.clientX)* this.koofScreenX  / this.dpi
+                            this.interval.offset + this.scrolling.power  / this.dpi
                     );
                 }
 
@@ -581,6 +628,31 @@
                 this.scrolling.clientX = event.clientX;
 
                 return true;
+            },
+
+            onDelete(){
+
+                let result  = [];
+
+                this.dots.map((dot) => {
+                    if(!dot.selected)
+                        result.push(dot);
+                });
+
+                this.dots = result;
+
+            },
+
+            onCopy(){
+                this.dots.map((dot) => {
+                    if(dot.selected) {
+                        dot.selected    = false;
+                        let new_dot = Object.assign({}, dot);
+                        new_dot.time += this.dotRadius * 2 / this.dpi;
+                        new_dot.selected = true;
+                        this.dots.push(new_dot);
+                    }
+                });
             },
 
             //Фокусировка на выбранном дне по dblclick
@@ -807,10 +879,16 @@
                 let rebaseMap = [];
                 let dots = Object.assign([], this.dots);
 
-                if(this.draggingNewDot.isDragging)
+                if(this.draggingNewDot.isDragging
+                    &&(this.draggingNewDot.y >= this.chart.offset.top)
+                    && (this.draggingNewDot.y <= this.chart.offset.top + this.chart.height)
+                    && (this.draggingNewDot.x >= this.chart.offset.left)
+                    && (this.draggingNewDot.x <= this.chart.offset.left + this.chart.width)
+
+                )
                     dots.push(this.createDroppedDot());
 
-                dots.map(function (dot) {
+                dots.map((dot) => {
 
                     let x = this.rebaseX(this.getChartX(dot));
                     let y = this.rebaseY(this.getChartY(dot));
@@ -821,7 +899,7 @@
                         dot: dot
                     });
 
-                }.bind(this));
+                });
 
                 rebaseMap.sort(function (a, b) {
 
@@ -846,7 +924,7 @@
                 let outside_right = null;
                 let inside_right = null;
 
-                rebaseMap.forEach(function (dot) {
+                rebaseMap.map((dot) => {
 
                     if (this.getChartX(dot.dot) < 0)
                         outside_left = dot;
@@ -862,7 +940,7 @@
                         body += 'L' + dot.x + ',' + dot.y;
                     }
 
-                }.bind(this));
+                });
 
                 let prefix = "";
                 let postfix = "";
@@ -922,7 +1000,7 @@
 
             //Коэфициент преобразования реальных точек во внутренние по высоте
             koofScreenY(){
-                return (+this.height) !=0 ?  this.height / this.clientHeight : 0;
+                return (+this.clientHeight) !=0 ?  this.height / this.clientHeight : 0;
             },
 
             //Радиус точек на графике
@@ -972,6 +1050,24 @@
 <style lang="less" rel="stylesheet/less">
 
     .light-schedule {
+
+        .toolbar {
+
+            .button {
+                cursor: pointer;
+            }
+
+            .button:hover {
+                fill: #f00;
+            }
+
+            .button.ico {
+                font-family: "Material Icons";
+                text-rendering: optimizeLegibility;
+                font-feature-settings: 'liga' 1;
+                font-style: normal;
+            }
+        }
 
         /* width: 100%; */
         /* height: auto; */
