@@ -7,6 +7,7 @@ export default {
         UPLOAD : 'Upload',
         DOWNLOAD : 'Download',
         ERROR_LOAD_LIGHT_CONFIG: 'Error of loading file',
+        DOT_INSPECTOR: 'Dot inspector',
     },
     ru : {
         PREFS_TITLE : 'Освещение',
@@ -16,5 +17,6 @@ export default {
         UPLOAD : 'Загрузить',
         DOWNLOAD : 'Сохранить',
         ERROR_LOAD_LIGHT_CONFIG: 'Ошибка загрузки файла',
+        DOT_INSPECTOR: 'Параметры точки',
     }
 }

@@ -10,6 +10,7 @@
       ]
     },
     "lucerna-scheduller" : {},
+    "lucerna-dot-inspector" : {},
     "lucerna-preferences" : {
       "intent_filter" : [
         {

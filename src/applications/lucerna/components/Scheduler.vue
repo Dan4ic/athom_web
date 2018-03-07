@@ -1,181 +1,201 @@
 <template>
-    <svg class="light-schedule"
-         :view-box.camel="[0, 0, width, height]"
-         @mousedown.prevent="onMouseDown"
-         @mousemove.prevent="onMouseMove"
-         @mouseup.prevent="onMouseUp"
-         @mouseleave.prevent="onMouseUp"
-         @touchstart.prevent="onTouch"
-         @touchmove.prevent="onTouch"
-         @touchend.prevent="onTouch"
-         @touchcancel.prevent="onTouch"
-    >
-        <g :transform="['translate(' + chart.offset.left, chart.offset.top + ')']">
+    <div>
+        <svg class="light-schedule"
+             :view-box.camel="[0, 0, width, height]"
+             @mousedown.prevent="onMouseDown"
+             @mousemove.prevent="onMouseMove"
+             @mouseup.prevent="onMouseUp"
+             @mouseleave.prevent="onMouseUp"
+             @touchstart.prevent="onTouch"
+             @touchmove.prevent="onTouch"
+             @touchend.prevent="onTouch"
+             @touchcancel.prevent="onTouch"
+        >
+            <g :transform="['translate(' + chart.offset.left, chart.offset.top + ')']">
 
-            <g v-if="currentTimeX > 0">
-                <rect class="current-time-box" :width="currentTimeX" :height="chart.height"></rect>
-                <line class="current-time-line" :x1="currentTimeX" :x2="currentTimeX" :y2="chart.height"></line>
-                <text
-                        :x="currentTimeX"
-                        :y="dotRadius * 1"
-                        :dy="!isMobileScreen? 8 * koofScreenY : -fontHeight / 2 + 4"
-                        :dx="chart.width / 2 < currentTimeX ? -2 : 2"
-                        :style="{'text-anchor' : chart.width / 2 < currentTimeX ? 'end' : 'start'}"
-                        :font-size="fontHeight"
-                        opacity="0.3"
-                >
-                    {{ currentTime | time}}
-                </text>
-            </g>
-
-            <g class="grid-days">
-
-                <rect class="axis-border" :width="chart.width" :height="chart.height"></rect>
-
-                <g
-                        v-for="percent in axisY"
-                        :transform="['translate(0', percent.y + ')']"
-                >
-                    <line :x2="chart.width" y2="0" class="axis-y" opacity="0.1"></line>
+                <g v-if="currentTimeX > 0">
+                    <rect class="current-time-box" :width="currentTimeX" :height="chart.height"></rect>
+                    <line class="current-time-line" :x1="currentTimeX" :x2="currentTimeX" :y2="chart.height"></line>
                     <text
-                            v-if="chart.showPercents"
-                            :x="isMobileScreen? 0 : -10"
-                            :dy="isMobileScreen? fontSizeAxisY : fontSizeAxisY / 2"
-                            :style="{'text-anchor' : isMobileScreen ? 'middle' : 'end'}"
-                            :font-size="fontSizeAxisY"
-                            :transform="[isMobileScreen ? 'rotate(90)' : '']"
+                            :x="currentTimeX"
+                            :y="dotRadius * 1"
+                            :dy="!isMobileScreen? 8 * koofScreenY : -fontHeight / 2 + 4"
+                            :dx="chart.width / 2 < currentTimeX ? -2 : 2"
+                            :style="{'text-anchor' : chart.width / 2 < currentTimeX ? 'end' : 'start'}"
+                            :font-size="fontHeight"
+                            opacity="0.3"
                     >
-                        {{percent.percent | percent}}
+                        {{ currentTime | time}}
                     </text>
                 </g>
 
-                <g
-                        v-if="showDaysXAxis"
-                >
+                <g class="grid-days">
+
+                    <rect class="axis-border" :width="chart.width" :height="chart.height"></rect>
 
                     <g
-                            v-for="(xDay, index) in axisXDays"
-                            :class="['axis-days', {'even' : !(xDay.number % 2)}]"
-                            :transform="['translate(' + xDay.x, '0)']"
-                            :key="xDay.number"
+                            v-for="percent in axisY"
+                            :transform="['translate(0', percent.y + ')']"
+                    >
+                        <line :x2="chart.width" y2="0" class="axis-y" opacity="0.1"></line>
+                        <text
+                                v-if="chart.showPercents"
+                                :x="isMobileScreen? 0 : -10"
+                                :dy="isMobileScreen? fontSizeAxisY : fontSizeAxisY / 2"
+                                :style="{'text-anchor' : isMobileScreen ? 'middle' : 'end'}"
+                                :font-size="fontSizeAxisY"
+                                :transform="[isMobileScreen ? 'rotate(90)' : '']"
+                        >
+                            {{percent.percent | percent}}
+                        </text>
+                    </g>
 
+                    <g
+                            v-if="showDaysXAxis"
                     >
 
-                        <clipPath :id="'clipDay' + xDay.number">
-                            <rect :width="xDay.width" :height="chart.height"/>
-                        </clipPath>
-
                         <g
-                                :clip-path="['url(#clipDay'+xDay.number+')']"
+                                v-for="(xDay, index) in axisXDays"
+                                :class="['axis-days', {'even' : !(xDay.number % 2)}]"
+                                :transform="['translate(' + xDay.x, '0)']"
+                                :key="xDay.number"
+
                         >
 
-                            <text
-                                    :y="chart.height / 2"
-                                    :x="xDay.width / 2"
-                                    :font-size="fontHeight * 5"
-                                    :dy="fontHeight"
+                            <clipPath :id="'clipDay' + xDay.number">
+                                <rect :width="xDay.width" :height="chart.height"/>
+                            </clipPath>
 
+                            <g
+                                    :clip-path="['url(#clipDay'+xDay.number+')']"
                             >
-                                {{xDay.number + 1}}
-                            </text>
+
+                                <text
+                                        :y="chart.height / 2"
+                                        :x="xDay.width / 2"
+                                        :font-size="fontHeight * 5"
+                                        :dy="fontHeight"
+
+                                >
+                                    {{xDay.number + 1}}
+                                </text>
+
+                            </g>
+
+                            <line
+                                    v-if="index > 0"
+                                    :y2="chart.height"
+                                    :style="{'stroke-width' : dayBorderWidth + 'px'}"
+                                    opacity="0"
+                            ></line>
+
+                            <rect :width="xDay.width" :height="chart.height" opacity="0" @dblclick="expandDay(xDay)"/>
 
                         </g>
 
-                        <line
-                                v-if="index > 0"
-                                :y2="chart.height"
-                                :style="{'stroke-width' : dayBorderWidth + 'px'}"
-                                opacity="0"
-                        ></line>
+                    </g>
 
-                        <rect :width="xDay.width" :height="chart.height" opacity="0" @dblclick="expandDay(xDay)"/>
-
+                    <g
+                            v-for="time in axisX"
+                            :transform="['translate(' + time.x, '0)']"
+                            :key="time.time"
+                    >
+                        <line :y2="chart.height" x2="0" class="axis-x" opacity="0.1"></line>
+                        <text
+                                v-if="chart.showTimes"
+                                :y="chart.height + fontSizeAxisX"
+                                style="text-anchor: middle;"
+                                :font-size="fontSizeAxisX"
+                        >
+                            {{time.time | time}}
+                        </text>
                     </g>
 
                 </g>
 
-                <g
-                        v-for="time in axisX"
-                        :transform="['translate(' + time.x, '0)']"
-                        :key="time.time"
-                >
-                    <line :y2="chart.height" x2="0" class="axis-x" opacity="0.1"></line>
-                    <text
-                            v-if="chart.showTimes"
-                            :y="chart.height + fontSizeAxisX"
-                            style="text-anchor: middle;"
-                            :font-size="fontSizeAxisX"
-                    >
-                        {{time.time | time}}
-                    </text>
+                <path class="schedulePath" :d="schedulePath"></path>
+
+                <g class="dots">
+
+                    <circle
+                            v-for="dot in dots"
+                            v-if="isDotVisible(dot)"
+                            :class="['dot', {'selected' : dot.selected || isInSelBox(dot)}]"
+                            :r="dotRadius"
+                            :cx="rebaseX(getChartX(dot))"
+                            :cy="rebaseY(getChartY(dot))"
+                            @mousedown="onDotMouseDown(dot)"
+                            @dblclick="isShowDotInspector=true"
+                    ></circle>
                 </g>
 
+                <rect
+                        class="selection-box"
+                        v-if="selectionBox.isSelectionBox"
+                        :x="selBox.x"
+                        :y="selBox.y"
+                        :width="selBox.width"
+                        :height="selBox.height"
+                />
+
             </g>
-
-            <path class="schedulePath" :d="schedulePath"></path>
-
-            <g class="dots">
-
-                <circle
-                        v-for="dot in dots"
-                        v-if="isDotVisible(dot)"
-                        :class="['dot', {'selected' : dot.selected || isInSelBox(dot)}]"
-                        :r="dotRadius"
-                        :cx="rebaseX(getChartX(dot))"
-                        :cy="rebaseY(getChartY(dot))"
-                        @mousedown="onDotMouseDown(dot)"
-                ></circle>
-            </g>
-
-            <rect
-                    class="selection-box"
-                    v-if="selectionBox.isSelectionBox"
-                    :x="selBox.x"
-                    :y="selBox.y"
-                    :width="selBox.width"
-                    :height="selBox.height"
-            />
-
-        </g>
-        <circle
-                v-if="draggingNewDot.isDragging"
-                class="dot"
-                :r="dotRadius"
-                :cx="draggingNewDot.x"
-                :cy="draggingNewDot.y"
-        />
-        <g class="toolbar" :transform="['translate(' + toolbar.left +','+ toolbar.top + ')']">
             <circle
+                    v-if="draggingNewDot.isDragging"
                     class="dot"
                     :r="dotRadius"
-                    :cx="dotRadius + dotRadius / 2"
-                    :cy="dotRadius + dotRadius / 2"
-                    @mousedown.prevent="onMouseDownNewDot"
-                    @mouseup.prevent="onMouseUpNewDot"
-            ></circle>
-            <text
-                    :y="dotRadius * 2"
-                    :x="dotRadius * 3 + dotRadius / 2"
-                    :dy="dotRadius"
-                    class="button ico"
-                    :font-size="dotRadius * 3"
-                    @mousedown.prevent="onDelete"
-            >
-                clear
-            </text>
-            <text
-                    :y="dotRadius * 2"
-                    :x="dotRadius * 7 + dotRadius / 2"
-                    :dy="dotRadius / 2"
-                    class="button ico"
-                    :font-size="dotRadius * 2"
-                    @mousedown.stop="onCopy"
-            >
-                content_copy
-            </text>
+                    :cx="draggingNewDot.x"
+                    :cy="draggingNewDot.y"
+            />
+            <g class="toolbar" :transform="['translate(' + toolbar.left +','+ toolbar.top + ')']">
+                <circle
+                        class="dot"
+                        :r="dotRadius"
+                        :cx="dotRadius + dotRadius / 2"
+                        :cy="dotRadius + dotRadius / 2"
+                        @mousedown.prevent="onMouseDownNewDot"
+                        @mouseup.prevent="onMouseUpNewDot"
+                ></circle>
+                <text
+                        :y="dotRadius * 2"
+                        :x="dotRadius * 3 + dotRadius / 2"
+                        :dy="dotRadius"
+                        class="button ico"
+                        :font-size="dotRadius * 3"
+                        @mousedown.prevent="onDelete"
+                >
+                    clear
+                </text>
+                <text
+                        :y="dotRadius * 2"
+                        :x="dotRadius * 7 + dotRadius / 2"
+                        :dy="dotRadius / 2"
+                        class="button ico"
+                        :font-size="dotRadius * 2"
+                        @mousedown.stop="onCopy"
+                >
+                    content_copy
+                </text>
 
-        </g>
-    </svg>
+            </g>
+        </svg>
+        <v-form ref="form" v-if="isShowDotInspector" class="dot-inspector">
+            <v-card style="height: 100%">
+                <v-card-title primary-title >
+                    <v-container style="padding: 0">
+                        <v-layout row>
+                            <h1>{{'DOT_INSPECTOR' | lang}}</h1>
+                        </v-layout>
+                        <v-layout>
+                            <lucerna-dot-inspector v-model="dotsForInspection"></lucerna-dot-inspector>
+                        </v-layout>
+                    </v-container>
+                </v-card-title>
+                <v-card-actions text-xs-right style="position: absolute; bottom: 0; z-index: 10001">
+                    <v-btn @click="isShowDotInspector=false">{{'SUBMIT' | lang }}</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-form>
+    </div>
 </template>
 
 <script>
@@ -365,6 +385,7 @@
                     offset: this.intervalStartOffset ? +this.intervalStartOffset : 0      //Смещение графика слева
                 },
                 dots: dots,
+                isShowDotInspector : false,
                 toolbar : {
                     top : 0,
                     left : 60,
@@ -732,6 +753,23 @@
 
         computed: {
 
+            dotsForInspection : {
+                get(){
+                    let dots = [];
+
+                    this.dots.map((dot) => {
+                        if(dot.selected)
+                            dots.push(Object.assign({}, dot));
+                    });
+
+                    return dots;
+                },
+                set(value){
+                    //todo реализовать
+                    return;
+                }
+            },
+
             //Calc selection box
             selBox(){
 
@@ -1048,6 +1086,15 @@
 </script>
 
 <style lang="less" rel="stylesheet/less">
+
+    .dot-inspector {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 10000;
+    }
 
     .light-schedule {
 
