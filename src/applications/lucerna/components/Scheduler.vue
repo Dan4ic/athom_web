@@ -29,6 +29,14 @@
                     </text>
                 </g>
 
+                <g :transform="['translate(0, 50)']">
+                    <spectrum
+                            :width="chart.width"
+                            :height="chart.height - 50"
+                            opacity="0.35"
+                    ></spectrum>
+                </g>
+
                 <g class="grid-days">
 
                     <rect class="axis-border" :width="chart.width" :height="chart.height"></rect>
@@ -201,8 +209,13 @@
 <script>
 
     import consts from 'consts';
+    import Spectrum from './Spectrum.vue';
 
     export default {
+
+        components : {
+            spectrum : Spectrum
+        },
 
         created () {
             window.addEventListener('mousewheel', this.proxyScrollEvent);
