@@ -193,7 +193,7 @@
                         <v-layout row>
                             <h1>{{'DOT_INSPECTOR' | lang}}</h1>
                         </v-layout>
-                        <v-layout>
+                        <v-layout row>
                             <lucerna-dot-inspector v-model="dotsForInspection"></lucerna-dot-inspector>
                         </v-layout>
                     </v-container>
@@ -208,10 +208,10 @@
 
 <script>
 
-    import consts from 'consts';
-    import Spectrum from './Spectrum.vue';
+  import consts from 'consts';
+  import Spectrum from './Spectrum.vue';
 
-    export default {
+  export default {
 
         components : {
             spectrum : Spectrum
@@ -423,22 +423,27 @@
 
         methods: {
 
-            createDot(time, brightness, selected){
+            createDot(time, brightness, selected) {
+                let channels = this.$store.state.lucerna.channels.map((channel, i) => {
+                    return {
+                        name: 'Channel ' + (i + 1),
+                        value: 5,
+                        color: channel.color
+                    };
+                });
+
+                // channels.unshift({
+                //     name: 'Brightness',
+                //     value: brightness * 100,
+                //     color: '#fff5d7'
+                // });
+
                 return {
                     selected: !!selected,
                     time: time,
                     brightness: brightness,
-                    spectrum: {
-                        0: 0.1,
-                        1: 0.2,
-                        2: 0.1,
-                        3: 0.6,
-                        4: 1,
-                        5: 0.2,
-                        6: 0.1,
-                        7: 0.2
-                    }
-                }
+                    channels: channels
+                };
             },
 
             createDroppedDot(isSelected){
