@@ -11,6 +11,24 @@
             </linearGradient>
         </defs>
         <path :d="path" fill="url(#spectrumGradient)" :opacity="opacity"/>
+        <template v-for="line in axis">
+            <line
+                    class="line-wave"
+                    :x1="line.x"
+                    :x2="line.x"
+                    :y1="0"
+                    :y2="line.length"
+                    :opacity="opacity"
+            ></line>
+            <text
+                    v-if="!(line.wave % 50)"
+                    class="text-wave"
+                    :x="line.x"
+                    :dy="line.length + textHeight * 1.5"
+                    :font-size="textHeight"
+                    text-anchor="middle"
+            >{{line.wave}}nm</text>
+        </template>
     </g>
 </template>
 
@@ -21,9 +39,23 @@
 
     export default {
 
-        props: ['value', 'width', 'height', 'opacity'],
+        props: ['value', 'width', 'height', 'opacity', 'text-height'],
 
         computed :{
+            axis(){
+                let result = [];
+                let k = this.width / (this.waveStop - this.waveStart);
+                for(let w = this.waveStart, offset = 0; w<this.waveStop; w++, offset++){
+                    if(!(w % 10))
+                        result.push({
+                            wave : w,
+                            x : (w - this.waveStart) * k,
+                            length : w % 50 ? this.textHeight : this.textHeight * 2
+                        });
+                }
+
+                return result;
+            },
             path(){
                 let spectum = this.$store.state.lucerna.channels[0].spectrum;
                 let max = 0;
@@ -68,6 +100,14 @@
 </script>
 
 <style lang="less" rel="stylesheet/less">
+
+    .text-wave {
+    }
+
+    .line-wave {
+        stroke-width: 1px;
+        stroke: #000;
+    }
 
     .dot-inspector {
 
