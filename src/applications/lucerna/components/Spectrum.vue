@@ -16,17 +16,18 @@
                     class="line-wave"
                     :x1="line.x"
                     :x2="line.x"
-                    :y1="0"
-                    :y2="line.length"
+                    :y1="height - line.length"
+                    :y2="height"
                     :opacity="opacity"
             ></line>
             <text
                     v-if="!(line.wave % 50)"
                     class="text-wave"
                     :x="line.x"
-                    :dy="line.length + textHeight * 1.5"
+                    :dy="height - line.length - textHeight * 0.5 "
                     :font-size="textHeight"
                     text-anchor="middle"
+                    :opacity="opacity"
             >{{line.wave}}nm</text>
         </template>
     </g>

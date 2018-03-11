@@ -34,7 +34,7 @@
                             :width="chart.width"
                             :height="chart.height"
                             opacity="0.35"
-                            :text-height="isMobileScreen? fontSizeAxisY : fontSizeAxisY / 2"
+                            :text-height="fontSizeAxisX"
                     ></spectrum>
                 </g>
 
