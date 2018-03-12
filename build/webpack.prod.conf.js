@@ -160,28 +160,54 @@ const webpackConfig = merge(baseWebpackConfig, {
 const apps_path = path.resolve(__dirname, '../src/applications/');
 
 fs.readdirSync(apps_path).forEach(file => {
-    if (fs.lstatSync(path.resolve(apps_path, file)).isDirectory()) {
-        webpackConfig.plugins.push(
-            new webpack.optimize.CommonsChunkPlugin({
-                name: file,
-                filename: 'apps/' + file + '.js',
-                children: true,
-            })
-        );
+    let dir = path.resolve(apps_path, file);
+    if (fs.lstatSync(dir).isDirectory()) {
+        let manifest = JSON.parse(fs.readFileSync(`${dir}/manifest.json`));
+        ['langs', 'store'].map((module) => {
+            if(module in manifest) {
+                webpackConfig.plugins.push(
+                    new webpack.optimize.CommonsChunkPlugin({
+                        name: `${file}-${module}`,
+                        filename: `apps/${file}/${module}.js`,
+                        children: true,
+                    })
+                );
+                webpackConfig.plugins.push(
+                    new CompressionWebpackPlugin({
+                        asset: `apps/${file}/${module}.gz`,
+                        filename(asset) {
+                            console.log(asset);
+                            return asset;
+                        },
+                        algorithm: 'gzip',
+                        deleteOriginalAssets: true,
+                        test: new RegExp(`${file}/${module}\.js`),
+                        minRatio: 1
+                    })
+                );
+            }
+        });
 
-        webpackConfig.plugins.push(
-            new CompressionWebpackPlugin({
-                asset: `apps/${file}.gz`,
-                filename(asset) {
-                    console.log(asset);
-                    return asset;
-                },
-                algorithm: 'gzip',
-                deleteOriginalAssets: true,
-                test: new RegExp(`${file}\.js`),
-                minRatio: 1
-            })
-        );
+        //Including components files
+        utils.componentSources(manifest).map((source, index) => {
+            let filename = `apps/${file}/component${index}.js`;
+            webpackConfig.plugins.push(
+                new webpack.optimize.CommonsChunkPlugin({
+                    name: `${file}-component-${index}`,
+                    filename: filename,
+                    children: true,
+                })
+            );
+            webpackConfig.plugins.push(
+                new CompressionWebpackPlugin({
+                    asset: `apps/${file}/component${index}.gz`,
+                    algorithm: 'gzip',
+                    deleteOriginalAssets: true,
+                    test: new RegExp(filename),
+                    minRatio: 1
+                })
+            );
+        });
     }
 });
 
