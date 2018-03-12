@@ -42,7 +42,6 @@ export default {
     mutations: {
         //Set profiles of applications
         setProfiles(state, profiles) {
-
             profiles.map((profile) => {
                 if ('components' in profile)
                     for (let component in profile.components) {
@@ -52,7 +51,6 @@ export default {
                         }
                     }
             });
-
             state.apps.profiles = profiles;
         },
 
