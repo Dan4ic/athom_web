@@ -112,10 +112,8 @@ fs.readdirSync(apps_path).forEach(dir => {
 
         //Including components files
         utils.componentSources(manifest).map((source, index) => {
-            module.exports.entry[`${dir}-component-${index}`] = path.resolve(apps_path, dir, source);
+            module.exports.entry[`${dir}-component-${index}`] = path.resolve(apps_path, dir, source.source);
         });
-
-        module.exports.entry[dir] = path.resolve(apps_path, dir, "index.js");
 
     }
 

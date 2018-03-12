@@ -66,14 +66,6 @@ const webpackConfig = merge(baseWebpackConfig, {
         new webpack.HashedModuleIdsPlugin(),
         // enable scope hoisting
         new webpack.optimize.ModuleConcatenationPlugin(),
-        /*
-        //Applications
-        new webpack.optimize.CommonsChunkPlugin({
-            name: 'lucerna',
-            filename : 'apps/lucerna.js',
-            children: true,
-        }),
-        */
 
         // split vendor js into its own file
         new webpack.optimize.CommonsChunkPlugin({

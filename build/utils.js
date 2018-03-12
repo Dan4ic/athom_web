@@ -104,16 +104,25 @@ exports.createNotifierCallback = () => {
 
 //
 exports.componentSources = function (manifest) {
+    let result  = [];
     let com_entries = [];
     if ('components' in manifest) {
         for (let name in manifest.components) {
             let component = manifest.components[name];
-            if (com_entries.indexOf(component.source) < 0) {
-                if (!component.source)
-                    throw new Error(`Source of component not defined ${name}`);
+
+            if (!component.source)
+                throw new Error(`Source of component not defined ${name}`);
+
+            let index = com_entries.indexOf(component.source);
+            if(index<0) {
+                result.push({
+                    source : component.source,
+                    components : [name]
+                });
                 com_entries.push(component.source);
-            }
+            } else
+                result[index].components.push(name);
         }
     }
-    return com_entries;
+    return result;
 }
