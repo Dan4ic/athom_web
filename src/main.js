@@ -27,6 +27,7 @@ window.$exportComponent     = Apps.exportComponent;
 window.$protocomponents     = [];
 window.$getComponentBy      = Apps.getComponentBy;
 window.$includeLang         = Apps.includeLang;
+window.$requireComponent    = Apps.requireComponent;
 
 //Loaded application components storage
 window.$applications    = {};

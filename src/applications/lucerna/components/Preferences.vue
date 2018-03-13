@@ -63,6 +63,8 @@
 
 <script>
 
+    $requireComponent('lucerna-basis');
+
     let consts = window.$consts;
 
     export default {

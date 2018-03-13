@@ -235,7 +235,6 @@
         components : {
             spectrum : Spectrum
         },
-
         created () {
             window.addEventListener('mousewheel', this.proxyScrollEvent);
             window.addEventListener('resize', this.onResize);

@@ -2,22 +2,30 @@ import consts from 'consts';
 
 export default {
 
+    //Create component by name
+    requireComponent(name) {
+        if (name in Vue.options.components)
+            return new Vue(new Promise(Vue.options.components[name]));
+        else
+            throw new Error(`Failed to create component ${name}`)
+    },
+
     //Include application lang constants
-    includeLang(consts){
-        for(let lng in consts)
+    includeLang(consts) {
+        for (let lng in consts)
             Object.assign(window.$consts.LANGS[lng], consts[lng]);
     },
 
     //Return registered components by category or category & action
-    getComponentBy(category, action){
-        let result  = [];
+    getComponentBy(category, action) {
+        let result = [];
 
-        window.$store.state.apps.profiles.map(function(profile){
-            for(let name in profile.components) {
-                let component   = profile.components[name];
-                if(component.intent_filter)
-                    for(let f=0; f < component.intent_filter.length; f++){
-                        if(
+        window.$store.state.apps.profiles.map(function (profile) {
+            for (let name in profile.components) {
+                let component = profile.components[name];
+                if (component.intent_filter)
+                    for (let f = 0; f < component.intent_filter.length; f++) {
+                        if (
                             component.intent_filter[f].category
                             && category === component.intent_filter[f].category
                             && (
@@ -37,23 +45,24 @@ export default {
     },
 
     //Register pubic component
-    exportComponent(component, object){
-        window.$protocomponents[component]  = object;
+    exportComponent(component, object) {
+        window.$protocomponents[component] = object;
     },
 
-    makePromisLoadComponent(url, component){
-        return function(resolve, reject) {
+    //Create promise for dynamically load component
+    makePromisLoadComponent(url, component) {
+        return function (resolve, reject) {
 
-            if(component in window.$protocomponents) {
+            if (component in window.$protocomponents) {
                 resolve(window.$protocomponents[component]);
                 return;
             }
 
             const script = document.createElement("script");
-            script.src  = url;
+            script.src = url;
 
             script.onload = () => {
-                if(component in window.$protocomponents)
+                if (component in window.$protocomponents)
                     resolve(window.$protocomponents[component]);
                 else {
                     window.$bus.$emit(consts.EVENTS.ALERT, consts.ALERT_TYPE.ERROR, Vue.filter('lang')('ERROR_LOAD_APP'));

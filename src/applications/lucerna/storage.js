@@ -1,4 +1,4 @@
-$store.registerModule('lucerna', {
+export default {
     namespaced: true,
     state: {
         channels    : [
@@ -43,4 +43,4 @@ $store.registerModule('lucerna', {
 
     }
 
-});
+}
