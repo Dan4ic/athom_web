@@ -59,11 +59,11 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: 'platform.html',
-      inject: true,
+      inject: "body",
       chunks: ['app'],
       inlineSource: 'app.js',
     }),
-    //new HtmlWebpackInlineSourcePlugin(),
+    new HtmlWebpackInlineSourcePlugin(),
     // copy custom static assets
     new CopyWebpackPlugin([
       {

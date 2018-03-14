@@ -87,7 +87,7 @@
 
     export default {
         name: 'App',
-        created(){
+        beforeCreate(){
             this.$router.addRoutes([
                 {
                     path: '/config_helper',
@@ -103,16 +103,23 @@
                     path: '/dashboard',
                     name: 'Dashboard',
                     component: Dashboard
+                },
+                {
+                    path: '/',
+                    name: 'Root',
+                    component: Dashboard
                 }
 
             ]);
         },
         mounted(){
-
             //Detect first enter
+
             if($store.state.user.first_enter) {
                 $store.commit('setUserFirstEnter', false);
                 this.$router.push('/config_helper');
+            } else {
+                this.$router.push('/dashboard');
             }
 
             this.onResize();

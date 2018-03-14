@@ -5,7 +5,7 @@ export default {
     //Create component by name
     requireComponent(name) {
         if (name in Vue.options.components)
-            return new Vue(new Promise(Vue.options.components[name]));
+            return new Promise(Vue.options.components[name]);
         else
             throw new Error(`Failed to create component ${name}`)
     },
@@ -46,7 +46,17 @@ export default {
 
     //Register pubic component
     exportComponent(component, object) {
-        window.$protocomponents[component] = object;
+        if(component in window.$resolvers_components) {
+            window.$resolvers_components[component].map((resolve) => {
+                try {
+                    resolve(object)
+                } catch (e) {
+                    console.error(e);
+                    window.$bus.$emit(consts.EVENTS.ALERT, consts.ALERT_TYPE.ERROR, Vue.filter('lang')('ERROR_LOAD_APP'));
+                }
+            });
+            window.$resolvers_components[component] = [];
+        }
     },
 
     //Create promise for dynamically load component
@@ -58,10 +68,16 @@ export default {
                 return;
             }
 
+            if(component in window.$resolvers_components)
+                window.$resolvers_components[component].push(resolve);
+            else
+                window.$resolvers_components[component] = [resolve];
+
             const script = document.createElement("script");
             script.src = url;
 
             script.onload = () => {
+                /*
                 if (component in window.$protocomponents)
                     resolve(window.$protocomponents[component]);
                 else {
@@ -69,6 +85,7 @@ export default {
                     script.remove();
                     reject(new Error(Vue.filter('lang')('ERROR_LOAD_APP')));
                 }
+                */
             };
 
             script.onerror = () => {
