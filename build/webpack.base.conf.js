@@ -3,7 +3,7 @@ const path = require('path')
 const utils = require('./utils')
 const config = require('../config')
 const vueLoaderConfig = require('./vue-loader.conf')
-const fs = require('fs')
+const fs = require('fs');
 
 function resolve(dir) {
     return path.join(__dirname, '..', dir)
@@ -90,31 +90,30 @@ module.exports = {
         net: 'empty',
         tls: 'empty',
         child_process: 'empty'
-    }
+    },
 }
 
-//Applications
+//Profile building
+global.components  = {};
 const apps_path = path.resolve(__dirname, '../src/applications/');
 
 fs.readdirSync(apps_path).forEach(dir => {
-
     let source = path.resolve(apps_path, dir);
 
     if (fs.lstatSync(source).isDirectory()) {
-
         let manifest = require(path.resolve(source, "manifest.json"));
 
-        //Including system modules
-        ['langs', 'store'].map((component) => {
-            if (component in manifest)
-                module.exports.entry[`${dir}-${component}`] = path.resolve(source, manifest[component].source);
-        });
+        global.components[dir] = {};
 
         //Including components files
         utils.componentSources(manifest).map((source, index) => {
             module.exports.entry[`${dir}-component-${index}`] = path.resolve(apps_path, dir, source.source);
+            source.components.map(function(cname){
+                global.components[dir][cname] = {
+                    source : source.source,
+                    bundle : `${dir}-component-${index}.js`
+                }
+            });
         });
-
     }
-
 });

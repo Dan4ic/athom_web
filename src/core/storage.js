@@ -44,10 +44,10 @@ export default {
         setProfiles(state, profiles) {
             profiles.map((profile) => {
                 if ('components' in profile)
-                    for (let component in profile.components) {
-                        if (!(component in Vue.options.components)) {
-                            console.log('Register component ', component);
-                            Vue.component(component, Apps.makePromisLoadComponent(profile.url, component));
+                    for (let cname in profile.components) {
+                        if (!(cname in Vue.options.components)) {
+                            console.log('Register component ', cname);
+                            Vue.component(cname, Apps.makePromisLoadComponent(profile.components[cname].source, cname));
                         }
                     }
             });

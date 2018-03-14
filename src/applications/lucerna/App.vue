@@ -9,8 +9,6 @@
 
 <script>
 
-    $requireComponent('lucerna-basis');
-
     export default {
         name: 'Lucerna',
         computed : {
