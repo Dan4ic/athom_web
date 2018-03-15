@@ -1,6 +1,7 @@
 <template>
     <div>
-        <svg class="light-schedule"
+        <svg v-if="!isShowDotInspector"
+             class="light-schedule"
              :view-box.camel="[0, 0, width, height]"
              @mousedown.prevent="onMouseDown"
              @mousemove.prevent="onMouseMove"
@@ -427,16 +428,12 @@
                 let channels = this.$store.state.lucerna.channels.map((channel, i) => {
                     return {
                         name: 'Channel ' + (i + 1),
-                        value: 5,
-                        color: channel.color
+                        value: brightness,
+                        color: channel.color,
+                        correlation: channel.correlation || i,
+                        lock: false
                     };
                 });
-
-                // channels.unshift({
-                //     name: 'Brightness',
-                //     value: brightness * 100,
-                //     color: '#fff5d7'
-                // });
 
                 return {
                     selected: !!selected,

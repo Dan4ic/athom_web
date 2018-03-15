@@ -1,39 +1,46 @@
 <template>
   <div>
-    <!-- Use the component -->
-    <!--<svg width="400" height="400">-->
-      <!--<g>-->
-        <!--<polygon :points="points"></polygon>-->
-        <!--<circle cx="200" cy="200" r="200"></circle>-->
-        <!--<text v-for="label in labels" :x="label.x" :y="label.y">{{label.name}}</text>-->
-      <!--</g>-->
-    <!--</svg>-->
+    <svg :width="options.width" :height="options.height"
+         @mousemove="onMouseMove($event)"
+         @mouseup="onMouseUp($event)">
 
-    <svg :width="diagram.width" :height="diagram.height" >
-      <g v-for="(axis, i) in axisY">
-        <text :x="axis.x" :y="axis.y">{{axis.value}}</text>
-        <line :x1="diagram.legend.paddingLeft" :y1="axis.y" :x2="diagram.width" :y2="axis.y" style="stroke:rgb(196,196,196);stroke-width:1" />
+      <g v-for="(axis, i) in control.axises" class="axises">
+        <text :x="axis.x" :y="axis.y" dy="0.28em">{{axis.value}}%</text>
+        <line :x1="options.axis.y.width" :y1="axis.y" :x2="options.width" :y2="axis.y" />
       </g>
-      <g v-for="(column, i) in columns">
-        <rect :x="column.columnX" :y="column.columnY" :width="column.width" :height="column.height" :style="{fill:column.color}" />
-        <text :x="column.textX" :y="column.textY">{{column.name}}</text>
+
+      <g class="brightness">
+        <text :x="control.brightness.x" :y="control.brightness.y" dy="0.28em">{{control.brightness.value}}%</text>
+        <line :x1="options.axis.y.width" :y1="control.brightness.y" :x2="options.width" :y2="control.brightness.y" />
+      </g>
+
+      <g v-for="(slider, i) in control.sliders" class="channel">
+        <g class="button increase"
+           @mousedown="increaseSlider($event, slider)">
+          <circle :r="options.slider.bottom.button.radius" :cx="slider.buttons.plus.x" :cy="slider.buttons.plus.y" :fill="slider.color" />
+          <text :x="slider.buttons.plus.x" :y="slider.buttons.plus.y" dy="0.23em">{{options.slider.top.button.text}}</text>
+        </g>
+
+        <rect :x="slider.offsetX" :y="slider.offsetY" :width="slider.width" :height="slider.height" :fill="slider.color" :stroke="slider.color"
+              @mousedown="onMouseDownSlider($event, slider)" />
+
+        <circle :r="options.slider.rail.radius" :cx="slider.position.x" :cy="slider.position.y" :fill="slider.color"
+                @mousedown="onMouseDownToggle($event, slider)" />
+
+        <g class="button decrease"
+           @mousedown="decreaseSlider($event, slider)">
+          <circle :r="options.slider.bottom.button.radius" :cx="slider.buttons.minus.x" :cy="slider.buttons.minus.y" :fill="slider.color" />
+          <text :x="slider.buttons.minus.x" :y="slider.buttons.minus.y" dy="0.28em">{{options.slider.bottom.button.text}}</text>
+        </g>
+
+        <rect :class="'toggle' + (slider.lock ? ' lock' : ' unlock')"
+              :x="slider.toggle.x" :y="slider.toggle.y"
+              :width="options.slider.toggle.width" :height="options.slider.toggle.height"
+              @mousedown="toggleLockSlider($event, slider)" />
       </g>
     </svg>
 
-    <!-- controls -->
-    <v-layout v-for="channel in channels" row>
-      <v-flex xs3>
-        <v-subheader>{{channel.name}}</v-subheader>
-      </v-flex>
-      <v-flex xs8>
-        <v-slider min="0" max="100" v-model="channel.value" thumb-label></v-slider>
-      </v-flex>
-      <v-flex xs1>
-        <v-text-field v-model="channel.value" type="number" min="0" max="100"></v-text-field>
-      </v-flex>
-    </v-layout>
-
-    <!--<pre>{{value}}</pre>-->
+    <pre>{{dot}}</pre>
   </div>
 </template>
 
@@ -49,23 +56,46 @@
       let channels = this.value[0].channels;
 
       return {
-        radarRadius: 200,
-
-        diagram: {
+        options: {
           width: 400,
           height: 400,
-          chart: {
-            columnSpace: 40,
+          slider: {
+            width: 50,
+            top: {
+              height: 50,
+              button: {
+                radius: 16,
+                text: "+"
+              }
+            },
+            bottom: {
+              height: 50,
+              button: {
+                radius: 16,
+                text: "-"
+              }
+            },
+            rail: {
+              width: 8,
+              radius: 14,
+              padding: 10
+            },
+            toggle: {
+              width: 20,
+              height: 20,
+              bottom: 2
+            }
           },
-          legend: {
-            paddingTop: 20,
-            paddingLeft: 40,
-            paddingBottom: 40,
-            paddingX: 10,
-            paddingY: 20,
-            axisYPaddingX: 10,
-            axisYStepCount: 5
-          }
+          axis: {
+            y: {
+              width: 30,
+              count: 5,
+              left: 0
+            },
+            x: {
+              height: 24
+            }
+          },
         },
 
         dot: this.value[0],
@@ -74,104 +104,189 @@
     },
 
     computed: {
-      // // a computed property for the polygon's points
-      // points() {
-      //   let total = this.channels.length;
-      //   return this.channels.map((channel, i) => {
-      //     let point = this.valueToPoint(channel.value, i, total);
-      //     return point.x + ',' + point.y
-      //   }, this).join(' ');
-      // },
 
-      columns() {
-        let chartWidth = this.diagram.width - this.diagram.legend.paddingLeft;
-        let chartHeight = this.diagram.height - this.diagram.legend.paddingBottom - this.diagram.legend.paddingTop;
+      control() {
+        const total = this.channels.length;
+        const slidersWidth = Math.round((this.options.width - this.options.axis.y.width) / total);
+        const slidersHeight = this.options.height - (this.options.slider.top.height + this.options.slider.bottom.height + this.options.axis.x.height);
 
-        let total = this.channels.length;
-        let columnWidth = Math.round((chartWidth - (total - 1) * this.diagram.chart.columnSpace) / total);
-        return this.channels.map((channel, i) => {
-          let offsetX = Math.round((columnWidth + this.diagram.chart.columnSpace) * i);
-          let height = Math.round(channel.value / 100 * chartHeight);
-          return {
-            name: channel.name,
-            columnX: this.diagram.legend.paddingLeft + offsetX,
-            columnY: chartHeight - height + this.diagram.legend.paddingTop,
-            textX: this.diagram.legend.paddingLeft + offsetX + this.diagram.legend.paddingX ,
-            textY: this.diagram.height - this.diagram.legend.paddingY,
-            width: columnWidth,
-            height: height,
-            color: channel.color
-          };
-        }, this);
-      },
+        let data = {
+          movedSlider: null,
+          axises: []
+        };
 
-      axisY() {
-        let axisYStepCount = this.diagram.legend.axisYStepCount;
-        let axisHeight = this.diagram.height - this.diagram.legend.paddingBottom - this.diagram.legend.paddingTop;
-        let axisStep = axisHeight / axisYStepCount;
-        let axisY = [];
-        for (let i = axisYStepCount; i >= 0; i--) {
-          axisY.push({
-            x: this.diagram.legend.axisYPaddingX,
-            y: Math.round(i * axisStep) + this.diagram.legend.paddingTop,
-            value: 100 - Math.round(100 / axisYStepCount * i)  + '%'
+        let axisYHeight = slidersHeight - this.options.slider.rail.padding * 2;
+        let axisYStep = axisYHeight / this.options.axis.y.count;
+        let axisYStepPercents = Math.round(1000 / this.options.axis.y.count) / 10;
+        for (let i = this.options.axis.y.count; i >= 0; i--) {
+          data.axises.push({
+            x: this.options.axis.y.left,
+            y: Math.round(i * axisYStep) + this.options.slider.top.height + this.options.slider.rail.padding,
+            value: Math.round((100 - axisYStepPercents * i) * 10) / 10
           });
         }
-        return axisY;
-      }//,
 
-      // labels() {
-      //   let total = this.channels.length;
-      //   return this.channels.map((channel, i) => {
-      //     let point = this.valueToPoint(channel.value + 10, i, total);
-      //     return {
-      //       name: i,
-      //       x: point.x,
-      //       y: point.y
-      //     };
-      //   }, this);
-      // }
+        data.brightness = {
+          x: this.options.axis.y.left,
+          y: Math.round(axisYHeight * (1 - this.dot.brightness)) + this.options.slider.top.height + this.options.slider.rail.padding,
+          value: Math.round(this.dot.brightness * 1000) / 10
+        };
+
+        data.sliders = this.channels.map((channel, i) => {
+          let sliderOffsetX = this.options.axis.y.width + slidersWidth * i + slidersWidth / 2 - this.options.slider.rail.width / 2;
+          let sliderOffsetY = this.options.slider.top.height + this.options.slider.rail.padding;
+          let sliderWidth = this.options.slider.rail.width;
+          let sliderHeight = slidersHeight - this.options.slider.rail.padding * 2;
+
+          let sliderPositionX = sliderOffsetX + this.options.slider.rail.width / 2;
+          let sliderPositionY = sliderOffsetY + (sliderHeight - sliderHeight * channel.value);
+
+          let buttonPlusPositionY = this.options.slider.top.height / 2;
+          let buttonMinusPositionY = this.options.slider.top.height + slidersHeight + this.options.slider.bottom.height / 2;
+
+          let togglePositionX = sliderOffsetX + this.options.slider.rail.width / 2 - this.options.slider.toggle.width / 2;
+          let togglePositionY = this.options.height - this.options.slider.toggle.height - this.options.slider.toggle.bottom;
+
+          return {
+            index: i,
+            name: channel.name,
+            color: channel.color,
+            value: channel.value,
+            lock: !!channel.lock,
+            offsetX: sliderOffsetX,
+            offsetY: sliderOffsetY,
+            width: sliderWidth,
+            height: sliderHeight,
+            position: {
+              x: sliderPositionX,
+              y: sliderPositionY
+            },
+            buttons: {
+              plus: {
+                x: sliderPositionX,
+                y: buttonPlusPositionY,
+              },
+              minus: {
+                x: sliderPositionX,
+                y: buttonMinusPositionY,
+              }
+            },
+            toggle: {
+              x: togglePositionX,
+              y: togglePositionY,
+              lock: false
+            }
+          };
+        }, this);
+
+        return data;
+      }
     },
 
     methods: {
-      valueToPoint(value, index, total) {
-        let x = 0;
-        let y = -value * 0.8;
-        let angle = Math.PI * 2 / total * index;
-        let cos = Math.cos(angle);
-        let sin = Math.sin(angle);
-        let tx = x * cos - y * sin + 100;
-        let ty = x * sin + y * cos + 100;
-        return {
-          x: tx,
-          y: ty
-        };
+
+      onMouseDownToggle(e, slider) {
+        this.movedSlider = slider;
+      },
+
+      onMouseDownSlider(e, slider) {
+        let delta = slider.offsetY + slider.height - e.offsetY;
+        let value = delta / slider.height;
+        value = Math.max(Math.min(value, 1), 0);
+        this.calculateChannels(slider, value);
+      },
+
+      onMouseUp(e) {
+        this.movedSlider = null;
+      },
+
+      onMouseMove(e) {
+        if (this.movedSlider) {
+          this.onMouseDownSlider(e, this.movedSlider);
+        }
+      },
+
+      increaseSlider(e, slider) {
+        let newValue = Math.min(slider.value + 0.01, 1);
+        this.calculateChannels(slider, newValue);
+      },
+
+      decreaseSlider(e, slider) {
+        let newValue = Math.max(slider.value - 0.01, 0);
+        this.calculateChannels(slider, newValue);
+      },
+
+      toggleLockSlider(e, slider) {
+        this.channels[slider.index].lock = !this.channels[slider.index].lock;
+      },
+
+      calculateChannels(slider, channelValue) {
+        if (!this.dot.totalBrightnessPower) {
+          this.dot.totalCorrelation = this.channels.map(ch => ch.correlation).reduce((a, b) => a + b, 0);
+          this.dot.totalBrightnessPower = this.dot.brightness * this.dot.totalCorrelation;
+        }
+
+        let currentChannel = this.channels[slider.index];
+        let maxChannelValue = this.dot.totalBrightnessPower / currentChannel.correlation;
+        channelValue = Math.min(channelValue, maxChannelValue, 1);
+
+        let channelBrightnessPower = channelValue * currentChannel.correlation;
+        let restBrightnessPower = this.dot.totalBrightnessPower - channelBrightnessPower;
+        let channelsBrightnessPower = this.channels
+          .filter((ch, i) => i !== slider.index)
+          .map(ch => ch.correlation * ch.value)
+          .reduce((a, b) => a + b, 0);
+
+        let unlockCorrelation = this.channels
+          .filter((ch, i) => !ch.lock && i !== slider.index)
+          .map(ch => ch.correlation)
+          .reduce((a, b) => a + b, 0);
+
+        let deltaBrightnessPower = restBrightnessPower - channelsBrightnessPower;
+        for (let i = 0; i < this.channels.length; i++) {
+          let ch = this.channels[i];
+          if (i !== slider.index && !ch.lock) {
+            let deltaChannelPower = deltaBrightnessPower / unlockCorrelation * ch.correlation;
+            deltaBrightnessPower -= deltaChannelPower;
+
+            let oldValue = ch.value;
+            let newValue = oldValue + deltaChannelPower / ch.correlation;
+            if (newValue > 1) {
+              let overValue = newValue - 1;
+              deltaBrightnessPower += overValue * ch.correlation;
+              newValue = 1;
+            } else if (newValue < 0) {
+              let underValue = 0 - newValue;
+              deltaBrightnessPower -= underValue * ch.correlation;
+              newValue = 0;
+            }
+            unlockCorrelation -= ch.correlation;
+            ch.value = newValue;
+          }
+        }
+
+        if (deltaBrightnessPower !== 0) {
+          channelValue = (channelBrightnessPower + deltaBrightnessPower) / currentChannel.correlation
+        }
+
+        currentChannel.value = channelValue;
+        slider.value = channelValue;
       }
+
     }
   }
 
 </script>
 
 <style lang="less" rel="stylesheet/less">
-
-    .dot-inspector {
-
-    }
-
-    .dot-inspector polygon {
-      fill: #42b983;
-      opacity: .75;
-    }
-
-    .dot-inspector circle {
-      fill: transparent;
-      stroke: #999;
+    .dot-inspector pre {
+      font-size: 10px;
+      overflow-y: scroll;
+      height: 250px;
     }
 
     .dot-inspector text {
       font-family: Helvetica Neue, Arial, sans-serif;
-      font-size: 10px;
-      fill: #666;
     }
 
     .dot-inspector label {
@@ -180,10 +295,76 @@
       width: 100px;
     }
 
-    .dot-inspector #raw {
-      position: absolute;
-      top: 0;
-      left: 300px;
+    .dot-inspector .axises text{
+      stroke: #007e9a;
+      font-size: 10px;
     }
+
+    .dot-inspector .axises line {
+      stroke: #00b8d4;
+      stroke-width: 1px
+    }
+
+    .dot-inspector .brightness text{
+      stroke: #b71c1c;
+      font-size: 10px;
+    }
+    .dot-inspector .brightness line {
+      stroke: #b71c1c;
+      stroke-width: 2px
+    }
+
+    .dot-inspector .channel > rect {
+      opacity: 0.6;
+      stroke-linecap: "round";
+      stroke-width: 5px;
+    }
+
+    .dot-inspector .channel:hover rect {
+      opacity: 1;
+    }
+
+    .dot-inspector .channel > circle {
+      stroke: #888;
+      stroke-opacity: 0.6;
+      stroke-width: 2px;
+    }
+
+    .dot-inspector .channel:hover circle {
+      stroke-opacity: 1;
+    }
+
+    .dot-inspector .channel .button > circle {
+      stroke: #888;
+      stroke-opacity: 0.6;
+      stroke-width: 2px;
+    }
+
+    .dot-inspector .channel .button:hover circle {
+      stroke-opacity: 1;
+    }
+
+    .dot-inspector .channel .button > text {
+      color: #222;
+      font-size: 26px;
+      text-anchor: middle;
+    }
+
+    .dot-inspector .channel .toggle {
+      stroke: #222;
+      stroke-opacity: 0.6;
+      stroke-width: 1px;
+      font-size: 26px;
+      text-anchor: middle;
+    }
+
+    .dot-inspector .channel .lock {
+      fill: #ff9c9b;
+    }
+
+    .dot-inspector .channel .unlock {
+      fill: #eae7ff;
+    }
+
 
 </style>
