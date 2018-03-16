@@ -30,13 +30,33 @@
                     </text>
                 </g>
 
-                <g :transform="['translate(0, 50)']">
+                <g :transform="['translate(0, 0)']">
                     <spectrum
                             :width="chart.width"
-                            :height="chart.height - 50"
+                            :height="chart.height"
                             opacity="0.35"
+                            :text-height="fontSizeAxisX"
                     ></spectrum>
                 </g>
+
+                <line
+                        v-if="target.x>0 && target.x < chart.width"
+                        class="target-line"
+                        stroke-dasharray="5, 5"
+                        :x1="target.x"
+                        :y1="0"
+                        :x2="target.x"
+                        :y2="chart.height"
+                />
+                <line
+                        v-if="target.y>0 && target.y < chart.height"
+                        class="target-line"
+                        stroke-dasharray="5, 5"
+                        :x1="0"
+                        :y1="target.y"
+                        :x2="chart.width"
+                        :y2="target.y"
+                />
 
                 <g class="grid-days">
 
@@ -146,7 +166,6 @@
                         :width="selBox.width"
                         :height="selBox.height"
                 />
-
             </g>
             <circle
                     v-if="draggingNewDot.isDragging"
@@ -217,7 +236,6 @@
         components : {
             spectrum : Spectrum
         },
-
         created () {
             window.addEventListener('mousewheel', this.proxyScrollEvent);
             window.addEventListener('resize', this.onResize);
@@ -359,18 +377,9 @@
                     clientX: 0,
                     clientY: 0
                 },
-                scrolling: {
-                    isScrolling: false,
-                    power : 0,
-                    inertTimer : setInterval(()=>{
-                        if(Math.abs(this.scrolling.power) > 1) {
-                            this.interval.offset = this.rebaseOffset(
-                                this.interval.offset + this.scrolling.power  / this.dpi
-                            );
-                            this.scrolling.power    /= 1.04;
-                        }
-                    }, 20),
-                    clientX: 0,
+                target : {
+                    x   : null,
+                    y   : null
                 },
                 selectionBox : {
                     isSelectionBox  : false,
@@ -413,6 +422,19 @@
                         top: 36,
                         left: 60
                     }
+                },
+                scrolling: {
+                    isScrolling: false,
+                    power : 0,
+                    inertTimer : setInterval(() => {
+                        if(Math.abs(this.scrolling.power) > 1) {
+                            this.interval.offset = this.rebaseOffset(
+                                this.interval.offset + this.scrolling.power  / this.dpi
+                            );
+                            this.scrolling.power    /= 1.04;
+                        }
+                    }, 20),
+                    clientX: 0,
                 }
             };
 
@@ -618,6 +640,9 @@
             },
 
             onMouseMove() {
+
+                this.target.x   = event.offsetX  * this.koofScreenX - this.chart.offset.left;
+                this.target.y   = event.offsetY  * this.koofScreenY - this.chart.offset.top;
 
                 if(this.draggingNewDot.isDragging) {
                     this.draggingNewDot.x   = event.offsetX  * this.koofScreenX;
@@ -1133,6 +1158,12 @@
 
         /* width: 100%; */
         /* height: auto; */
+
+        .target-line {
+            stroke: #00f;
+            stroke-width: 1px;
+            opacity: 0.3;
+        }
 
         .selection-box {
             stroke: none;

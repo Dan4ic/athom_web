@@ -2,11 +2,13 @@
 const utils = require('./utils')
 const webpack = require('webpack')
 const config = require('../config')
+const fs = require('fs')
 const merge = require('webpack-merge')
 const path = require('path')
 const baseWebpackConfig = require('./webpack.base.conf')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const portfinder = require('portfinder')
 const restapi = require('./restapi')
@@ -57,8 +59,11 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: 'platform.html',
-      inject: true
+      inject: "body",
+      chunks: ['app'],
+      inlineSource: 'app.js',
     }),
+    new HtmlWebpackInlineSourcePlugin(),
     // copy custom static assets
     new CopyWebpackPlugin([
       {
@@ -95,3 +100,34 @@ module.exports = new Promise((resolve, reject) => {
     }
   })
 })
+
+
+//Prepare manifest
+const apps_path = path.resolve(__dirname, '../src/applications/');
+
+let profile = [];
+
+fs.readdirSync(apps_path).forEach(dir => {
+    if(fs.lstatSync(path.resolve(apps_path, dir)).isDirectory()) {
+        let app_path    = path.resolve(apps_path, dir);
+        let manifest    = require(path.resolve(app_path, "manifest.json"));
+
+        if(fs.existsSync(path.resolve(app_path, "favicon.png"))) {
+            manifest.favicon    = 'data:image/png;base64,'
+                + new Buffer(fs.readFileSync(path.resolve(app_path, "favicon.png"))).toString('base64');
+        } else if(fs.existsSync(path.resolve(app_path, "favicon.svg"))) {
+            manifest.favicon    = 'data:image/svg+xml;utf8,'
+                + fs.readFileSync(path.resolve(app_path, "favicon.svg"));
+        }
+
+        if(dir in global.components){
+            for(let cname in manifest.components){
+              if(cname in global.components[dir])
+                  manifest.components[cname].source = global.components[dir][cname].bundle;
+            }
+        }
+        profile.push(manifest);
+    }
+});
+
+fs.writeFileSync(path.resolve(__dirname, '../static/profile.json'), JSON.stringify(profile));

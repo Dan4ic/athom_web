@@ -5,11 +5,6 @@ import Root from '../Root.vue'
 Vue.use(Router)
 
 export default new Router({
-  routes: [
-    {
-      path: '/',
-      name: 'Root',
-      component: Root
-    }
-  ]
+  mode: 'history',
+  routes: []
 })

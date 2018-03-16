@@ -1,7 +1,11 @@
 {
   "name" : "Lucerna",
   "components" : {
+    "lucerna-basis" : {
+      "source" : "basis.js"
+    },
     "lucerna-app" : {
+      "source" : "scheduler.js",
       "intent_filter" : [
         {
           "action"    : "smarttank.intent.action.MAIN",
@@ -9,9 +13,14 @@
         }
       ]
     },
-    "lucerna-scheduller" : {},
-    "lucerna-dot-inspector" : {},
+    "lucerna-scheduller" : {
+      "source" : "scheduler.js"
+    },
+    "lucerna-dot-inspector" : {
+      "source" : "scheduler.js"
+    },
     "lucerna-preferences" : {
+      "source" : "prefs.js",
       "intent_filter" : [
         {
           "action"    : "smarttank.intent.action.MAIN",

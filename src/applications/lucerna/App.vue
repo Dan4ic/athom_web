@@ -10,9 +10,7 @@
 <script>
 
     export default {
-        name: 'Lucerna2',
-        methods : {
-        },
+        name: 'Lucerna',
         computed : {
             interval(){
                 return this.$store.state.lucerna.interval;

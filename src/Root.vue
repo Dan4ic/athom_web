@@ -1,6 +1,7 @@
 <template>
     <div>
-        <launcher v-if="isAppReady" />
+        <launcher v-if="isAppReady" :key="0"/>
+
         <div
                 v-else
                 style="position: fixed; top: 0; left: 0; bottom: 0; right: 0; background-color: #fff; z-index: 10000;"
@@ -21,15 +22,15 @@
 
     export default {
         name: 'SmartTankCore',
-        mounted(){
+        mounted() {
             setTimeout(() => {
                 window.$bus.$emit(consts.EVENTS.CORE_IS_LOADED);
             }, 50);
         },
-        computed : {
-          isAppReady(){
-              return !!this.$store.state.apps.profiles;
-          }
+        computed: {
+            isAppReady() {
+                return !!this.$store.state.apps.profiles;
+            }
         }
     }
 </script>

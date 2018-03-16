@@ -17,16 +17,18 @@ window.Vue = Vue;
 
 let theBus  = new Vue(EventsBus);
 
-Vue.prototype.$bus          = theBus;
-Vuex.Store.prototype.$bus   = theBus;
-window.Vue.$bus             = theBus;
-window.$store               = new Vuex.Store(storage);
-window.$bus                 = theBus;
-window.$consts              = consts;
-window.$exportComponent     = Apps.exportComponent;
-window.$protocomponents     = [];
-window.$getComponentBy      = Apps.getComponentBy;
-window.$includeLang         = Apps.includeLang;
+Vue.prototype.$bus              = theBus;
+Vuex.Store.prototype.$bus       = theBus;
+window.Vue.$bus                 = theBus;
+window.$store                   = new Vuex.Store(storage);
+window.$bus                     = theBus;
+window.$consts                  = consts;
+window.$exportComponent         = Apps.exportComponent;
+window.$protocomponents         = [];   //
+window.$resolvers_components    = [];
+window.$getComponentBy          = Apps.getComponentBy;
+window.$includeLang             = Apps.includeLang;
+window.$requireComponent        = Apps.requireComponent;
 
 //Loaded application components storage
 window.$applications    = {};

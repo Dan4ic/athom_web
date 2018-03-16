@@ -66,14 +66,6 @@ const webpackConfig = merge(baseWebpackConfig, {
         new webpack.HashedModuleIdsPlugin(),
         // enable scope hoisting
         new webpack.optimize.ModuleConcatenationPlugin(),
-        /*
-        //Applications
-        new webpack.optimize.CommonsChunkPlugin({
-            name: 'lucerna',
-            filename : 'apps/lucerna.js',
-            children: true,
-        }),
-        */
 
         // split vendor js into its own file
         new webpack.optimize.CommonsChunkPlugin({
@@ -160,28 +152,30 @@ const webpackConfig = merge(baseWebpackConfig, {
 const apps_path = path.resolve(__dirname, '../src/applications/');
 
 fs.readdirSync(apps_path).forEach(file => {
-    if (fs.lstatSync(path.resolve(apps_path, file)).isDirectory()) {
-        webpackConfig.plugins.push(
-            new webpack.optimize.CommonsChunkPlugin({
-                name: file,
-                filename: 'apps/' + file + '.js',
-                children: true,
-            })
-        );
+    let dir = path.resolve(apps_path, file);
+    if (fs.lstatSync(dir).isDirectory()) {
+        let manifest = JSON.parse(fs.readFileSync(`${dir}/manifest.json`));
 
-        webpackConfig.plugins.push(
-            new CompressionWebpackPlugin({
-                asset: `apps/${file}.gz`,
-                filename(asset) {
-                    console.log(asset);
-                    return asset;
-                },
-                algorithm: 'gzip',
-                deleteOriginalAssets: true,
-                test: new RegExp(`${file}\.js`),
-                minRatio: 1
-            })
-        );
+        //Including components files
+        utils.componentSources(manifest).map((source, index) => {
+            let filename = `apps/${file}/component${index}.js`;
+            webpackConfig.plugins.push(
+                new webpack.optimize.CommonsChunkPlugin({
+                    name: `${file}-component-${index}`,
+                    filename: filename,
+                    children: true,
+                })
+            );
+            webpackConfig.plugins.push(
+                new CompressionWebpackPlugin({
+                    asset: `apps/${file}/component${index}.gz`,
+                    algorithm: 'gzip',
+                    deleteOriginalAssets: true,
+                    test: new RegExp(filename),
+                    minRatio: 1
+                })
+            );
+        });
     }
 });
 

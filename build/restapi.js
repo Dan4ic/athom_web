@@ -3,6 +3,7 @@
 'use strict'
 const fs = require('fs')
 const path = require('path')
+const utils = require('./utils')
 var bodyParser = require('body-parser')
 
 const virtual_state_data = path.join(__dirname, '/devstorage/state.json');
@@ -38,35 +39,9 @@ module.exports = function(app){
         }
     };
 
-
     app.get('/api/profile', function(req, res) {
         console.log('>Get profile data ');
-
-        const apps_path = path.resolve(__dirname, '../src/applications/');
-
-        let profile = [];
-
-        fs.readdirSync(apps_path).forEach(dir => {
-            if(fs.lstatSync(path.resolve(apps_path, dir)).isDirectory()) {
-                let app_path    = path.resolve(apps_path, dir);
-                let manifest    = require(path.resolve(app_path, "manifest.json"));
-
-                manifest.url    = `http://localhost:8080/${dir}.js`;
-
-                if(fs.existsSync(path.resolve(app_path, "favicon.png"))) {
-                    manifest.favicon    = 'data:image/png;base64,'
-                        + new Buffer(fs.readFileSync(path.resolve(app_path, "favicon.png"))).toString('base64');
-                } else if(fs.existsSync(path.resolve(app_path, "favicon.svg"))) {
-                    manifest.favicon    = 'data:image/svg+xml;utf8,'
-                        + fs.readFileSync(path.resolve(app_path, "favicon.svg"));
-                }
-
-                profile.push(manifest);
-            }
-        });
-
-        res.json(profile);
-
+        res.json(require(path.resolve(__dirname, "../static/profile.json")));
     });
 
     app.get('/api/state', function(req, res) {
