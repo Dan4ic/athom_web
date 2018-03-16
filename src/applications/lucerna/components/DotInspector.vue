@@ -2,7 +2,9 @@
   <div>
     <svg :width="options.width" :height="options.height"
          @mousemove="onMouseMove($event)"
-         @mouseup="onMouseUp($event)">
+         @mouseup="onMouseUp($event)"
+         @touchmove.prevent="onTouchMove($event)"
+         @touchend.prevent="onMouseUp($event)">
 
       <g v-for="(axis, i) in control.axises" class="axises">
         <text :x="axis.x" :y="axis.y" dy="0.28em">{{axis.value}}%</text>
@@ -16,19 +18,25 @@
 
       <g v-for="(slider, i) in control.sliders" class="channel">
         <g class="button increase"
-           @mousedown="increaseSlider($event, slider)">
+           @mousedown="increaseSlider($event, slider)"
+           @touchstart="increaseSlider($event, slider)">
           <circle :r="options.slider.bottom.button.radius" :cx="slider.buttons.plus.x" :cy="slider.buttons.plus.y" :fill="slider.color" />
           <text :x="slider.buttons.plus.x" :y="slider.buttons.plus.y" dy="0.23em">{{options.slider.top.button.text}}</text>
         </g>
 
         <rect :x="slider.offsetX" :y="slider.offsetY" :width="slider.width" :height="slider.height" :fill="slider.color" :stroke="slider.color"
-              @mousedown="onMouseDownSlider($event, slider)" />
+              @mousedown="onMouseDownSlider($event, slider)"
+              @touchstart="onTouchDownSlider($event, slider)"/>
 
-        <circle :r="options.slider.rail.radius" :cx="slider.position.x" :cy="slider.position.y" :fill="slider.color"
-                @mousedown="onMouseDownToggle($event, slider)" />
+        <g @mousedown="onMouseDownToggle($event, slider)"
+           @touchstart="onMouseDownToggle($event, slider)">
+          <circle :r="options.slider.rail.radius" :cx="slider.position.x" :cy="slider.position.y" :fill="slider.color"/>
+          <text :x="slider.position.x" :y="slider.position.y" dy="0.23em" class="value">{{slider.displayValue.toFixed(1)}}</text>
+        </g>
 
         <g class="button decrease"
-           @mousedown="decreaseSlider($event, slider)">
+           @mousedown="decreaseSlider($event, slider)"
+           @touchstart="decreaseSlider($event, slider)">
           <circle :r="options.slider.bottom.button.radius" :cx="slider.buttons.minus.x" :cy="slider.buttons.minus.y" :fill="slider.color" />
           <text :x="slider.buttons.minus.x" :y="slider.buttons.minus.y" dy="0.28em">{{options.slider.bottom.button.text}}</text>
         </g>
@@ -36,7 +44,8 @@
         <rect :class="'toggle' + (slider.lock ? ' lock' : ' unlock')"
               :x="slider.toggle.x" :y="slider.toggle.y"
               :width="options.slider.toggle.width" :height="options.slider.toggle.height"
-              @mousedown="toggleLockSlider($event, slider)" />
+              @mousedown="toggleLockSlider($event, slider)"
+              @touchstart="toggleLockSlider($event, slider)" />
       </g>
     </svg>
 
@@ -57,8 +66,8 @@
 
       return {
         options: {
-          width: 400,
-          height: 400,
+          width: 350,
+          height: 500,
           slider: {
             width: 50,
             top: {
@@ -147,11 +156,14 @@
           let togglePositionX = sliderOffsetX + this.options.slider.rail.width / 2 - this.options.slider.toggle.width / 2;
           let togglePositionY = this.options.height - this.options.slider.toggle.height - this.options.slider.toggle.bottom;
 
+          let displayValue = Math.round(channel.value * 1000) / 10;
+
           return {
             index: i,
             name: channel.name,
             color: channel.color,
             value: channel.value,
+            displayValue: displayValue,
             lock: !!channel.lock,
             offsetX: sliderOffsetX,
             offsetY: sliderOffsetY,
@@ -186,11 +198,25 @@
     methods: {
 
       onMouseDownToggle(e, slider) {
+        console.log('onMouseDownToggle');
         this.movedSlider = slider;
       },
 
       onMouseDownSlider(e, slider) {
         let delta = slider.offsetY + slider.height - e.offsetY;
+        let value = delta / slider.height;
+        value = Math.max(Math.min(value, 1), 0);
+        this.calculateChannels(slider, value);
+      },
+
+      onTouchDownSlider(e, slider) {
+        if (e.touches.length > 1 || (e.type === "touchend" && e.touches.length > 0))
+          return;
+
+        let touch = e.changedTouches[0];
+
+        // TODO need to ask Roman how to fix it.
+        let delta = slider.offsetY + slider.height + this.options.slider.top.height - touch.clientY + touch.radiusY + 5;
         let value = delta / slider.height;
         value = Math.max(Math.min(value, 1), 0);
         this.calculateChannels(slider, value);
@@ -203,6 +229,12 @@
       onMouseMove(e) {
         if (this.movedSlider) {
           this.onMouseDownSlider(e, this.movedSlider);
+        }
+      },
+
+      onTouchMove(e) {
+        if (this.movedSlider) {
+          this.onTouchDownSlider(e, this.movedSlider);
         }
       },
 
@@ -324,7 +356,7 @@
       opacity: 1;
     }
 
-    .dot-inspector .channel > circle {
+    .dot-inspector .channel > g circle {
       stroke: #888;
       stroke-opacity: 0.6;
       stroke-width: 2px;
@@ -342,6 +374,12 @@
 
     .dot-inspector .channel .button:hover circle {
       stroke-opacity: 1;
+    }
+
+    .dot-inspector .channel text.value {
+      color: #FFF;
+      font-size: 10px;
+      text-anchor: middle;
     }
 
     .dot-inspector .channel .button > text {

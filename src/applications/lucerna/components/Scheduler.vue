@@ -154,7 +154,8 @@
                             :cx="rebaseX(getChartX(dot))"
                             :cy="rebaseY(getChartY(dot))"
                             @mousedown="onDotMouseDown(dot)"
-                            @dblclick="isShowDotInspector=true"
+                            @dblclick.prevent="onDotDblClick()"
+                            @touchstart.prevent="onDotTouchStart()">
                     ></circle>
                 </g>
 
@@ -435,7 +436,8 @@
                         }
                     }, 20),
                     clientX: 0,
-                }
+                },
+                dblDotTouchTimer: null
             };
 
             data.zoom.value = this.rebaseZoomByParams(data, data.zoom.value);
@@ -715,6 +717,38 @@
                     }
                 });
             },
+
+            onDotDblClick() {
+                this.isShowDotInspector = true;
+            },
+
+            onDotTouchStart() {
+              let self = this;
+              console.log("1 this.dblDotTouchTimer = " + this.dblDotTouchTimer);
+              if (this.dblDotTouchTimer == null) {
+                console.log("2 this.dblDotTouchTimer = " + this.dblDotTouchTimer);
+                this.dblDotTouchTimer = setTimeout(function () {
+                  console.log("4 this.dblDotTouchTimer = " + this.dblDotTouchTimer);
+                  self.dblDotTouchTimer = null;
+                }, 300);
+                console.log("3 this.dblDotTouchTimer = " + this.dblDotTouchTimer);
+              } else {
+                console.log("5 this.dblDotTouchTimer = " + this.dblDotTouchTimer);
+                clearTimeout(this.dblDotTouchTimer);
+                this.dblDotTouchTimer = null;
+                this.isShowDotInspector = true;
+                console.log("6 this.dblDotTouchTimer = " + this.dblDotTouchTimer);
+              }
+            },
+
+            // onDotTouchEnd() {
+            //   console.log("7 this.onDotTouchEnd = " + this.dblDotTouchTimer);
+            //     this.dblDotTouchTimer = setTimeout(function () {
+            //       console.log("8 this.dblDotTouchTimer = " + this.dblDotTouchTimer);
+            //       this.dblDotTouchTimer = null;
+            //     }, 300);
+            //   }
+            // },
 
             //Фокусировка на выбранном дне по dblclick
             expandDay(xDay){
