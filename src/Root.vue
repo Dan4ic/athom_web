@@ -2,7 +2,7 @@
     <div>
         <launcher v-if="isProfileReady" :key="0"/>
         <template v-if="!this.is_launcher_loaded">
-            <div style="position: fixed; left: 0; top: 0; bottom: 0; right: 0; opacity: 0.5; background-color: #AB47BC; z-index: 99999"></div>
+            <div style="position: fixed; left: 0; top: 0; bottom: 0; right: 0; opacity: 0.5; background-color: #E3F2FD; z-index: 99999"></div>
             <div
                     v-if="!this.is_launcher_loaded"
                     style="position: fixed; top: 0; left: 0; bottom: 0; right: 0; background-color: #fff; z-index: 10000;"
@@ -12,7 +12,7 @@
                         :size="80"
                         color="primary"
                         style="margin-left: -40px; margin-top: -40px; left: 50%; top: 50%; position: fixed; z-index: 100000"
-                ></v-progress-circular>
+                ><span style="font-size: 10px;">Loading...</span></v-progress-circular>
             </div>
         </template>
     </div>
