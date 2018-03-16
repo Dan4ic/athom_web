@@ -25,6 +25,10 @@ export default {
     },
     methods : {
         startWebsocket(){
+
+            //todo disabled websocket
+            return;
+
             if (!"WebSocket" in window){
                 console.warn("WebSocket NOT supported by your Browser!");
                 return false;

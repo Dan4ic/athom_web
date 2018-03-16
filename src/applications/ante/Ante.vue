@@ -47,11 +47,12 @@
             </span>
                 <span v-if="!isMobileScreen" class="status_label">
                 {{ 'FIRMWARE' | lang }}: {{this.$store.state.system.firmware_v}}
+                    [{{isNetPending}}]
             </span>
             </v-footer>
 
             <v-progress-linear
-                    v-if="$store.state.is_net_dending"
+                    v-if="isNetPending"
                     style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 5px; margin: 0px;"
                     :indeterminate="true">
 
@@ -156,6 +157,9 @@
             currentTime(){
                 return this.getFormattedDate(this.hwDateTime, this.$store.state.display.lang)
                         + ' ' + this.getFormattedTime(this.hwDateTime,  this.$store.state.display.lang);
+            },
+            isNetPending(){
+                return this.$store.state.is_net_pending;
             }
         },
         methods: {

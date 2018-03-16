@@ -63,39 +63,49 @@ export default {
     makePromisLoadComponent(url, component) {
         return function (resolve, reject) {
 
-            if (component in window.$protocomponents) {
-                resolve(window.$protocomponents[component]);
-                return;
+            let doLoadComponent = (attempt) => {
+
+                if (component in window.$protocomponents) {
+                    resolve(window.$protocomponents[component]);
+                    return;
+                }
+
+                if(component in window.$resolvers_components)
+                    window.$resolvers_components[component].push(resolve);
+                else
+                    window.$resolvers_components[component] = [resolve];
+
+                const script = document.createElement("script");
+                script.src = url;
+
+                script.onload = () => {
+                    window.$store.commit('decNetPending');
+                    console.info(`Loaded component ${component}`);
+
+                    //Is loaded launcher?
+                    if(component==='launcher')
+                        window.$bus.$emit(consts.EVENTS.LAUNCHER_IS_LOADED);
+
+                };
+
+                script.onerror = () => {
+                    script.remove();
+
+                    if(attempt-- > 0)
+                        doLoadComponent(attempt)
+                    else {
+                        console.info(`Error load component ${component}`);
+                        window.$store.commit('decNetPending');
+                        window.$bus.$emit(consts.EVENTS.ALERT, consts.ALERT_TYPE.ERROR, Vue.filter('lang')('ERROR_LOAD_APP'));
+                        reject(new Error("Failed to load module script with URL " + url));
+                    }
+                };
+
+                window.$store.commit('incNetPending');
+                document.documentElement.appendChild(script);
             }
 
-            if(component in window.$resolvers_components)
-                window.$resolvers_components[component].push(resolve);
-            else
-                window.$resolvers_components[component] = [resolve];
-
-            const script = document.createElement("script");
-            script.src = url;
-
-            script.onload = () => {
-                /*
-                if (component in window.$protocomponents)
-                    resolve(window.$protocomponents[component]);
-                else {
-                    window.$bus.$emit(consts.EVENTS.ALERT, consts.ALERT_TYPE.ERROR, Vue.filter('lang')('ERROR_LOAD_APP'));
-                    script.remove();
-                    reject(new Error(Vue.filter('lang')('ERROR_LOAD_APP')));
-                }
-                */
-            };
-
-            script.onerror = () => {
-                window.$bus.$emit(consts.EVENTS.ALERT, consts.ALERT_TYPE.ERROR, Vue.filter('lang')('ERROR_LOAD_APP'));
-                reject(new Error("Failed to load module script with URL " + url));
-                delete window[tempGlobal];
-                script.remove();
-            };
-
-            document.documentElement.appendChild(script);
+            doLoadComponent(5);
         }
     },
 

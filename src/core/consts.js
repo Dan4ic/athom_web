@@ -10,6 +10,7 @@ export default {
     },
     EVENTS : {
         CORE_IS_LOADED : 'core-loaded',
+        LAUNCHER_IS_LOADED : 'launcher-loaded',
         DO_SCREEN_REBUILD : 'do-screen-rebuild',
         PUT_CONFIG_ERROR : 'put-config-error',
         PUT_CONFIG_SUCCESS : 'put-config-success',
