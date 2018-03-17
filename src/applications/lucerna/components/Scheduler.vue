@@ -212,7 +212,7 @@
                 <v-card-title primary-title >
                     <v-container style="padding: 0">
                         <v-layout row>
-                            <h1>{{'DOT_INSPECTOR' | lang}}</h1>
+                            <h2>{{'DOT_INSPECTOR' | lang}}</h2>
                         </v-layout>
                         <v-layout row>
                             <lucerna-dot-inspector v-model="dotsForInspection"></lucerna-dot-inspector>
@@ -724,31 +724,16 @@
 
             onDotTouchStart() {
               let self = this;
-              console.log("1 this.dblDotTouchTimer = " + this.dblDotTouchTimer);
               if (this.dblDotTouchTimer == null) {
-                console.log("2 this.dblDotTouchTimer = " + this.dblDotTouchTimer);
                 this.dblDotTouchTimer = setTimeout(function () {
-                  console.log("4 this.dblDotTouchTimer = " + this.dblDotTouchTimer);
                   self.dblDotTouchTimer = null;
                 }, 300);
-                console.log("3 this.dblDotTouchTimer = " + this.dblDotTouchTimer);
               } else {
-                console.log("5 this.dblDotTouchTimer = " + this.dblDotTouchTimer);
                 clearTimeout(this.dblDotTouchTimer);
                 this.dblDotTouchTimer = null;
                 this.isShowDotInspector = true;
-                console.log("6 this.dblDotTouchTimer = " + this.dblDotTouchTimer);
               }
             },
-
-            // onDotTouchEnd() {
-            //   console.log("7 this.onDotTouchEnd = " + this.dblDotTouchTimer);
-            //     this.dblDotTouchTimer = setTimeout(function () {
-            //       console.log("8 this.dblDotTouchTimer = " + this.dblDotTouchTimer);
-            //       this.dblDotTouchTimer = null;
-            //     }, 300);
-            //   }
-            // },
 
             //Фокусировка на выбранном дне по dblclick
             expandDay(xDay){

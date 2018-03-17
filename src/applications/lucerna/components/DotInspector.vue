@@ -49,7 +49,7 @@
       </g>
     </svg>
 
-    <pre>{{dot}}</pre>
+    <!--<pre>{{dot}}</pre>-->
   </div>
 </template>
 
@@ -61,6 +61,27 @@
 
     props: ['value'],
 
+    created () {
+      console.log("created");
+      window.addEventListener('resize', this.onResize);
+
+      // this.$bus.$on(consts.EVENTS.DO_SCREEN_REBUILD, (type, messages) => {
+      //   this.onResize();
+      // });
+    },
+
+    destroyed () {
+      console.log("destroyed");
+      window.removeEventListener('resize', this.onResize)
+    },
+
+    mounted() {
+      console.log("mounted");
+      this.onResize();
+
+      this.initialChannels();
+    },
+
     data() {
       let channels = this.value[0].channels;
 
@@ -71,14 +92,14 @@
           slider: {
             width: 50,
             top: {
-              height: 50,
+              height: 60,
               button: {
                 radius: 16,
                 text: "+"
               }
             },
             bottom: {
-              height: 50,
+              height: 60,
               button: {
                 radius: 16,
                 text: "-"
@@ -197,6 +218,12 @@
 
     methods: {
 
+      onResize() {
+        // this.options.width = window.screen.availWidth;
+        // this.options.height = window.screen.availHeight - 52 - 40;
+        console.log("onResize: width=" + this.options.width + " height=" + this.options.height);
+      },
+
       onMouseDownToggle(e, slider) {
         console.log('onMouseDownToggle');
         this.movedSlider = slider;
@@ -252,12 +279,7 @@
         this.channels[slider.index].lock = !this.channels[slider.index].lock;
       },
 
-      calculateChannels(slider, channelValue) {
-        if (!this.dot.totalBrightnessPower) {
-          this.dot.totalCorrelation = this.channels.map(ch => ch.correlation).reduce((a, b) => a + b, 0);
-          this.dot.totalBrightnessPower = this.dot.brightness * this.dot.totalCorrelation;
-        }
-
+      calculateChannels(slider, channelValue, unlock) {
         let currentChannel = this.channels[slider.index];
         let maxChannelValue = this.dot.totalBrightnessPower / currentChannel.correlation;
         channelValue = Math.min(channelValue, maxChannelValue, 1);
@@ -270,14 +292,14 @@
           .reduce((a, b) => a + b, 0);
 
         let unlockCorrelation = this.channels
-          .filter((ch, i) => !ch.lock && i !== slider.index)
+          .filter((ch, i) => (!ch.lock || !!unlock) && i !== slider.index)
           .map(ch => ch.correlation)
           .reduce((a, b) => a + b, 0);
 
         let deltaBrightnessPower = restBrightnessPower - channelsBrightnessPower;
         for (let i = 0; i < this.channels.length; i++) {
           let ch = this.channels[i];
-          if (i !== slider.index && !ch.lock) {
+          if (i !== slider.index && (!ch.lock || !!unlock)) {
             let deltaChannelPower = deltaBrightnessPower / unlockCorrelation * ch.correlation;
             deltaBrightnessPower -= deltaChannelPower;
 
@@ -302,9 +324,27 @@
         }
 
         currentChannel.value = channelValue;
-        slider.value = channelValue;
-      }
+      },
 
+      initialChannels() {
+        let totalCorrelation = this.channels.map(ch => ch.correlation).reduce((a, b) => a + b, 0);
+        this.dot.totalBrightnessPower = this.dot.brightness * totalCorrelation;
+
+        let totalChannelsPower = this.channels.map(ch => ch.value * ch.correlation).reduce((a, b) => a + b, 0);
+        if (this.dot.totalBrightnessPower !== totalChannelsPower) {
+          let maxChannelIndex = 0;
+          let maxChannel = this.channels[maxChannelIndex];
+          for (let i = 0; i < this.channels.length; i++) {
+            if (maxChannel.value < this.channels[i].value) {
+              maxChannelIndex = i;
+              maxChannel = this.channels[maxChannelIndex];
+            }
+          }
+
+          let maxChannelValue = Math.min(maxChannel.value * this.dot.totalBrightnessPower / totalChannelsPower, 1);
+          this.calculateChannels({ index: maxChannelIndex }, maxChannelValue, true);
+        }
+      }
     }
   }
 
