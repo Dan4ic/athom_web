@@ -1,6 +1,7 @@
 <template>
     <div>
-        <svg class="light-schedule"
+        <svg v-if="!isShowDotInspector"
+             class="light-schedule"
              :view-box.camel="[0, 0, width, height]"
              @mousedown.prevent="onMouseDown"
              @mousemove.prevent="onMouseMove"
@@ -153,7 +154,8 @@
                             :cx="rebaseX(getChartX(dot))"
                             :cy="rebaseY(getChartY(dot))"
                             @mousedown="onDotMouseDown(dot)"
-                            @dblclick="isShowDotInspector=true"
+                            @dblclick.prevent="onDotDblClick()"
+                            @touchstart.prevent="onDotTouchStart()">
                     ></circle>
                 </g>
 
@@ -210,9 +212,9 @@
                 <v-card-title primary-title >
                     <v-container style="padding: 0">
                         <v-layout row>
-                            <h1>{{'DOT_INSPECTOR' | lang}}</h1>
+                            <h2>{{'DOT_INSPECTOR' | lang}}</h2>
                         </v-layout>
-                        <v-layout>
+                        <v-layout row>
                             <lucerna-dot-inspector v-model="dotsForInspection"></lucerna-dot-inspector>
                         </v-layout>
                     </v-container>
@@ -227,10 +229,10 @@
 
 <script>
 
-    import consts from 'consts';
-    import Spectrum from './Spectrum.vue';
+  import consts from 'consts';
+  import Spectrum from './Spectrum.vue';
 
-    export default {
+  export default {
 
         components : {
             spectrum : Spectrum
@@ -434,7 +436,8 @@
                         }
                     }, 20),
                     clientX: 0,
-                }
+                },
+                dblDotTouchTimer: null
             };
 
             data.zoom.value = this.rebaseZoomByParams(data, data.zoom.value);
@@ -445,22 +448,23 @@
 
         methods: {
 
-            createDot(time, brightness, selected){
+            createDot(time, brightness, selected) {
+                let channels = this.$store.state.lucerna.channels.map((channel, i) => {
+                    return {
+                        name: 'Channel ' + (i + 1),
+                        value: brightness,
+                        color: channel.color,
+                        correlation: channel.correlation || i,
+                        lock: false
+                    };
+                });
+
                 return {
                     selected: !!selected,
                     time: time,
                     brightness: brightness,
-                    spectrum: {
-                        0: 0.1,
-                        1: 0.2,
-                        2: 0.1,
-                        3: 0.6,
-                        4: 1,
-                        5: 0.2,
-                        6: 0.1,
-                        7: 0.2
-                    }
-                }
+                    channels: channels
+                };
             },
 
             createDroppedDot(isSelected){
@@ -712,6 +716,23 @@
                         this.dots.push(new_dot);
                     }
                 });
+            },
+
+            onDotDblClick() {
+                this.isShowDotInspector = true;
+            },
+
+            onDotTouchStart() {
+              let self = this;
+              if (this.dblDotTouchTimer == null) {
+                this.dblDotTouchTimer = setTimeout(function () {
+                  self.dblDotTouchTimer = null;
+                }, 300);
+              } else {
+                clearTimeout(this.dblDotTouchTimer);
+                this.dblDotTouchTimer = null;
+                this.isShowDotInspector = true;
+              }
             },
 
             //Фокусировка на выбранном дне по dblclick
