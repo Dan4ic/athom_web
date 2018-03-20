@@ -5,6 +5,7 @@ const fs = require('fs')
 module.exports = {
   appendFile(bundle, file){
     fs.appendFileSync(bundle, 'test');
+    //todo
     //Int32Array
   },
   make(appname){
