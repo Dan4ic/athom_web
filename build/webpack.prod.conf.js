@@ -147,7 +147,6 @@ const webpackConfig = merge(baseWebpackConfig, {
     ]
 })
 
-
 //Applications
 const apps_path = path.resolve(__dirname, '../src/applications/');
 
