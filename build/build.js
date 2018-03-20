@@ -45,7 +45,7 @@ rm(path.join(config.build.assetsRoot, config.build.assetsSubDirectory), err => {
         });
         console.info(chalk.yellow('  Built applications bundles:\n'))
         for(let i=0; i<bundles.length; i++) {
-            console.info(chalk.yellow(`  ${i+1}. ${bundles[i]}:\n`))
+            console.info(chalk.yellow(`  ${i+1}. ${bundles[i]};`))
         }
     }
   })
