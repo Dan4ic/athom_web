@@ -110,8 +110,9 @@ fs.readdirSync(apps_path).forEach(dir => {
             module.exports.entry[`${dir}-component-${index}`] = path.resolve(apps_path, dir, source.source);
             source.components.map(function(cname){
                 global.components[dir][cname] = {
-                    source : source.source,
-                    bundle : `${dir}-component-${index}.js`
+                    source      : source.source,
+                    bundle      : `${dir}-component-${index}.js`,
+                    bundle_dist : `component${index}.js`,
                 }
             });
         });
