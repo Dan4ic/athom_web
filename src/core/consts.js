@@ -30,7 +30,7 @@ export default {
     },
     REST : {
         STATE : "/api/state",
-        PROFILE : "/api/profile",
+        PROFILE : "/manifest",
         CONFIG : "/api/config",
         AP_AVAILABLE : "/api/rescan_net",
         TIME : "/api/time",

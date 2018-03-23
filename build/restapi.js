@@ -39,7 +39,14 @@ module.exports = function(app){
         }
     };
 
+    /*
     app.get('/api/profile', function(req, res) {
+        console.log('>Get profile data ');
+        res.json(require(path.resolve(__dirname, "../static/profile.json")));
+    });
+    */
+
+    app.get('/manifest', function(req, res) {
         console.log('>Get profile data ');
         res.json(require(path.resolve(__dirname, "../static/profile.json")));
     });

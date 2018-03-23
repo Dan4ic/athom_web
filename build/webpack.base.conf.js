@@ -112,7 +112,7 @@ fs.readdirSync(apps_path).forEach(dir => {
                 global.components[dir][cname] = {
                     source      : source.source,
                     bundle      : `${dir}-component-${index}.js`,
-                    bundle_dist : `component${index}.js`,
+                    bundle_dist : `component${index}.jgz`,
                 }
             });
         });

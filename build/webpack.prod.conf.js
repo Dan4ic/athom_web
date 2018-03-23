@@ -116,7 +116,8 @@ const webpackConfig = merge(baseWebpackConfig, {
             filename: 'platform.html',
             template: 'platform.html',
             inject: true,
-            inlineSource: 'platform.css|platform.js',
+            chunks: ['app', 'vendor'],
+            inlineSource: 'app.js|vendor.js',
             //Injection source code to HTML
             minify: {
                 removeComments: true,
@@ -167,7 +168,7 @@ fs.readdirSync(apps_path).forEach(file => {
             );
             webpackConfig.plugins.push(
                 new CompressionWebpackPlugin({
-                    asset: `apps/${file}/component${index}.gz`,
+                    asset: `apps/${file}/component${index}.jgz`,
                     algorithm: 'gzip',
                     deleteOriginalAssets: true,
                     test: new RegExp(filename),

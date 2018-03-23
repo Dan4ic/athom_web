@@ -42,15 +42,19 @@ export default {
     mutations: {
         //Set profiles of applications
         setProfiles(state, profiles) {
-            profiles.map((profile) => {
+            for(let appid in profiles) {
+                let profile = profiles[appid];
                 if ('components' in profile)
                     for (let cname in profile.components) {
                         if (!(cname in Vue.options.components)) {
                             console.log('Register component ', cname);
-                            Vue.component(cname, Apps.makePromisLoadComponent(profile.components[cname].source, cname));
+                            if(process.env.NODE_ENV === 'production')
+                                Vue.component(cname, Apps.makePromisLoadComponent(`/apps/${appid}/${profile.components[cname].source}`, cname));
+                            else
+                                Vue.component(cname, Apps.makePromisLoadComponent(profile.components[cname].source, cname));
                         }
                     }
-            });
+            };
             state.apps.profiles = profiles;
         },
 

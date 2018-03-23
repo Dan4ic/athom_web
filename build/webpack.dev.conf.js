@@ -106,11 +106,13 @@ module.exports = new Promise((resolve, reject) => {
 //Prepare manifest
 const apps_path = path.resolve(__dirname, '../src/applications/');
 
-let profile = [];
+let profile = {};
+let appid = 1;
 
 fs.readdirSync(apps_path).forEach(dir => {
     if (fs.lstatSync(path.resolve(apps_path, dir)).isDirectory()) {
-        profile.push(Manifest.make(dir));
+        profile[appid]  = Manifest.make(dir);
+        appid++;
     }
 });
 

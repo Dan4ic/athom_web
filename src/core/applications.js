@@ -20,7 +20,8 @@ export default {
     getComponentBy(category, action) {
         let result = [];
 
-        window.$store.state.apps.profiles.map(function (profile) {
+        for(let appid in window.$store.state.apps.profiles) {
+            let profile = window.$store.state.apps.profiles[appid];
             for (let name in profile.components) {
                 let component = profile.components[name];
                 if (component.intent_filter)
@@ -39,7 +40,7 @@ export default {
                         ) result.push(name);
                     }
             }
-        });
+        };
 
         return result;
     },
