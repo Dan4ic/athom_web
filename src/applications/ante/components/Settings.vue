@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container style="display: flex; flex-direction: row; flex-wrap:wrap;">
       <DateTimeComponent class="panel" :style="panelStyle"></DateTimeComponent>
       <NetworkComponent class="panel" :style="panelStyle"></NetworkComponent>
       <DisplayComponent class="panel" :style="panelStyle"></DisplayComponent>
@@ -10,6 +10,7 @@
               :key="pref_comp_name"
               :style="panelStyle"
       ></component>
+      <Applications class="panel" :style="panelStyle"></Applications>
   </v-container>
 </template>
 
@@ -18,6 +19,7 @@
 import NetworkComponent from './settings/Network.vue';
 import DisplayComponent from './settings/Display.vue';
 import DateTimeComponent from './settings/DateTime.vue';
+import Applications from './settings/Applications.vue';
 import consts from 'consts';
 
 let PANEL_WIDTH     = 540;
@@ -29,7 +31,8 @@ export default {
   components : {
       NetworkComponent : NetworkComponent,
       DisplayComponent : DisplayComponent,
-      DateTimeComponent : DateTimeComponent
+      DateTimeComponent : DateTimeComponent,
+      Applications: Applications
   },
   computed:{
     customPrefs() {
@@ -85,7 +88,8 @@ export default {
 <style scoped>
 
   .panel {
-    float: left;
+      display:flex;
+    /* float: left; */
     margin-left: 4px;
     margin-right: 4px;
     margin-bottom: 4px;

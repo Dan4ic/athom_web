@@ -12,8 +12,13 @@ export default {
 
     //Include application lang constants
     includeLang(consts) {
-        for (let lng in consts)
+        //todo если включить debugger вываливается ошибка interval
+        //debugger;
+        for (let lng in consts) {
+            if(!window.$consts.LANGS[lng])
+                window.$consts.LANGS[lng]   = {};
             Object.assign(window.$consts.LANGS[lng], consts[lng]);
+        }
     },
 
     //Return registered components by category or category & action

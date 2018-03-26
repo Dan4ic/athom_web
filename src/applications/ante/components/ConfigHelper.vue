@@ -91,7 +91,7 @@ export default {
   data () {
     return {
         step: 0,
-        languages: Consts.LANGS.AVAILABLE,
+        languages: Vue.filter('lang')('AVAILABLE'),
         is_valid_network    : false,
     }
   }

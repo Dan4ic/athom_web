@@ -1,6 +1,6 @@
 <template>
     <v-form v-model="is_valid" :lazy-validation="lazyValidation" ref="form">
-        <v-card>
+        <v-card style="width: 100%">
             <v-card-title primary-title>
                 <v-layout row wrap>
                     <h1>{{'ACCESS_POINT' | lang }}</h1>

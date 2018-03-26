@@ -1,6 +1,6 @@
 <template>
     <v-form>
-        <v-card>
+        <v-card style="width: 100%">
             <v-card-title primary-title>
                 <v-layout row wrap>
                     <h1>{{'DATE_TIME' | lang}}</h1>
@@ -13,19 +13,16 @@
                                 required
                         ></v-select>
                     </v-flex>
-
-                    <template v-if="float">
+                    <template v-if="isMobileScreen" style="display: flex; flex-wrap: wrap">
                         <v-flex xs12>
-                            <v-date-picker class="float_packer" v-model="currDate" :landscape="!isMobileScreen"></v-date-picker>
-                            <v-time-picker class="float_packer" v-model="currTime" :landscape="!isMobileScreen" format="24hr"></v-time-picker>
+                            <v-date-picker class="float_packer" style="display: flex; width: 100%" v-model="currDate"></v-date-picker>
+                            <v-time-picker class="float_packer" style="display: flex; width: 100%" v-model="currTime"format="24hr"></v-time-picker>
                         </v-flex>
                     </template>
                     <template v-else>
-                        <v-flex xs12 class="text-xs-center">
-                            <v-date-picker :style="isMobileScreen ? {width:'100%'} : {}" v-model="currDate" :landscape="!isMobileScreen"></v-date-picker>
-                        </v-flex>
-                        <v-flex xs12>
-                            <v-time-picker :style="isMobileScreen ? {width:'100%'} : {}" v-model="currTime" :landscape="!isMobileScreen" format="24hr"></v-time-picker>
+                        <v-flex xs12 class="text-xs-center" style="display: flex;">
+                            <v-date-picker style="display: flex; width: 50%;" full-width v-model="currDate"></v-date-picker>
+                            <v-time-picker style="display: flex; width: 50%;" v-model="currTime" format="24hr"></v-time-picker>
                         </v-flex>
                     </template>
                     <v-flex xs12>
@@ -45,7 +42,7 @@
 
 <script>
 
-    import consts from 'consts';
+    import consts from '../../consts';
     import template from './Template.vue'
 
     export default {

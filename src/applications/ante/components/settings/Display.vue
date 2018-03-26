@@ -1,6 +1,6 @@
 <template>
     <v-form ref="form" lazy-validation>
-        <v-card>
+        <v-card style="width: 100%">
             <v-card-title primary-title>
                 <v-layout row wrap>
                     <h1>{{'DISPLAY_TITLE' | lang}}</h1>
@@ -40,7 +40,7 @@
         extends : template,
         computed: {
             themes(){
-                return consts.LANGS[this.$store.state.display.lang].THEMES;
+                return Vue.filter('lang')('THEMES');
             },
 
             theme: {

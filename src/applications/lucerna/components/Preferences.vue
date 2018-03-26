@@ -1,6 +1,6 @@
 <template>
     <v-form ref="form" lazy-validation>
-        <v-card>
+        <v-card style="width: 100%">
             <v-card-title primary-title>
                 <v-container style="padding: 0">
                     <v-layout row>
