@@ -24,6 +24,10 @@
     export default {
         name: 'SmartTankCore',
         mounted() {
+
+            this.onResize();
+            window.addEventListener('resize', this.onResize, { passive: true });
+
             setTimeout(() => {
                 window.$bus.$emit(consts.EVENTS.CORE_IS_LOADED);
             }, 50);
@@ -32,6 +36,16 @@
             this.$bus.$on(consts.EVENTS.LAUNCHER_IS_LOADED, (type, messages) => {
                 this.is_launcher_loaded = true;
             });
+        },
+        beforeDestroy () {
+            if (typeof window !== 'undefined') {
+                window.removeEventListener('resize', this.onResize, { passive: true })
+            }
+        },
+        methods : {
+            onResize () {
+                this.$store.commit('setIsMobile', window.innerWidth < 600);
+            }
         },
         computed: {
             isProfileReady(){

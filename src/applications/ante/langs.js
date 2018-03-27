@@ -47,6 +47,12 @@ export default {
         STATE_ERROR : 'Error of loading state file',
         ERROR_LOAD_APP : 'Error of loading application',
         APPS_TITLE: 'Applications',
+        APPLICATION : 'Application',
+        VENDOR : 'Vendor',
+        UNINSTALL : 'Uninstall',
+        UNINSTALL_APP_TITLE : 'Uninstalling application',
+        UNINSTALL_APP_BODY : 'Are you sure you want to uninstall application?',
+        INSTALL_NEW_APP : 'Install new application'
     },
     ru : {
         DISPLAY_TITLE : 'Экран',
@@ -96,5 +102,11 @@ export default {
         STATE_ERROR : 'Ошибка чтения статуса контроллера',
         ERROR_LOAD_APP : 'Ошибка загрузки приложения',
         APPS_TITLE: 'Приложения',
+        APPLICATION : 'Приложение',
+        VENDOR : 'Поставщик',
+        UNINSTALL : 'Удалить',
+        UNINSTALL_APP_TITLE : 'Удаление приложения',
+        UNINSTALL_APP_BODY : 'Вы уверены, что хотите удалить приложение?',
+        INSTALL_NEW_APP : 'Установить новое приложение'
     }
 }

@@ -1,5 +1,6 @@
 {
   "name" : "Lucerna",
+  "vendor" : "rpiontik",
   "components" : {
     "lucerna-basis" : {
       "source" : "basis.js"

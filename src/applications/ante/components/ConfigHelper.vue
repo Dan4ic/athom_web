@@ -1,5 +1,5 @@
 <template>
-  <v-container fill-width >
+  <v-container class="custom_container" fill-width >
       <v-stepper v-model="step" style="max-width: 1065px; margin: auto">
           <v-stepper-header>
               <v-stepper-step step="1" :complete="step > 1" :style="step>1?{cursor: 'pointer'}:{}" @click.native="step>1 ? step=1:null;">{{'INTRODUCTION' | lang}}</v-stepper-step>
@@ -13,8 +13,8 @@
               <v-stepper-step step="5" :complete="step == 5" @click.native="step>5 ? step=5:null;">{{'READY' | lang}}</v-stepper-step>
           </v-stepper-header>
           <v-stepper-items>
-              <v-stepper-content step="1">
-                  <v-card class="mb-5 step-card" style="padding: 24px;">
+              <v-stepper-content class="custom_stepper_content" step="1">
+                  <v-card class="mb-2 step-card" style="padding: 24px;">
                       <div v-html="htmlHello"></div>
                       <v-select
                               style="position: absolute; right: 16px; top:16px; width: 160px;"
@@ -29,22 +29,22 @@
                   </router-link>
                   <v-btn color="primary" @click.native="step = 2">{{'CONTINUE' | lang}}</v-btn>
               </v-stepper-content>
-              <v-stepper-content step="2">
-                  <DateTimeComponent :lazyValidation="false" class="mb-5 step-card" :float="true" :hide-actions="true"></DateTimeComponent>
+              <v-stepper-content class="custom_stepper_content" step="2">
+                  <DateTimeComponent :lazyValidation="false" class="mb-2 step-card" :float="true" :hide-actions="true"></DateTimeComponent>
                   <v-btn flat @click.native="step = 1">{{'BACK' | lang}}</v-btn>
                   <v-btn color="primary" @click.native="step = 3">{{'CONTINUE' | lang}}</v-btn>
               </v-stepper-content>
-              <v-stepper-content step="3">
-                  <NetworkComponent :lazyValidation="false" v-model="is_valid_network" class="mb-5 step-card" :hide-actions="true"></NetworkComponent>
+              <v-stepper-content class="custom_stepper_content" step="3">
+                  <NetworkComponent :lazyValidation="false" v-model="is_valid_network" class="mb-2 step-card" :hide-actions="true"></NetworkComponent>
                   <v-btn flat @click.native="step = 2">{{'BACK' | lang}}</v-btn>
                   <v-btn color="primary" :disabled="!is_valid_network" @click.native="step = 4">{{'CONTINUE' | lang}}</v-btn>
               </v-stepper-content>
-              <v-stepper-content step="4">
-                  <DisplayComponent :lazyValidation="false" class="mb-5 step-card" :hide-actions="true"></DisplayComponent>
+              <v-stepper-content class="custom_stepper_content" step="4">
+                  <DisplayComponent :lazyValidation="false" class="mb-2 step-card" :hide-actions="true"></DisplayComponent>
                   <v-btn flat @click.native="step = 3">{{'BACK' | lang}}</v-btn>
                   <v-btn color="primary" @click.native="step = 5">{{'CONTINUE' | lang}}</v-btn>
               </v-stepper-content>
-              <v-stepper-content step="5">
+              <v-stepper-content class="custom_stepper_content" step="5">
                   <div v-html="htmlDone"></div>
                   <v-btn flat @click.native="step = 4">{{'BACK' | lang}}</v-btn>
                   <v-btn color="primary" @click.native="$router.push('/');">{{'BEGIN_WORK' | lang}}</v-btn>
@@ -106,6 +106,16 @@ export default {
     }
 
     .step-card {
+    }
+
+    @media (max-width: 599px) {
+        .custom_stepper_content {
+            padding: 0 !important;
+        }
+
+        .custom_container {
+            padding: 0 !important;
+        }
     }
 
 </style>

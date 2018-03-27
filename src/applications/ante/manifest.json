@@ -1,5 +1,6 @@
 {
   "name" : "SmartTank",
+  "vendor" : "rpiontik",
   "components" : {
     "launcher" : {
       "source" : "index.js",
