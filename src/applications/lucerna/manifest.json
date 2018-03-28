@@ -1,6 +1,10 @@
 {
   "name" : "Lucerna",
   "vendor" : "rpiontik",
+  "description" : {
+    "ru" : "Приложение управления светильником для морского и пресноводного аквариума",
+    "en" : "The application for lighting control of marine and freshwater aquariums"
+  },
   "components" : {
     "lucerna-basis" : {
       "source" : "basis.js"

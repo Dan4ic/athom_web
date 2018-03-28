@@ -62,7 +62,7 @@
                     :type="alerts[0].type"
                     :value="true"
                     transition="scale-transition"
-                    style="position: fixed; right: 16px; top: 16px; width: 400px; max-width: 80%; z-index: 2000"
+                    style="position: fixed; right: 16px; top: 16px; width: 400px; max-width: 80%; z-index: 20000"
             >
                 <span v-html="alerts[0].message"></span>
                 <v-btn

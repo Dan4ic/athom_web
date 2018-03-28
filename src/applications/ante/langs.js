@@ -52,7 +52,13 @@ export default {
         UNINSTALL : 'Uninstall',
         UNINSTALL_APP_TITLE : 'Uninstalling application',
         UNINSTALL_APP_BODY : 'Are you sure you want to uninstall application?',
-        INSTALL_NEW_APP : 'Install new application'
+        INSTALL_NEW_APP : 'Install new application',
+        INSTALL_APP_TITLE : 'Install application',
+        INSTALL : 'Install',
+        DO_SELECT_APP : 'Drag the application file here or click here to select.',
+        DESCRIPTION : 'Description',
+        SIZE : 'Size',
+        ERROR_APP_BUNDLE_FORMAT : 'The file is not an application file or is incompatible',
     },
     ru : {
         DISPLAY_TITLE : 'Экран',
@@ -107,6 +113,12 @@ export default {
         UNINSTALL : 'Удалить',
         UNINSTALL_APP_TITLE : 'Удаление приложения',
         UNINSTALL_APP_BODY : 'Вы уверены, что хотите удалить приложение?',
-        INSTALL_NEW_APP : 'Установить новое приложение'
+        INSTALL_NEW_APP : 'Установить новое приложение',
+        INSTALL_APP_TITLE : 'Установка приложения',
+        INSTALL : 'Установить',
+        DO_SELECT_APP : 'Перетащите сюда файл приложения или кликните здесь для выбора.',
+        DESCRIPTION : 'Описание',
+        SIZE : 'Размер',
+        ERROR_APP_BUNDLE_FORMAT : 'Файл не является файлом приложения или несовместим',
     }
 }

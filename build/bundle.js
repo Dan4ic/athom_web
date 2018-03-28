@@ -6,17 +6,17 @@ const Manifest = require('./manifest')
 module.exports = {
     createBundle(bundle, manifest){
         fs.writeFileSync(bundle, "SMTB01");
-        let manifest_raw = JSON.stringify(manifest);
-        fs.appendFileSync(bundle, Buffer.from(new Int32Array([manifest_raw.length]).buffer), "binary");
+        let manifest_raw = new Buffer(JSON.stringify(manifest), 'UTF-8');
+        fs.appendFileSync(bundle, Buffer.from(new Uint32Array([manifest_raw.length]).buffer), "binary");
         fs.appendFileSync(bundle, manifest_raw);
     },
     appendName(bundle, name){
-        fs.appendFileSync(bundle, Buffer.from(new Int32Array([name.length]).buffer), "binary");
+        fs.appendFileSync(bundle, Buffer.from(new Uint32Array([name.length]).buffer), "binary");
         fs.appendFileSync(bundle, name);
     },
     appendFile(bundle, file) {
         this.appendName(bundle, path.basename(file));
-        fs.appendFileSync(bundle, Buffer.from(new Int32Array([fs.statSync(file).size]).buffer), "binary");
+        fs.appendFileSync(bundle, Buffer.from(new Uint32Array([fs.statSync(file).size]).buffer), "binary");
         fs.appendFileSync(bundle, fs.readFileSync(file, 'binary'), "binary");
     },
     make(appname) {

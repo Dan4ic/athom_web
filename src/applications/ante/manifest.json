@@ -1,6 +1,10 @@
 {
   "name" : "SmartTank",
   "vendor" : "rpiontik",
+  "description" : {
+    "ru" : "Приложение рабочего стола от SmartTank",
+    "en" : "The launcher application by SmartTank"
+  },
   "components" : {
     "launcher" : {
       "source" : "index.js",

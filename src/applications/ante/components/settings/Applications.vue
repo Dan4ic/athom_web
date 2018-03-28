@@ -42,19 +42,22 @@
                 <v-btn @click="doUninstall" flat>{{'UNINSTALL' | lang }}</v-btn>
             </template>
         </modal>
+        <install-app v-if="show_install_modal" @onclose="show_install_modal = false"></install-app>
     </v-form>
 </template>
 
 <script>
 
     import modal from './../Modal.vue';
+    import installApp from './InstallApp.vue';
     import consts from './../../consts';
     import template from './Template.vue'
 
     export default {
         name: 'Applications',
         components : {
-            modal : modal,
+            modal,
+            'install-app' : installApp
         },
         extends : template,
         computed: {
@@ -78,7 +81,7 @@
         },
         methods: {
             doInstall(){
-
+                this.show_install_modal = true;
             },
             doUninstall(){
 
@@ -91,6 +94,7 @@
         data () {
             return {
                 show_uninstall_modal : false,
+                show_install_modal : false,
                 selected_app : null,
                 headers: [
                     { text: Vue.filter('lang')('APPLICATION'), align: 'left', value: 'name' },

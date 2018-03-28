@@ -3,7 +3,7 @@
         <div>
             <div class="mask"></div>
             <div class="modal-form">
-                <v-card style="">
+                <v-card style="width: 100%">
                     <v-card-title primary-title>
                         <slot name="title"></slot>
                         <slot name="body"></slot>
