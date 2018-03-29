@@ -1,6 +1,9 @@
 {
   "name" : "Lucerna",
   "vendor" : "rpiontik",
+  "version" : 1,
+  "subversion" : 0,
+  "patch" : 0,
   "description" : {
     "ru" : "Приложение управления светильником для морского и пресноводного аквариума",
     "en" : "The application for lighting control of marine and freshwater aquariums"

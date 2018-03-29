@@ -59,6 +59,10 @@ export default {
         DESCRIPTION : 'Description',
         SIZE : 'Size',
         ERROR_APP_BUNDLE_FORMAT : 'The file is not an application file or is incompatible',
+        ERROR_APP_INSTALL : 'Error of install application',
+        INFO_APP_ALREADY_INSTALLED : 'Application is already installed. If you continue, the application will be updated. Found version: ',
+        VERSION : 'Version',
+        ERROR_APP_UNINSTALL : 'Error of uninstall application'
     },
     ru : {
         DISPLAY_TITLE : 'Экран',
@@ -120,5 +124,9 @@ export default {
         DESCRIPTION : 'Описание',
         SIZE : 'Размер',
         ERROR_APP_BUNDLE_FORMAT : 'Файл не является файлом приложения или несовместим',
+        ERROR_APP_INSTALL : 'Ошибка установки приложения',
+        INFO_APP_ALREADY_INSTALLED : 'Приложение уже установлено. Если вы продолжите, приложение будет обновлено. Установлена версия: ',
+        VERSION : 'Версия',
+        ERROR_APP_UNINSTALL : 'Ошибка удаления приложения!'
     }
 }

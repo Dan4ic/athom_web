@@ -1,6 +1,9 @@
 {
   "name" : "SmartTank",
   "vendor" : "rpiontik",
+  "version" : 1,
+  "subversion" : 0,
+  "patch" : 0,
   "description" : {
     "ru" : "Приложение рабочего стола от SmartTank",
     "en" : "The launcher application by SmartTank"

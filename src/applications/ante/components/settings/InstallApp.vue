@@ -34,6 +34,10 @@
                                 <td width="1%">{{'SIZE' | lang}}:</td>
                                 <td>{{manifest ? Math.round(size / 1024 + 1) : ''}}kB</td>
                             </tr>
+                            <tr>
+                                <td width="1%">{{'VERSION' | lang}}:</td>
+                                <td>{{manifest ? version : ''}}</td>
+                            </tr>
                         </table>
                     </v-flex>
                 </v-layout>
@@ -41,7 +45,8 @@
         </template>
         <template slot="actions">
             <v-btn @click="$emit('onclose')">{{'CANCEL' | lang }}</v-btn>
-            <v-btn @click="doUninstall" flat>{{'INSTALL' | lang }}</v-btn>
+            <v-btn @click="doInstall" flat :disabled="!manifest">{{'INSTALL' | lang }}</v-btn>
+            <block-screen v-if="installing"></block-screen>
         </template>
     </modal>
 </template>
@@ -49,6 +54,8 @@
 <script>
 
     import modal from './../Modal.vue'
+    import blockScreen from './../BlockScreen.vue';
+    import utils from './../../utils';
 
     const consts = window.$consts;
 
@@ -56,10 +63,35 @@
         name: 'InstallApplication',
         components : {
             modal,
+            'block-screen' : blockScreen
         },
         methods: {
-            doUninstall(){
-
+            doInstall(){
+                let formData = new FormData();
+                formData.append('data', new Blob([this.buffer]), 'bundle.smt');
+                this.$store.commit('incNetPending');
+                this.installing = true;
+                this.$axios.post( '/install',
+                    formData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    }
+                ).then(() => {
+                    this.$store.commit('decNetPending');
+                    document.location.reload(true);
+                })
+                .catch((e) => {
+                    console.error(e);
+                    this.installing = false;
+                    this.$store.commit('decNetPending');
+                    this.$bus.$emit(
+                        consts.EVENTS.ALERT,
+                        consts.ALERT_TYPE.ERROR,
+                        Vue.filter('lang')('ERROR_APP_INSTALL')
+                    );
+                });
             },
 
             readString(dataview, offset, length){
@@ -71,6 +103,21 @@
                 }
 
                 return (new TextDecoder()).decode(new Uint8Array(result));
+
+            },
+
+            checkManifest(){
+
+                for(let appid in this.$store.state.apps.profiles){
+                    let app = this.$store.state.apps.profiles[appid];
+                    if(app.name == this.manifest.name) {
+                        this.$bus.$emit(
+                            consts.EVENTS.ALERT,
+                            consts.ALERT_TYPE.INFO,
+                            Vue.filter('lang')('INFO_APP_ALREADY_INSTALLED') + utils.getStrVersion(app)
+                        );
+                    }
+                }
 
             },
 
@@ -97,34 +144,31 @@
                     }
 
                     let manifest_len = dataview.getUint32(6, true);
-                    debugger;
-
-                    console.log(manifest_len, this.readString(dataview, 10, manifest_len));
                     this.manifest = JSON.parse(this.readString(dataview, 10, manifest_len));
+
+                    this.checkManifest();
                 }
                 reader.readAsArrayBuffer(file);
             }
         },
         computed: {
+            version(){
+                return utils.getStrVersion(this.manifest);
+            },
             htmlFileCaption(){
                 return Vue.filter('lang')('DO_SELECT_APP');
             },
             description(){
-                if(!this.manifest || !('description' in this.manifest))
-                    return '';
-                let lang = this.$store.state.display.lang;
-
-                if(lang in this.manifest.description)
-                    return this.manifest.description[lang];
-                else
-                    return this.manifest.description['en'];
+                return !this.manifest ? '' : utils.getDescription(this.manifest);
             }
         },
         data() {
             return {
                 manifest : null,
                 size : null,
-                buffer : null
+                file : null,
+                buffer : null,
+                installing : false,
             }
         }
     }

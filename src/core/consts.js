@@ -23,7 +23,8 @@ export default {
     },
     ALERT_TYPE :{
         ERROR : 'error',
-        SUCCESS : 'success'
+        SUCCESS : 'success',
+        INFO : 'info',
     },
     REST : {
         STATE : "/api/state",

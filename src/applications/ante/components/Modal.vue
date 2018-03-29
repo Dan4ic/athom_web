@@ -1,6 +1,7 @@
 <template>
     <transition name="modal">
         <div>
+            <div v-html="'<style> html, body { position: static; overflow-y:hidden;}</style>'"></div>
             <div class="mask"></div>
             <div class="modal-form">
                 <v-card style="width: 100%">
