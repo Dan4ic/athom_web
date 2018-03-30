@@ -14,11 +14,13 @@ export default {
     includeLang(consts) {
         //todo если включить debugger вываливается ошибка interval
         //debugger;
+        console.info(consts);
         for (let lng in consts) {
             if(!window.$consts.LANGS[lng])
                 window.$consts.LANGS[lng]   = {};
             Object.assign(window.$consts.LANGS[lng], consts[lng]);
         }
+        console.info(window.$consts.LANGS);
     },
 
     //Return registered components by category or category & action
