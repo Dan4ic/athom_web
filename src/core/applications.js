@@ -57,6 +57,7 @@ export default {
         if(component in window.$resolvers_components) {
             window.$resolvers_components[component].map((resolve) => {
                 try {
+                    console.log(`Resolved for ${component}`);
                     resolve(object)
                 } catch (e) {
                     console.error(e);
@@ -65,6 +66,7 @@ export default {
             });
             window.$resolvers_components[component] = [];
         }
+        window.$protocomponents[component]  = object;
     },
 
     //Create promise for dynamically load component

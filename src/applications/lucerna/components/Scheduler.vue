@@ -288,70 +288,7 @@
         },
 
         data() {
-            const example_dots = [
-                    /*
-                {
-                    selected: false,
-                    time: 23760,
-                    brightness: 0.01,
-                    spectrum: {
-                        0: 0.1,
-                        1: 0.2,
-                        2: 0.1,
-                        3: 0.6,
-                        4: 1,
-                        5: 0.2,
-                        6: 0.1,
-                        7: 0.2
-                    }
-                },
-                {
-                    selected: false,
-                    time: 38880,
-                    brightness: 0.9,
-                    spectrum: {
-                        0: 0.3,
-                        1: 0.2,
-                        2: 0.2,
-                        3: 0.1,
-                        4: 0.6,
-                        5: 0.7,
-                        6: 0.1,
-                        7: 0.9
-                    }
-                },
-                {
-                    selected: false,
-                    time: 52560,
-                    brightness: 0.9,
-                    spectrum: {
-                        0: 0.3,
-                        1: 0.2,
-                        2: 0.2,
-                        3: 0.1,
-                        4: 0.6,
-                        5: 0.7,
-                        6: 0.1,
-                        7: 0.9
-                    }
-                },
-                {
-                    selected: false,
-                    time: 67620,
-                    brightness: 0.01,
-                    spectrum: {
-                        0: 1,
-                        1: 0.5,
-                        2: 0.4,
-                        3: 0.3,
-                        4: 0.2,
-                        5: 0.1,
-                        6: 0.1,
-                        7: 0.1
-                    }
-                },
-                */
-            ];
+            const example_dots = [];
 
             let dots = [];
 
