@@ -78,9 +78,10 @@ export default {
                     return;
                 }
 
-                if(component in window.$resolvers_components)
+                if(component in window.$resolvers_components) {
                     window.$resolvers_components[component].push(resolve);
-                else
+                    return;
+                } else
                     window.$resolvers_components[component] = [resolve];
 
                 const script = document.createElement("script");
