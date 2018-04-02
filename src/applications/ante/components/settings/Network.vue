@@ -133,8 +133,10 @@
                     if(this.sta_password && this.sta_password.length)
                         data.net.sta_password   = this.sta_password;
 
-                    if(data.net.length)
+                    for(let key in data) {
                         this.$store.dispatch('putConfiguration', {data : data});
+                        break;
+                    }
                 }
             },
 

@@ -47,7 +47,7 @@
             </span>
                 <span v-if="!isMobileScreen" class="status_label">
                 {{ 'FIRMWARE' | lang }}: {{this.$store.state.system.firmware_v}}
-                    [{{isNetPending}}]
+                    [{{lang}}]
             </span>
             </v-footer>
 
@@ -152,6 +152,9 @@
             },
             isNetPending(){
                 return this.$store.state.is_net_pending;
+            },
+            lang(){
+                return this.$store.state.display.lang;
             }
         },
         watch : {
