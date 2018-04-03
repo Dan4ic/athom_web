@@ -27,7 +27,8 @@ export default {
         startWebsocket(){
 
             //todo disabled websocket
-            return;
+            if(process.env.NODE_ENV !== 'production')
+                return;
 
             if (!"WebSocket" in window){
                 console.warn("WebSocket NOT supported by your Browser!");
@@ -35,7 +36,7 @@ export default {
             }
 
             if(!this.websocket)
-                this.websocket = new WebSocket(consts.WEBSOCKET.ADDRESS);
+                this.websocket = new WebSocket('ws://' + window.location.hostname + ':8080');
 
             this.$emit(consts.EVENTS.WS_STARTING);
 
