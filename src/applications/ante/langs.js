@@ -62,7 +62,10 @@ export default {
         ERROR_APP_INSTALL : 'Error of install application',
         INFO_APP_ALREADY_INSTALLED : 'Application is already installed. If you continue, the application will be updated. Found version: ',
         VERSION : 'Version',
-        ERROR_APP_UNINSTALL : 'Error of uninstall application'
+        ERROR_APP_UNINSTALL : 'Error of uninstall application',
+        ERROR_FIRMWARE : 'Error of flashing firmware',
+        UPDATE_FIRMWARE_TITLE : 'Update firmware',
+        DO_FIRMWARE : 'FLASHING',
     },
     ru : {
         DISPLAY_TITLE : 'Экран',
@@ -127,6 +130,9 @@ export default {
         ERROR_APP_INSTALL : 'Ошибка установки приложения',
         INFO_APP_ALREADY_INSTALLED : 'Приложение уже установлено. Если вы продолжите, приложение будет обновлено. Установлена версия: ',
         VERSION : 'Версия',
-        ERROR_APP_UNINSTALL : 'Ошибка удаления приложения!'
+        ERROR_APP_UNINSTALL : 'Ошибка удаления приложения!',
+        ERROR_FIRMWARE : 'Ошибка прошивки контроллера',
+        UPDATE_FIRMWARE_TITLE : 'Обновление прошивки',
+        DO_FIRMWARE : 'Обновить',
     }
 }

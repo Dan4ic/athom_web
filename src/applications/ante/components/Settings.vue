@@ -11,6 +11,7 @@
               :style="panelStyle"
       ></component>
       <Applications class="panel" :style="panelStyle"></Applications>
+      <Firmware class="panel" :style="panelStyle"></Firmware>
   </v-container>
 </template>
 
@@ -20,6 +21,7 @@ import NetworkComponent from './settings/Network.vue';
 import DisplayComponent from './settings/Display.vue';
 import DateTimeComponent from './settings/DateTime.vue';
 import Applications from './settings/Applications.vue';
+import Firmware from './settings/Firmware.vue';
 import consts from 'consts';
 
 let PANEL_WIDTH     = 540;
@@ -32,7 +34,8 @@ export default {
       NetworkComponent : NetworkComponent,
       DisplayComponent : DisplayComponent,
       DateTimeComponent : DateTimeComponent,
-      Applications: Applications
+      Applications: Applications,
+      Firmware : Firmware
   },
   computed:{
     customPrefs() {

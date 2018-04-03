@@ -45,6 +45,15 @@ module.exports = function(app){
         res.json(require(path.resolve(__dirname, "../static/profile.json")));
     });
 
+    app.post('/firmware', function(req, res) {
+        console.log('>Flashing firmware');
+        let form = new formidable.IncomingForm();
+        form.parse(req, function (err, fields, files) {
+            //todo сделать что-то с этим
+        });
+        res.send(200);
+    });
+
     app.post('/install', function(req, res) {
         console.log('>Install application ');
         let form = new formidable.IncomingForm();
