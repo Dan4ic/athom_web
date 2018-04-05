@@ -13,6 +13,7 @@ const CompressionWebpackPlugin = require('compression-webpack-plugin')
 const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const fs = require('fs')
+const mjsmaker = require('./scripts')
 
 const env = process.env.NODE_ENV === 'testing'
     ? require('../config/test.env')
@@ -38,12 +39,15 @@ const webpackConfig = merge(baseWebpackConfig, {
             'process.env': env
         }),
         new UglifyJsPlugin({
+            test: /\.(js|mjs)$/,
             uglifyOptions: {
-                compress: {
-                    warnings: false
-                }
+                compress: true,
+                minimize: true,
+                output: {
+                    comments: false
+                },
             },
-            sourceMap: config.build.productionSourceMap,
+            sourceMap: false,
             parallel: true
         }),
         // extract css into its own file
@@ -176,6 +180,8 @@ fs.readdirSync(apps_path).forEach(file => {
                 })
             );
         });
+
+        mjsmaker.make(file, manifest);
     }
 });
 

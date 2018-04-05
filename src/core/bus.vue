@@ -6,7 +6,6 @@
 import consts from './consts'
 
 export default {
-
     created(){
         this.$on(consts.EVENTS.UBUS_MESSAGE, (action, messages, distrib) => {
             if(!distrib || distrib != consts.WEBSOCKET.DISTRIB_MESSAGE_INTERNAL)
@@ -25,7 +24,6 @@ export default {
     },
     methods : {
         startWebsocket(){
-
             //todo disabled websocket
             if(process.env.NODE_ENV !== 'production')
                 return;

@@ -93,6 +93,7 @@ module.exports = {
     },
 }
 
+
 //Profile building
 global.components  = {};
 const apps_path = path.resolve(__dirname, '../src/applications/');

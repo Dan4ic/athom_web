@@ -3,6 +3,8 @@ const path = require('path')
 const fs = require('fs')
 
 module.exports = {
+    BIN_BLOCK_ENTRY : 0,
+    BIN_BLOCK_SUBSCRIPTION : 1,
     make(app){
         const app_path  = path.resolve(__dirname, '../src/applications/', app);
 
@@ -28,4 +30,36 @@ module.exports = {
 
         return manifest;
     },
+    binary(manifest){
+        //No script side
+        if(!('scripts' in manifest))
+            return Buffer.from([]);
+
+        //Application name
+        let result  = [];
+        Buffer.concat([
+            Buffer.from(new Uint32Array([manifest.name.length]).buffer),
+            Buffer.from(manifest.name, 'UTF-8')
+        ]);
+
+        if(!('entry' in manifest.scripts))
+            throw new Error(`The ${manifest.name} application do not have required block [entry] im manifest`);
+
+        if(!('modules' in manifest.scripts))
+            throw new Error(`The ${manifest.name} application do not have required block [modules] in manifest`);
+
+        if(!(manifest.scripts.entry in manifest.scripts.modules))
+            throw new Error(`The ${manifest.name} application has entry [${manifest.scripts.entry}] but do not have module for it`);
+
+        result.push(Buffer.from(new Uint32Array([this.BIN_BLOCK_ENTRY, manifest.scripts.entry.length]).buffer));
+        result.push(Buffer.from(manifest.scripts.entry, 'UTF-8'));
+
+        if('subscriptions' in manifest.scripts)
+            manifest.scripts.subscriptions.map((item)=>{
+                result.push(Buffer.from(new Uint32Array([this.BIN_BLOCK_SUBSCRIPTION, item.length]).buffer));
+                result.push(Buffer.from(item, 'UTF-8'));
+            });
+
+        return Buffer.concat(result);
+    }
 }

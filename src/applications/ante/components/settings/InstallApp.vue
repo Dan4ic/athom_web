@@ -134,7 +134,7 @@
 
                     let dataview = new DataView(this.buffer);
 
-                    if(this.readString(dataview, 0, 6) !== 'SMTB01'){
+                    if(this.readString(dataview, 0, 6) !== 'SMTB02'){
                         this.$bus.$emit(
                             consts.EVENTS.ALERT,
                             consts.ALERT_TYPE.ERROR,
@@ -143,8 +143,9 @@
                         return;
                     }
 
-                    let manifest_len = dataview.getUint32(6, true);
-                    this.manifest = JSON.parse(this.readString(dataview, 10, manifest_len));
+                    let name_len = dataview.getUint32(6, true);
+                    let manifest_len = dataview.getUint32(10 + name_len, true);
+                    this.manifest = JSON.parse(this.readString(dataview, 14 + name_len, manifest_len));
 
                     this.checkManifest();
                 }

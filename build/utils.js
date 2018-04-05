@@ -3,6 +3,7 @@ const path = require('path')
 const config = require('../config')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const packageConfig = require('../package.json')
+const fs = require('fs');
 
 exports.assetsPath = function (_path) {
     const assetsSubDirectory = process.env.NODE_ENV === 'production'
@@ -125,4 +126,13 @@ exports.componentSources = function (manifest) {
         }
     }
     return result;
+}
+
+
+exports.mkdirp = function(filepath) {
+    var dirname = path.dirname(filepath);
+
+    if (!fs.existsSync(dirname)) {
+        fs.mkdirSync(dirname);
+    }
 }

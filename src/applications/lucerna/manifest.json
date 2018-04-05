@@ -36,5 +36,21 @@
         }
       ]
     }
+  },
+  "scripts" : {
+    "subscriptions" : ["start"],
+    "entry" : "scheduler",
+    "modules" : {
+      "scheduler": {
+        "source": "scripts/scheduler.js",
+        "optimize": {
+          "uglify": false
+        }
+      },
+      "utils": {
+        "source": "scripts/utils.js",
+        "optimize": false
+      }
+    }
   }
 }
