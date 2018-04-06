@@ -5,6 +5,10 @@ const fs = require('fs')
 module.exports = {
     BIN_BLOCK_ENTRY : 0,
     BIN_BLOCK_SUBSCRIPTION : 1,
+    check(manifest){
+       //todo application name max 64
+       //todo file name max 64
+    },
     make(app){
         const app_path  = path.resolve(__dirname, '../src/applications/', app);
 

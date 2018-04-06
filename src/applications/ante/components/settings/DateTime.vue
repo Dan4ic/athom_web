@@ -77,6 +77,14 @@
             timeZones(){
                 return consts.TIME_ZONES;
             },
+            ntp_sync : {
+                get() {
+                    return this.custom_ntp_sync !== null ? this.custom_ntp_sync : this.$store.state.net.sync_with_ntp;
+                },
+                set(value) {
+                    this.custom_ntp_sync   = value;
+                }
+            },
             timeZone : {
                 get(){
 
@@ -139,6 +147,9 @@
 
                 this.$store.dispatch('putConfiguration', {
                     data : {
+                        net : {
+                            sync_with_ntp : this.ntp_sync ? "1" : "0"
+                        },
                         time : {
                             current : "" + curr_moment,
                             offset : "" + this.timezoneOffset
@@ -152,7 +163,7 @@
             return {
                 custom_date : null,
                 custom_time : null,
-                ntp_sync : true,
+                custom_ntp_sync : null,
                 new_timezone : null
             }
         }
