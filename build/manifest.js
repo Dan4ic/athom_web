@@ -3,11 +3,13 @@ const path = require('path')
 const fs = require('fs')
 
 module.exports = {
-    BIN_BLOCK_ENTRY : 0,
-    BIN_BLOCK_SUBSCRIPTION : 1,
+    BIN_BLOCK_NAME : 0,
+    BIN_BLOCK_ENTRY : 1,
+    BIN_BLOCK_SUBSCRIPTION : 2,
     check(manifest){
        //todo application name max 64
        //todo file name max 64
+       //todo MAX_TASK_NAME_LEN 16
     },
     make(app){
         const app_path  = path.resolve(__dirname, '../src/applications/', app);
@@ -41,10 +43,8 @@ module.exports = {
 
         //Application name
         let result  = [];
-        Buffer.concat([
-            Buffer.from(new Uint32Array([manifest.name.length]).buffer),
-            Buffer.from(manifest.name, 'UTF-8')
-        ]);
+        result.push(Buffer.from(new Uint32Array([this.BIN_BLOCK_NAME, manifest.name.length]).buffer));
+        result.push(Buffer.from(manifest.name, 'UTF-8'));
 
         if(!('entry' in manifest.scripts))
             throw new Error(`The ${manifest.name} application do not have required block [entry] im manifest`);
