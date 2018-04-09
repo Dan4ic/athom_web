@@ -43,9 +43,7 @@
     "modules" : {
       "scheduler": {
         "source": "scripts/scheduler.js",
-        "optimize": {
-          "uglify": false
-        }
+        "optimize": false
       },
       "utils": {
         "source": "scripts/utils.js",
