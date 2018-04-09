@@ -108,12 +108,7 @@
             },
             doUninstall(){
                 this.deleting = true;
-                this.$axios.delete('/uninstall',
-                    {
-                        data : {
-                            appid : this.selected_app.appid
-                        }
-                    }
+                this.$axios.delete(`/uninstall/${this.selected_app.appid}`, {}
                 ).then(() => {
                     this.$store.commit('decNetPending');
                     document.location.reload(true);
