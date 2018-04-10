@@ -38,7 +38,7 @@
     }
   },
   "scripts" : {
-    "subscriptions" : ["$-started"],
+    "subscriptions" : ["$-started", "$-script-error"],
     "entry" : "scheduler",
     "modules" : {
       "scheduler": {
