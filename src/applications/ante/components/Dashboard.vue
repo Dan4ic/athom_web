@@ -1,6 +1,7 @@
 <template>
   <v-container style="min-height: 100%; position: relative">
-    <lucerna-app></lucerna-app>
+    <espconfig-app></espconfig-app>
+    <!-- <lucerna-app></lucerna-app> -->
   </v-container>
 </template>
 
