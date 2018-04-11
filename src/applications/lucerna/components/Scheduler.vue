@@ -533,6 +533,11 @@
 
                     if (dot.selected) {
                         dot.brightness = (this.chart.height - this.rebaseY(this.getChartY(dot))) / this.chart.height;
+
+                        //todo ДЛЯ ТЕСТОВ ШЛЕМ ЕВЕНТ В КОНТРОЛЛЕР
+                        window.$bus.$emit(window.$consts.EVENTS.UBUS_MESSAGE, "lucerna-echo", dot.brightness);
+                        //todo ДЛЯ ТЕСТОВ ШЛЕМ ЕВЕНТ В КОНТРОЛЛЕР
+
                         dot.time = this.interval.offset + this.rebaseX(this.getChartX(dot)) / this.dpi;
                     }
                 });
