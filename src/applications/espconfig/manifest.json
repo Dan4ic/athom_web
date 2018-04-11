@@ -1,0 +1,31 @@
+{
+  "name" : "ESPConfig",
+  "vendor" : "ivanolab",
+  "version" : 1,
+  "subversion" : 0,
+  "patch" : 0,
+  "description" : {
+    "ru" : "Приложение конфигурирования аппаратной части ESP32",
+    "en" : "The application for configuring of ESP32"
+  },
+  "components" : {
+    "espconfig-app" : {
+      "source" : "espconfig.js",
+      "intent_filter" : [
+        {
+          "action"    : "smarttank.intent.action.MAIN",
+          "category"  : "smarttank.intent.category.LAUNCHER"
+        }
+      ]
+    },
+    "espconfig-preferences" : {
+      "source" : "prefs.js",
+      "intent_filter" : [
+        {
+          "action"    : "smarttank.intent.action.MAIN",
+          "category"  : "smarttank.intent.category.PREFERENCE"
+        }
+      ]
+    }
+  }
+}
