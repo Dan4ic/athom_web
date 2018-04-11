@@ -23,6 +23,7 @@
                                     type="number"
                                     min="1"
                                     :max="'maxFrequency'"
+                                    required
                             ></v-text-field>
                         </v-flex>
                     </v-layout>
@@ -44,29 +45,27 @@
                 get(){
                     return this.$store.state.display.lang;
                 }
-            },
-            pwmresolution: {
-                get(){
-                    return {text: '15 bit', value: '15'};
-                }
-            },
-            maxFrequency(){
-                return 80000000 / (2 ^ this.data.pwmresolution.value)
             }
-
-
         },
         data () {
             return {
-                pwmresolutions : [
-                    {text: '10 bit', value: '10'},
-                    {text: '11 bit', value: '11'},
-                    {text: '12 bit', value: '12'},
-                    {text: '13 bit', value: '13'},
-                    {text: '14 bit', value: '14'},
-                    {text: '15 bit', value: '15'}
-                ],
-                pwmFrequency : 0
+                pwmresolutions : [ 10, 11, 12, 13, 14, 15 ],
+                pwmFrequency : 2440,
+                pwmresolution: 15,
+                maxFrequency: 2440
+            }
+        },
+        watch: {
+            pwmresolution : function (val) {
+                this.maxFrequency = 80000000 / (1 << val)
+                if (this.maxFrequency < this.pwmFrequency) {
+                    this.pwmFrequency = this.maxFrequency;
+                }
+            },
+            pwmFrequency : function (val) {
+                if (this.maxFrequency < val) {
+                    this.pwmFrequency = this.maxFrequency;
+                }
             }
         }
 
