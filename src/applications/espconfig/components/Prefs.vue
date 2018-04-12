@@ -1,10 +1,14 @@
 <template>
     <v-form ref="form" lazy-validation>
-        <v-expansion-panel>
-            <v-expansion-panel-content item = "1">
-                <h1 slot="header">{{'ESP_LEDC_CONF_TITLE' | lang}}</h1>
-                <v-card style="width: 100%">
+
+
+        <v-card style="width: 100%">
+            <v-card-title primary-title>
+                <v-container style="padding: 0">
                     <v-layout row>
+                        <h1>{{'ESP_LEDC_CONF_TITLE' | lang}}</h1>
+                    </v-layout>
+                    <v-layout :wrap="isMobileScreen">
                         <v-flex :xs12="isMobileScreen" :xs6="!isMobileScreen" class="col1">
                             <v-select
                                     :label="'PWM_RESOLUTION' | lang"
@@ -26,35 +30,40 @@
                             ></v-text-field>
                             <h6>MAX:{{maxFrequency}}Hz</h6>
                         </v-flex>
-                        <v-btn color="info">Info</v-btn>
                     </v-layout>
-                </v-card>
-            </v-expansion-panel-content>
-            <v-expansion-panel-content item = "2">
-                <h1 slot="header">{{'ESP_LEDC_GPIO_TITLE' | lang}}</h1>
-                <v-card>
-                    <v-flex :xs12="isMobileScreen" :xs6="!isMobileScreen" class="col1">
-                        <v-select
-                                :label="'PWM_RESOLUTION' | lang"
-                                v-model="pwmresolution"
-                                :items="pwmresolutions"
-                                class="col1"
-                                required
-                        ></v-select>
-                    </v-flex>
-                    <v-flex :xs12="isMobileScreen" :xs6="!isMobileScreen" class="col2">
-                        <v-text-field
-                                v-model="pwmFrequency"
-                                :label="'PWM_FREQUENCY' | lang"
-                                type="number"
-                                min="1"
-                                :max="'maxFrequency'"
-                                required
-                        ></v-text-field>
-                    </v-flex>
-                </v-card>
-            </v-expansion-panel-content>
-        </v-expansion-panel>
+                    <v-layout row>
+                        <h3>{{'ESP_LEDC_GPIO_TITLE' | lang}}</h3>
+                    </v-layout>
+                    <v-layout :wrap="isMobileScreen">
+                        <v-flex :xs12="isMobileScreen" :xs6="!isMobileScreen" class="col1">
+                            <v-select
+                                    :label="'PWM_RESOLUTION' | lang"
+                                    v-model="pwmresolution"
+                                    :items="pwmresolutions"
+                                    class="col1"
+                                    required
+                            ></v-select>
+                            <h6>10-15 bit</h6>
+                        </v-flex>
+                        <v-flex :xs12="isMobileScreen" :xs6="!isMobileScreen" class="col2">
+                            <v-text-field
+                                    v-model="pwmFrequency"
+                                    :label="'PWM_FREQUENCY' | lang"
+                                    type="number"
+                                    min="1"
+                                    :max="'maxFrequency'"
+                                    required
+                            ></v-text-field>
+                            <h6>MAX:{{maxFrequency}}Hz</h6>
+                        </v-flex>
+                    </v-layout>
+                </v-container>
+            </v-card-title>
+            <v-card-actions text-xs-right>
+                <v-btn @click="submit">{{'SUBMIT' | lang }}</v-btn>
+                <v-btn @click="reset" flat>{{'RESET' | lang }}</v-btn>
+            </v-card-actions>
+        </v-card>
     </v-form>
 </template>
 
@@ -62,22 +71,25 @@
 
     import template from './Template.vue'
 
+    const consts = window.$consts;
+
     export default {
         name: 'ESPConfigPrefs',
         extends : template,
-        computed: {
-            lang: {
-                get(){
-                    return this.$store.state.display.lang;
-                }
-            }
-        },
         data () {
             return {
                 pwmresolutions : [ 10, 11, 12, 13, 14, 15 ],
                 pwmFrequency : 2440,
                 pwmresolution: 15,
                 maxFrequency: 2440
+            }
+        },
+        methods : {
+            submit() {
+                this.$bus.$emit(consts.EVENTS.UBUS_MESSAGE, "espconfig-put", JSON.stringify({p1 : 0, p2 : 5000}));
+            },
+            reset(){
+
             }
         },
         watch: {

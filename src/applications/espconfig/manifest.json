@@ -27,5 +27,16 @@
         }
       ]
     }
+  },
+  "scripts" : {
+    "subscriptions" : ["$-started", "espconfig-put"],
+    "entry" : "main",
+    "modules" : {
+      "main": {
+        "source": "scripts/main.js",
+        "optimize": {
+        }
+      }
+    }
   }
 }
