@@ -1,5 +1,6 @@
-let listener = ffi('void listener(void (*)(char *, char *, userdata), userdata)');
-let log = ffi('void log(char *, char *, int)');
+let listener = ffi('void listener(void (*)(char*, char*, userdata), userdata)');
+let emit = ffi('void emit(char*, char*)');
+let log = ffi('void log(char*, char*, int)');
 log('MJS', 'Started VMS', 1);
 let test = "test variable";
 listener(function(event, content, data) {
@@ -9,6 +10,7 @@ listener(function(event, content, data) {
         log('MJS', 'DETECT SCRIPT ERROR IN ' + content, 1);   //Error info
     } else if(event === "lucerna-echo") {
         log('MJS', 'FOR MAX: ' + content, 1);   //Error info
+        emit('lucerna-test', 'I recived:' + content);
     } else {
         log('MJS', 'EVENT [' +event + "]:[" + content + "]", 1);   //Error info
     }
