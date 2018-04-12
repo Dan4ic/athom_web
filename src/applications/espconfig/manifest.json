@@ -34,8 +34,7 @@
     "modules" : {
       "main": {
         "source": "scripts/main.js",
-        "optimize": {
-        }
+        "optimize": {}
       }
     }
   }
