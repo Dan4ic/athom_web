@@ -8,7 +8,7 @@ listener(function(event, content, data) {
     } else if(event === "$-script-error") {
         log('MJS', 'DETECT SCRIPT ERROR IN ' + content, 1);   //Error info
     } else if(event === "lucerna-echo") {
-        log('MJS', 'ECHO FROM WEB: ' + content, 1);   //Error info
+        log('MJS', 'FOR MAX: ' + content, 1);   //Error info
     } else {
         log('MJS', 'EVENT [' +event + "]:[" + content + "]", 1);   //Error info
     }
