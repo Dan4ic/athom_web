@@ -24,7 +24,7 @@
                                     :label="'PWM_FREQUENCY' | lang"
                                     type="number"
                                     min="1"
-                                    :max="'maxFrequency'"
+                                    :max="maxFrequency"
                                     :hint = maxFrequency.toString()
                                     persistent-hint
                                     required
@@ -108,7 +108,7 @@
         },
         methods: {
             submit () {
-                this.$bus.$emit(consts.EVENTS.UBUS_MESSAGE, 'espconfig-put', JSON.stringify({res: this.pwmresolution, freq: this.pwmFrequency}))
+                this.$bus.$emit(consts.EVENTS.UBUS_MESSAGE, 'espconfig-put', JSON.stringify({res: 1 * this.pwmresolution, freq: 1 * this.pwmFrequency}))
             },
             reset () {
 
@@ -116,13 +116,13 @@
         },
         watch: {
             pwmresolution : function (val) {
-                this.maxFrequency = 80000000 / (1 << val)
+                this.maxFrequency = 80000000 / (1 << (1 * val));
                 if (this.maxFrequency < this.pwmFrequency) {
                     this.pwmFrequency = this.maxFrequency;
                 }
             },
             pwmFrequency : function (val) {
-                if (this.maxFrequency < val) {
+                if (this.maxFrequency < (1 * val)) {
                     this.pwmFrequency = this.maxFrequency;
                 }
             }
