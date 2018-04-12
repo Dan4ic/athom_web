@@ -227,7 +227,6 @@
 
 <script>
 
-    import consts from 'consts';
     import Spectrum from './Spectrum.vue';
 
     const consts = window.$consts;
