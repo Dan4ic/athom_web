@@ -1,12 +1,10 @@
 <template>
     <v-form ref="form" lazy-validation>
-            <v-card style="width: 100%">
-                <v-card-title primary-title>
-                    <v-container style="padding: 0">
+        <v-expansion-panel>
+            <v-expansion-panel-content item = "1">
+                <h1 slot="header">{{'ESP_LEDC_CONF_TITLE' | lang}}</h1>
+                <v-card style="width: 100%">
                     <v-layout row>
-                        <h1>{{'ESP_CONF_TITLE' | lang}}</h1>
-                    </v-layout>
-                    <v-layout :wrap="isMobileScreen">
                         <v-flex :xs12="isMobileScreen" :xs6="!isMobileScreen" class="col1">
                             <v-select
                                     :label="'PWM_RESOLUTION' | lang"
@@ -15,6 +13,7 @@
                                     class="col1"
                                     required
                             ></v-select>
+                            <h6>10-15 bit</h6>
                         </v-flex>
                         <v-flex :xs12="isMobileScreen" :xs6="!isMobileScreen" class="col2">
                             <v-text-field
@@ -25,11 +24,37 @@
                                     :max="'maxFrequency'"
                                     required
                             ></v-text-field>
+                            <h6>MAX:{{maxFrequency}}Hz</h6>
                         </v-flex>
+                        <v-btn color="info">Info</v-btn>
                     </v-layout>
-                    </v-container>
-                </v-card-title>
-            </v-card>
+                </v-card>
+            </v-expansion-panel-content>
+            <v-expansion-panel-content item = "2">
+                <h1 slot="header">{{'ESP_LEDC_GPIO_TITLE' | lang}}</h1>
+                <v-card>
+                    <v-flex :xs12="isMobileScreen" :xs6="!isMobileScreen" class="col1">
+                        <v-select
+                                :label="'PWM_RESOLUTION' | lang"
+                                v-model="pwmresolution"
+                                :items="pwmresolutions"
+                                class="col1"
+                                required
+                        ></v-select>
+                    </v-flex>
+                    <v-flex :xs12="isMobileScreen" :xs6="!isMobileScreen" class="col2">
+                        <v-text-field
+                                v-model="pwmFrequency"
+                                :label="'PWM_FREQUENCY' | lang"
+                                type="number"
+                                min="1"
+                                :max="'maxFrequency'"
+                                required
+                        ></v-text-field>
+                    </v-flex>
+                </v-card>
+            </v-expansion-panel-content>
+        </v-expansion-panel>
     </v-form>
 </template>
 
