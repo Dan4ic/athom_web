@@ -111,7 +111,7 @@ delivered when node is subscriber for this message.
 ```
 
 #### Specific massages for controller   
-- **$-started** - (CURRENT_TIME) No content. Happens when the controller starts or script installed.
+- **$-started** - No content. Happens when the controller starts or script installed.
 
 #### mjs script
 ``` javascript
