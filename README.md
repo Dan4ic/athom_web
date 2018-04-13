@@ -76,19 +76,38 @@ delivered when node is subscriber for this message.
 ```
 
 ### Predefined system messages
-
-- **$-started** - No content. Happens when the controller starts or script installed.
-- **$-current-time** - Contains epoch time (ms). Happens when the time is synchronized.
-- **$-online** - No content. Happens when the controller connected to Internet.
-- **$-offline** - No content. Happens when the controller disconnected.
-- **$-script-error** - Contains error text. Happens when the script generates an error.
+> All broadcast system messages is defined in **window.$const.UBUS**
+#### Broadcast  
+- **$-current-time** - (CURRENT_TIME) Contains epoch time (ms). Happens when the time is synchronized.
+- **$-online** - (IS_ONLINE) No content. Happens when the controller connected to Internet.
+- **$-offline** - (IS_OFFLINE) No content. Happens when the controller disconnected.
+- **$-script-error** - (SCRIPT_ERROR) Contains error text. Happens when the script generates an error.
 
 #### JavaScript
 ``` javascript
  window.$bus.$on(window.$consts.EVENTS.UBUS_MESSAGE, function(type, messages) {
-    if(type === "$-current-time")
-        console.log(new Date(1 * messages));
+    switch(type){
+        case window.$consts.UBUS.CURRENT_TIME:
+            console.log('Now is ', new Date(1 * messages));
+            break;
+        case window.$consts.UBUS.SCRIPT_ERROR:
+            console.error('Script error: ', messages);
+            break;
+    }
  });
+```
+
+#### Specific massages for controller   
+- **$-started** - (CURRENT_TIME) No content. Happens when the controller starts or script installed.
+
+#### mjs script
+``` javascript
+ let listener = ffi('void listener(void (*)(char*, char*, userdata), userdata)');
+ listener(function(event, content, data) {
+    if(event === "$-started"){
+        print("Controller is ready!");       
+    }
+ }, null);
 ```
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
