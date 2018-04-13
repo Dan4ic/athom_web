@@ -75,4 +75,20 @@ delivered when node is subscriber for this message.
 
 ```
 
+### Predefined system messages
+
+- **$-started** - No content. Happens when the controller starts or script installed.
+- **$-current-time** - Contains epoch time (ms). Happens when the time is synchronized.
+- **$-online** - No content. Happens when the controller connected to Internet.
+- **$-offline** - No content. Happens when the controller disconnected.
+- **$-script-error** - Contains error text. Happens when the script generates an error.
+
+#### JavaScript
+``` javascript
+ window.$bus.$on(window.$consts.EVENTS.UBUS_MESSAGE, function(type, messages) {
+    if(type === "$-current-time")
+        console.log(new Date(1 * messages));
+ });
+```
+
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
