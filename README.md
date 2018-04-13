@@ -8,7 +8,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
   - [Build Setup](#build-setup)
-  - [System UBUS messages](#system-ubus-messages)
+  - [UBUS messages](#ubus-messages)
     - [WEB browser](#web-browser)
     - [Controller](#controller)
     - [Predefined system messages](#predefined-system-messages)
@@ -33,7 +33,7 @@ npm run build --report
 
 ```
 
-## System UBUS messages
+## UBUS messages
 >UBUS is universal bus for communicate between different nodes. 
 Any device can provide the role. Include WEB browser. When you send
 message to the bus, all nodes receive it. Important - message will be
