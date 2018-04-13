@@ -1,8 +1,12 @@
+# SmartTank 
+
+> The project is web part of SmartTank opensource project.
+> 
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [SmartTank](#smarttank)
   - [Build Setup](#build-setup)
   - [System UBUS messages](#system-ubus-messages)
     - [WEB browser](#web-browser)
@@ -11,10 +15,6 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# SmartTank 
-
-> The project is web part of SmartTank opensource project.
-> 
 
 ## Build Setup
 
