@@ -53,6 +53,7 @@
                                 </td>
                                 <td class="text-xs-center">
                                         <v-slider thumb-label :max="100" v-model="props.item.duty"></v-slider>
+                                    test
                                 </td>
                                 <td width="10%" class="text-xs-center">
                                     <v-btn small @click="setchannelparams(props.item)">SET</v-btn>
@@ -92,24 +93,24 @@
                     { text: 'GPIO',     value: 'gpioNum', align: 'left', sortable: true },
                     { text: 'Channel',  value: 'ledcChannel' },
                     { text: 'Duty',     value: 'duty', align: 'left'},
-                    { text: 'Set config' }
+                    { text: 'Set config', value: 'setduty'}
                 ],
                 gpioItems: [
-                    { value: false, pinNum:  1, gpioNum: 32, ledcChannel:  1, duty: 0 },
-                    { value: false, pinNum:  2, gpioNum: 33, ledcChannel:  2, duty: 0 },
-                    { value: false, pinNum:  3, gpioNum: 26, ledcChannel:  3, duty: 0 },
-                    { value: false, pinNum:  4, gpioNum: 27, ledcChannel:  4, duty: 0 },
-                    { value: false, pinNum:  5, gpioNum: 14, ledcChannel:  5, duty: 0 },
-                    { value: false, pinNum:  6, gpioNum: 12, ledcChannel:  6, duty: 0 },
-                    { value: false, pinNum:  7, gpioNum: 13, ledcChannel:  7, duty: 0 },
-                    { value: false, pinNum:  8, gpioNum: 15, ledcChannel:  8, duty: 0 },
-                    { value: false, pinNum:  9, gpioNum:  2, ledcChannel:  9, duty: 0 },
-                    { value: false, pinNum: 10, gpioNum:  5, ledcChannel: 10, duty: 0 },
-                    { value: false, pinNum: 11, gpioNum: 18, ledcChannel: 11, duty: 0 },
-                    { value: false, pinNum: 12, gpioNum: 19, ledcChannel: 12, duty: 0 },
-                    { value: false, pinNum: 13, gpioNum: 21, ledcChannel: 13, duty: 0 },
-                    { value: false, pinNum: 14, gpioNum: 22, ledcChannel: 14, duty: 0 },
-                    { value: false, pinNum: 15, gpioNum: 23, ledcChannel: 15, duty: 0 }
+                    { value: false, pinNum:  1, gpioNum: 32, ledcChannel:  1, duty: 0, setduty: 0 },
+                    { value: false, pinNum:  2, gpioNum: 33, ledcChannel:  2, duty: 0, setduty: 0},
+                    { value: false, pinNum:  3, gpioNum: 26, ledcChannel:  3, duty: 0, setduty: 0 },
+                    { value: false, pinNum:  4, gpioNum: 27, ledcChannel:  4, duty: 0, setduty: 0 },
+                    { value: false, pinNum:  5, gpioNum: 14, ledcChannel:  5, duty: 0, setduty: 0 },
+                    { value: false, pinNum:  6, gpioNum: 12, ledcChannel:  6, duty: 0, setduty: 0 },
+                    { value: false, pinNum:  7, gpioNum: 13, ledcChannel:  7, duty: 0, setduty: 0 },
+                    { value: false, pinNum:  8, gpioNum: 15, ledcChannel:  8, duty: 0, setduty: 0 },
+                    { value: false, pinNum:  9, gpioNum:  2, ledcChannel:  9, duty: 0, setduty: 0 },
+                    { value: false, pinNum: 10, gpioNum:  5, ledcChannel: 10, duty: 0, setduty: 0 },
+                    { value: false, pinNum: 11, gpioNum: 18, ledcChannel: 11, duty: 0, setduty: 0 },
+                    { value: false, pinNum: 12, gpioNum: 19, ledcChannel: 12, duty: 0, setduty: 0 },
+                    { value: false, pinNum: 13, gpioNum: 21, ledcChannel: 13, duty: 0, setduty: 0 },
+                    { value: false, pinNum: 14, gpioNum: 22, ledcChannel: 14, duty: 0, setduty: 0 },
+                    { value: false, pinNum: 15, gpioNum: 23, ledcChannel: 15, duty: 0, setduty: 0 }
                 ]
             }
         },
