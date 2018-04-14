@@ -29,7 +29,7 @@
     }
   },
   "scripts" : {
-    "subscriptions" : ["$-started", "espconfig-put", "espconfig-setch"],
+    "subscriptions" : ["$-started", "espconfig-put", "espconfig-setchcfg", "espconfig-setduty"],
     "entry" : "main",
     "modules" : {
       "main": {

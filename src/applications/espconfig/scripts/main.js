@@ -11,10 +11,14 @@ listener(function (event, content, data) {
         log('ESPC', 'DETECT EVENT = ' + content, 1);
         let params = JSON.parse(content);
         ledc_setTimersConfig(params.freq, params.res);
-    } else if(event === "espconfig-setch"){
+    } else if(event === "espconfig-setchcfg"){
         log('ESPC', 'DETECT EVENT = ' + content, 1);
         let params = JSON.parse(content);
         ledc_setChanneltoGPIO(params.channel, params.gpio);
+
+    } else if(event === "espconfig-setduty"){
+        log('ESPC', 'DETECT EVENT = ' + content, 1);
+        let params = JSON.parse(content);
         ledc_setDutyToChannel(params.channel, params.duty);
 
     } else {
