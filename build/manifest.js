@@ -6,6 +6,10 @@ module.exports = {
     BIN_BLOCK_NAME : 0,
     BIN_BLOCK_ENTRY : 1,
     BIN_BLOCK_SUBSCRIPTION : 2,
+    BIN_BLOCK_STORAGE_VERSION : 10,
+    BIN_BLOCK_STORAGE_MIGRATION : 11,
+    BIN_BLOCK_STORAGE_TYPE_INT : 12,
+    BIN_BLOCK_STORAGE_TYPE_DOUBLE : 13,
     check(manifest){
         //todo file name max 64
         //todo MAX_TASK_NAME_LEN 16
@@ -35,6 +39,10 @@ module.exports = {
                 throw new Error(`The ${manifest.name} application has migration [${manifest.storage.migration}] but do not have module for it`);
             if(!('objects' in manifest.storage))
                 throw new Error(`Storage of ${manifest.name} do not have required block "objects"`);
+            for(let object_name in manifest.storage.objects) {
+                if(!('struct' in manifest.storage.objects[object_name]))
+                    throw new Error(`The ${manifest.name} application has error in storage structure [storage/objects/${object_name}/struct}]`);
+            }
         }
     },
     make(app){
@@ -87,6 +95,29 @@ module.exports = {
                 result.push(Buffer.from(item, 'UTF-8'));
             });
 
+        //Storage
+        if('storage' in manifest){
+            //Version
+            result.push(Buffer.from(new Uint32Array([this.BIN_BLOCK_STORAGE_VERSION, manifest.storage.version]).buffer));
+            //Migration
+            result.push(Buffer.from(new Uint32Array([this.BIN_BLOCK_STORAGE_MIGRATION, manifest.storage.migration.length]).buffer));
+            result.push(Buffer.from(manifest.storage.migration, 'UTF-8'));
+            //Objects
+            for(let object_name in manifest.objects){
+                let object = manifest.objects[object_name];
+                let expander = function(node, level){
+                    for(let field in node) {
+                        if(node[field] === "double") {
+                            result.push(Buffer.from(new Uint32Array([this.BIN_BLOCK_STORAGE_TYPE_DOUBLE + level * 2048]).buffer));
+                        } else if(node[field] === "int") {
+                            result.push(Buffer.from(new Uint32Array([this.BIN_BLOCK_STORAGE_TYPE_INT + level * 2048]).buffer));
+                        }
+                        result.push(Buffer.from(new Uint32Array([field.length]).buffer));
+                        result.push(Buffer.from(field, 'UTF-8'));
+                    }
+                };
+            }
+        }
         return Buffer.concat(result);
     }
 }
