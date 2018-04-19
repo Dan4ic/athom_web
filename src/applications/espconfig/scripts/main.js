@@ -8,16 +8,16 @@ log('ESPC', 'Started', 1);
 ledc_setDutyToChannel(0, 5000);
 listener(function (event, content, data) {
     if(event === "espconfig-put"){
-        log('ESPC', 'DETECT EVENT = ' + content, 1);
+//        log('ESPC', 'DETECT EVENT = ' + content, 1);
         let params = JSON.parse(content);
         ledc_setTimersConfig(params.freq, params.res);
     } else if(event === "espconfig-setchcfg"){
-        log('ESPC', 'DETECT EVENT = ' + content, 1);
+//        log('ESPC', 'DETECT EVENT = ' + content, 1);
         let params = JSON.parse(content);
         ledc_setChanneltoGPIO(params.channel, params.gpio);
 
     } else if(event === "espconfig-setduty"){
-        log('ESPC', 'DETECT EVENT = ' + content, 1);
+//        log('ESPC', 'DETECT EVENT = ' + content, 1);
         let params = JSON.parse(content);
         ledc_setDutyToChannel(params.channel, params.duty);
 
