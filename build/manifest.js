@@ -76,6 +76,8 @@ module.exports = {
     binary(manifest){
         this.check(manifest);
 
+        let result  = [];
+
         //No script side
         if(!('scripts' in manifest))
             return Buffer.from([]);
@@ -86,7 +88,6 @@ module.exports = {
         }
 
         //Application name
-        let result  = [];
         result.push(Buffer.from(new Uint32Array([this.BIN_BLOCK_NAME]).buffer));
         appendName(manifest.name);
 
@@ -109,7 +110,7 @@ module.exports = {
             result.push(Buffer.from(new Uint32Array([this.BIN_BLOCK_STORAGE_MIGRATION]).buffer));
             appendName(manifest.storage.migration);
             //Objects
-            let expander = function(node, level){
+            let expander = (node, level) => {
                 let level_prefix = level * 2048;
                 for(let field in node) {
                     if(node[field] === "double") {
@@ -125,8 +126,8 @@ module.exports = {
                     }
                 }
             };
-            for(let object_name in manifest.objects)
-                expander(manifest.objects[object_name]);
+            for(let object_name in manifest.storage.objects)
+                expander(manifest.storage.objects[object_name].struct);
         }
         return Buffer.concat(result);
     }
