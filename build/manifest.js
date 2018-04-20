@@ -125,7 +125,6 @@ module.exports = {
                     }
                 }
             };
-
             for(let object_name in manifest.objects)
                 expander(manifest.objects[object_name]);
         }
