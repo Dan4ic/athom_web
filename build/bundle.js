@@ -17,6 +17,15 @@ module.exports = {
         let binary_raw  = Manifest.binary(manifest);
         fs.appendFileSync(bundle, Buffer.from(new Uint32Array([binary_raw.length]).buffer), "binary");
         fs.appendFileSync(bundle, binary_raw);
+
+        //Storages
+        let storages = Manifest.storages(manifest);
+        for(let storage_name in storages){
+            this.appendName(bundle, `data/${storage_name}.str`);
+            let storage = storages[storage_name];
+            fs.appendFileSync(bundle, Buffer.from(new Uint32Array([storage.length]).buffer), "binary");
+            fs.appendFileSync(bundle, storage);
+        }
     },
     appendName(bundle, name){
         fs.appendFileSync(bundle, Buffer.from(new Uint32Array([name.length]).buffer), "binary");

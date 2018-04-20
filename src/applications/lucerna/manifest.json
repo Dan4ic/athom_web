@@ -59,6 +59,12 @@
     "version" : 1,
     "migration" : "migration",
     "objects" : {
+      "test" : {
+        "struct" : {
+          "field1" : "int",
+          "field2" : "int"
+        }
+      },
       "dots" : {
         "struct" : {
           "time" : "double",

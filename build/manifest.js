@@ -6,11 +6,12 @@ module.exports = {
     BIN_BLOCK_NAME : 0,
     BIN_BLOCK_ENTRY : 1,
     BIN_BLOCK_SUBSCRIPTION : 2,
-    BIN_BLOCK_STORAGE_VERSION : 10,
-    BIN_BLOCK_STORAGE_MIGRATION : 11,
-    BIN_BLOCK_STORAGE_TYPE_INT : 12,
-    BIN_BLOCK_STORAGE_TYPE_DOUBLE : 13,
-    BIN_BLOCK_STORAGE_TYPE_OBJECT : 14,
+    BIN_BLOCK_STORAGE_OBJECT : 10,
+    BIN_BLOCK_STORAGE_VERSION : 11,
+    BIN_BLOCK_STORAGE_MIGRATION : 12,
+    BIN_BLOCK_STORAGE_TYPE_INT : 13,
+    BIN_BLOCK_STORAGE_TYPE_DOUBLE : 14,
+    BIN_BLOCK_STORAGE_TYPE_OBJECT : 15,
     check(manifest){
         //todo file name max 64
         //todo MAX_TASK_NAME_LEN 16
@@ -46,6 +47,7 @@ module.exports = {
             }
         }
     },
+
     make(app){
         const app_path  = path.resolve(__dirname, '../src/applications/', app);
 
@@ -73,62 +75,76 @@ module.exports = {
 
         return manifest;
     },
-    binary(manifest){
-        this.check(manifest);
 
+    makeBinaryField(type, name){
+        return Buffer.concat([
+            Buffer.from(new Uint32Array([type]).buffer),
+            Buffer.from(new Uint32Array([name.length]).buffer),
+            Buffer.from(name, 'UTF-8')
+        ]);
+    },
+
+    binary(manifest){
         let result  = [];
 
         //No script side
         if(!('scripts' in manifest))
             return Buffer.from([]);
 
-        let appendName = (name) => {
-            result.push(Buffer.from(new Uint32Array([name.length]).buffer));
-            result.push(Buffer.from(name, 'UTF-8'));
-        }
-
         //Application name
-        result.push(Buffer.from(new Uint32Array([this.BIN_BLOCK_NAME]).buffer));
-        appendName(manifest.name);
+        result.push(this.makeBinaryField(this.BIN_BLOCK_NAME, manifest.name));
 
         //Entry name
-        result.push(Buffer.from(new Uint32Array([this.BIN_BLOCK_ENTRY]).buffer));
-        appendName(manifest.scripts.entry);
+        result.push(this.makeBinaryField(this.BIN_BLOCK_ENTRY, manifest.scripts.entry));
 
         //Subscriptions
         if('subscriptions' in manifest.scripts)
-            manifest.scripts.subscriptions.map((item)=>{
-                result.push(Buffer.from(new Uint32Array([this.BIN_BLOCK_SUBSCRIPTION]).buffer));
-                appendName(item);
+            manifest.scripts.subscriptions.map((item) => {
+                result.push(this.makeBinaryField(this.BIN_BLOCK_SUBSCRIPTION, item));
             });
 
         //Storage
-        if('storage' in manifest){
+        if('storage' in manifest) {
             //Version
-            result.push(Buffer.from(new Uint32Array([this.BIN_BLOCK_STORAGE_VERSION, manifest.storage.version]).buffer));
+            result.push(this.makeBinaryField(this.BIN_BLOCK_STORAGE_VERSION, "" + manifest.storage.version));
             //Migration
-            result.push(Buffer.from(new Uint32Array([this.BIN_BLOCK_STORAGE_MIGRATION]).buffer));
-            appendName(manifest.storage.migration);
-            //Objects
-            let expander = (node, level) => {
+            result.push(this.makeBinaryField(this.BIN_BLOCK_STORAGE_MIGRATION, manifest.storage.migration));
+        }
+
+        return Buffer.concat(result);
+    },
+
+    storages(manifest){
+        let result  = {};
+
+        //Storage
+        if('storage' in manifest){
+            //Encoding object structure
+            let encode_struct = (node, level) => {
                 let level_prefix = level * 2048;
+                let result  = [];
                 for(let field in node) {
                     if(node[field] === "double") {
-                        result.push(Buffer.from(new Uint32Array([level_prefix + this.BIN_BLOCK_STORAGE_TYPE_DOUBLE]).buffer));
-                        appendName(field);
+                        result.push(this.makeBinaryField(level_prefix + this.BIN_BLOCK_STORAGE_TYPE_DOUBLE, field));
                     } else if(node[field] === "int") {
-                        result.push(Buffer.from(new Uint32Array([level_prefix + this.BIN_BLOCK_STORAGE_TYPE_INT]).buffer));
-                        appendName(field);
+                        result.push(this.makeBinaryField(level_prefix + this.BIN_BLOCK_STORAGE_TYPE_INT, field));
                     } else if(typeof node[field] === 'object'){
-                        result.push(Buffer.from(new Uint32Array([level_prefix + this.BIN_BLOCK_STORAGE_TYPE_OBJECT]).buffer));
-                        appendName(field);
-                        expander(node[field]);
-                    }
+                        result.push(this.makeBinaryField(level_prefix + this.BIN_BLOCK_STORAGE_TYPE_OBJECT, field));
+                        result.push(encode_struct(node[field], level + 1));
+                    } else
+                        throw new Error(`Storage of ${manifest.name} have error type "${node[field]}"`);
                 }
+                return Buffer.concat(result);
             };
-            for(let object_name in manifest.storage.objects)
-                expander(manifest.storage.objects[object_name].struct);
+            for(let object_name in manifest.storage.objects) {
+                let struct = encode_struct(manifest.storage.objects[object_name].struct, 0);
+                result[object_name] = Buffer.concat([
+                    Buffer.from(new Uint32Array([struct.length]).buffer),
+                    struct
+                ]);
+            }
         }
-        return Buffer.concat(result);
+
+        return result;
     }
 }
