@@ -10,6 +10,7 @@ module.exports = {
     BIN_BLOCK_STORAGE_MIGRATION : 11,
     BIN_BLOCK_STORAGE_TYPE_INT : 12,
     BIN_BLOCK_STORAGE_TYPE_DOUBLE : 13,
+    BIN_BLOCK_STORAGE_TYPE_OBJECT : 14,
     check(manifest){
         //todo file name max 64
         //todo MAX_TASK_NAME_LEN 16
@@ -79,20 +80,25 @@ module.exports = {
         if(!('scripts' in manifest))
             return Buffer.from([]);
 
+        let appendName = (name) => {
+            result.push(Buffer.from(new Uint32Array([name.length]).buffer));
+            result.push(Buffer.from(name, 'UTF-8'));
+        }
+
         //Application name
         let result  = [];
-        result.push(Buffer.from(new Uint32Array([this.BIN_BLOCK_NAME, manifest.name.length]).buffer));
-        result.push(Buffer.from(manifest.name, 'UTF-8'));
+        result.push(Buffer.from(new Uint32Array([this.BIN_BLOCK_NAME]).buffer));
+        appendName(manifest.name);
 
         //Entry name
-        result.push(Buffer.from(new Uint32Array([this.BIN_BLOCK_ENTRY, manifest.scripts.entry.length]).buffer));
-        result.push(Buffer.from(manifest.scripts.entry, 'UTF-8'));
+        result.push(Buffer.from(new Uint32Array([this.BIN_BLOCK_ENTRY]).buffer));
+        appendName(manifest.scripts.entry);
 
         //Subscriptions
         if('subscriptions' in manifest.scripts)
             manifest.scripts.subscriptions.map((item)=>{
-                result.push(Buffer.from(new Uint32Array([this.BIN_BLOCK_SUBSCRIPTION, item.length]).buffer));
-                result.push(Buffer.from(item, 'UTF-8'));
+                result.push(Buffer.from(new Uint32Array([this.BIN_BLOCK_SUBSCRIPTION]).buffer));
+                appendName(item);
             });
 
         //Storage
@@ -100,23 +106,28 @@ module.exports = {
             //Version
             result.push(Buffer.from(new Uint32Array([this.BIN_BLOCK_STORAGE_VERSION, manifest.storage.version]).buffer));
             //Migration
-            result.push(Buffer.from(new Uint32Array([this.BIN_BLOCK_STORAGE_MIGRATION, manifest.storage.migration.length]).buffer));
-            result.push(Buffer.from(manifest.storage.migration, 'UTF-8'));
+            result.push(Buffer.from(new Uint32Array([this.BIN_BLOCK_STORAGE_MIGRATION]).buffer));
+            appendName(manifest.storage.migration);
             //Objects
-            for(let object_name in manifest.objects){
-                let object = manifest.objects[object_name];
-                let expander = function(node, level){
-                    for(let field in node) {
-                        if(node[field] === "double") {
-                            result.push(Buffer.from(new Uint32Array([this.BIN_BLOCK_STORAGE_TYPE_DOUBLE + level * 2048]).buffer));
-                        } else if(node[field] === "int") {
-                            result.push(Buffer.from(new Uint32Array([this.BIN_BLOCK_STORAGE_TYPE_INT + level * 2048]).buffer));
-                        }
-                        result.push(Buffer.from(new Uint32Array([field.length]).buffer));
-                        result.push(Buffer.from(field, 'UTF-8'));
+            let expander = function(node, level){
+                let level_prefix = level * 2048;
+                for(let field in node) {
+                    if(node[field] === "double") {
+                        result.push(Buffer.from(new Uint32Array([level_prefix + this.BIN_BLOCK_STORAGE_TYPE_DOUBLE]).buffer));
+                        appendName(field);
+                    } else if(node[field] === "int") {
+                        result.push(Buffer.from(new Uint32Array([level_prefix + this.BIN_BLOCK_STORAGE_TYPE_INT]).buffer));
+                        appendName(field);
+                    } else if(typeof node[field] === 'object'){
+                        result.push(Buffer.from(new Uint32Array([level_prefix + this.BIN_BLOCK_STORAGE_TYPE_OBJECT]).buffer));
+                        appendName(field);
+                        expander(node[field]);
                     }
-                };
-            }
+                }
+            };
+
+            for(let object_name in manifest.objects)
+                expander(manifest.objects[object_name]);
         }
         return Buffer.concat(result);
     }
