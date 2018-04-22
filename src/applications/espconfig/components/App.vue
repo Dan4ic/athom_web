@@ -20,11 +20,11 @@
         </v-card>
         <v-card style="width: 100%">
             <v-card-title>
-                <v-layout wrap>
+                <v-layout row wrap column>
                     <h1>{{'FENIST_SENSORS_DATA_TITLE' | lang}}</h1>
-                </v-layout>
-                <v-layout row :wrap="isMobileScreen">
                     <h5 v-for="sensor in owSensors">ID: {{sensor.owid}} Temperature: {{sensor.temperature}}&deg;C</h5>
+                    <h5>Fan voltage: {{fan.voltage}} V</h5>
+                    <h5>Fan tachometer: {{fan.tachometer}} RPM</h5>
                 </v-layout>
             </v-card-title>
         </v-card>
@@ -62,10 +62,14 @@
         },
         mounted () {
             this.$bus.$on(consts.EVENTS.UBUS_MESSAGE, (type, messages) => {
-                if(type === 'temperature-change') {
-                    let params = JSON.parse(messages);
+                let params = JSON.parse(messages);
+                if (type === 'temperature-change') {
                     this.owSensors[params.number].temperature = params.temperature / 100;
                     this.owSensors[params.number].owid = params.owid;
+                } else if (type === 'fan-v-change') {
+                    this.fan.voltage = params.fanvoltage / 1000;
+                } else if (type === 'tah-change') {
+                    this.fan.tachometer = params.tachometer;
                 }
             })
         },
@@ -75,6 +79,10 @@
                     owid: 0,
                     temperature: 0
                 }],
+                fan: {
+                    tachometer: 0,
+                    voltage: 0
+                },
                 ledcchannels: [
                     {channel: 1, value: 0},
                     {channel: 2, value: 0},
