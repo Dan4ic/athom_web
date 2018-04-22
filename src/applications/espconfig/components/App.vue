@@ -20,11 +20,11 @@
         </v-card>
         <v-card style="width: 100%">
             <v-card-title>
-                <v-layout row>
+                <v-layout wrap>
                     <h1>{{'FENIST_SENSORS_DATA_TITLE' | lang}}</h1>
                 </v-layout>
                 <v-layout row :wrap="isMobileScreen">
-                    <h5>ID: {{owId}} Temperature: {{owTemp}}</h5>
+                    <h5 v-for="sensor in owSensors">ID: {{sensor.owid}} Temperature: {{sensor.temperature}}&deg;C</h5>
                 </v-layout>
             </v-card-title>
         </v-card>
@@ -64,17 +64,17 @@
             this.$bus.$on(consts.EVENTS.UBUS_MESSAGE, (type, messages) => {
                 if(type === 'temperature-change') {
                     let params = JSON.parse(messages);
-                    this.owId = params.id;
-                    this.owTemp = params.temperature / 100;
-                    this.owSensors[params.id] = params.temperature / 100;
+                    this.owSensors[params.number].temperature = params.temperature / 100;
+                    this.owSensors[params.number].owid = params.owid;
                 }
             })
         },
         data () {
             return {
-                owId: 0,
-                owTemp: 0,
-                owSensors: {},
+                owSensors: [{
+                    owid: 0,
+                    temperature: 0
+                }],
                 ledcchannels: [
                     {channel: 1, value: 0},
                     {channel: 2, value: 0},
@@ -104,6 +104,7 @@
                     show: true,
                     tooltip: 'hover',
                     piecewise: false,
+                    useKeyboard: true,
                     style: {
                         display: 'inline-block',
                         marginLeft: '30px'
