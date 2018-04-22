@@ -1,110 +1,125 @@
 <template>
     <v-form ref="form" lazy-validation>
-        <v-expansion-panel>
-            <v-expansion-panel-content item = "1">
-                <h1 slot="header">{{'ESP_LEDC_CONF_TITLE' | lang}}</h1>
-                <v-card style="width: 100%">
-                    <v-layout row>
-                        <v-flex :xs12="isMobileScreen" :xs6="!isMobileScreen" class="col1">
-                            <v-select
-                                    :label="'PWM_RESOLUTION' | lang"
-                                    v-model="pwmresolution"
-                                    :items="pwmresolutions"
-                                    class="col1"
-                                    required
-                            ></v-select>
-                            <h6>10-15 bit</h6>
-                        </v-flex>
-                        <v-flex :xs12="isMobileScreen" :xs6="!isMobileScreen" class="col2">
-                            <v-text-field
-                                    v-model="pwmFrequency"
-                                    :label="'PWM_FREQUENCY' | lang"
-                                    type="number"
-                                    min="1"
-                                    :max="'maxFrequency'"
-                                    required
-                            ></v-text-field>
-                            <h6>MAX:{{maxFrequency}}Hz</h6>
-                        </v-flex>
-                        <v-btn color="info">Info</v-btn>
-                    </v-layout>
-                </v-card>
-            </v-expansion-panel-content>
-            <v-expansion-panel-content item = "2">
-                <h1 slot="header">{{'ESP_LEDC_GPIO_TITLE' | lang}}</h1>
-                <v-card>
-                    <v-flex :xs12="isMobileScreen" :xs6="!isMobileScreen" class="col1">
-                        <v-select
-                                :label="'PWM_RESOLUTION' | lang"
-                                v-model="pwmresolution"
-                                :items="pwmresolutions"
-                                class="col1"
-                                required
-                        ></v-select>
-                    </v-flex>
-                    <v-flex :xs12="isMobileScreen" :xs6="!isMobileScreen" class="col2">
-                        <v-text-field
-                                v-model="pwmFrequency"
-                                :label="'PWM_FREQUENCY' | lang"
-                                type="number"
-                                min="1"
-                                :max="'maxFrequency'"
-                                required
-                        ></v-text-field>
-                    </v-flex>
-                </v-card>
-            </v-expansion-panel-content>
-        </v-expansion-panel>
+        <v-card style="width: 100%">
+            <v-card-title>
+                <v-layout row>
+                    <h1>{{'LEDC_PWM_VAL_TITLE' | lang}}</h1>
+                </v-layout>
+                <v-layout row :wrap="isMobileScreen">
+                    <vue-slider v-for="item in ledcchannels"
+                                v-model="item.value"
+                                v-bind="slidersdata"
+                                @callback="setchannelDuty(item)"
+                    ></vue-slider>
+                </v-layout>
+            </v-card-title>
+            <v-card-actions text-xs-right>
+                <v-btn @click="submit">{{'SUBMIT' | lang }}</v-btn>
+                <v-btn @click="reset" flat>{{'RESET' | lang }}</v-btn>
+            </v-card-actions>
+        </v-card>
+        <v-card style="width: 100%">
+            <v-card-title>
+                <v-layout row>
+                    <h1>{{'FENIST_SENSORS_DATA_TITLE' | lang}}</h1>
+                </v-layout>
+                <v-layout row :wrap="isMobileScreen">
+                    <h5>ID: {{owId}} Temperature: {{owTemp}}</h5>
+                </v-layout>
+            </v-card-title>
+        </v-card>
     </v-form>
 </template>
 
 <script>
+    /* eslint-disable indent */
+
 
     import template from './Template.vue'
-
+    import vueSlider from './vue2-slider.vue'
+    const consts = window.$consts
     export default {
-        name: 'ESPConfigPrefs',
-        extends : template,
+        name: 'LedChannelsValues',
+        extends: template,
+        components: {
+            vueSlider
+        },
         computed: {
             lang: {
-                get(){
+                get () {
                     return this.$store.state.display.lang;
                 }
             }
         },
-        data () {
-            return {
-                pwmresolutions : [ 10, 11, 12, 13, 14, 15 ],
-                pwmFrequency : 2440,
-                pwmresolution: 15,
-                maxFrequency: 2440
+        methods: {
+            submit () {
+            },
+            reset () {
+            },
+            setchannelDuty (val) {
+                this.$bus.$emit(consts.EVENTS.UBUS_MESSAGE, 'espconfig-setduty', JSON.stringify({channel: 1 * val.channel, duty: 100 * val.value}));
             }
         },
-        watch: {
-            pwmresolution : function (val) {
-                this.maxFrequency = 80000000 / (1 << val)
-                if (this.maxFrequency < this.pwmFrequency) {
-                    this.pwmFrequency = this.maxFrequency;
+        mounted () {
+            this.$bus.$on(consts.EVENTS.UBUS_MESSAGE, (type, messages) => {
+                if(type === 'temperature-change') {
+                    let params = JSON.parse(messages);
+                    this.owId = params.id;
+                    this.owTemp = params.temperature / 100;
+                    this.owSensors[params.id] = params.temperature / 100;
                 }
-            },
-            pwmFrequency : function (val) {
-                if (this.maxFrequency < val) {
-                    this.pwmFrequency = this.maxFrequency;
+            })
+        },
+        data () {
+            return {
+                owId: 0,
+                owTemp: 0,
+                owSensors: {},
+                ledcchannels: [
+                    {channel: 1, value: 0},
+                    {channel: 2, value: 0},
+                    {channel: 3, value: 0},
+                    {channel: 4, value: 0},
+                    {channel: 5, value: 0},
+                    {channel: 6, value: 0},
+                    {channel: 7, value: 0},
+                    {channel: 8, value: 0},
+                    {channel: 9, value: 0},
+                    {channel: 10, value: 0},
+                    {channel: 11, value: 0},
+                    {channel: 12, value: 0},
+                    {channel: 13, value: 0},
+                    {channel: 14, value: 0},
+                    {channel: 15, value: 0}
+                ],
+                slidersdata: {
+                    width: 4,
+                    height: 300,
+                    dotSize: 22,
+                    eventType: 'auto',
+                    min: 0,
+                    max: 100,
+                    interval: 0.01,
+                    disabled: false,
+                    show: true,
+                    tooltip: 'hover',
+                    piecewise: false,
+                    style: {
+                        display: 'inline-block',
+                        marginLeft: '30px'
+                    },
+                    direction: 'vertical',
+                    speed: 0.5,
+                    processStyle: {
+                        backgroundColor: '#555'
+                    }
                 }
             }
         }
-
     }
+
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 
-    .col1 {
-        padding-right: 4px;
-    }
-
-    .col2 {
-        padding-left: 4px;
-    }
 </style>

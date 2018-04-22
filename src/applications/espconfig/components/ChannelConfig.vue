@@ -22,12 +22,6 @@
                                         single-line
                                 ></v-select>
                             </td>
-                            <td class="text-xs-center">
-                                <v-slider thumb-label :max="100" v-model="props.item.duty"></v-slider>
-                            </td>
-                            <td width="10%" class="text-xs-center">
-                                <v-btn small @click="setchannelDuty(props.item)">Set Duty</v-btn>
-                            </td>
                         </template>
                         <template slot="pageText" slot-scope="props">
                             Items {{ props.pageStart }} - {{ props.pageStop }} from {{ props.itemsLength }}
@@ -44,8 +38,8 @@
 </template>
 
 <script>
-    const consts = window.$consts;
-    export default {
+const consts = window.$consts
+export default {
   name: 'ChannelConfig',
   data () {
     return {
@@ -53,43 +47,37 @@
       gpioHeaders: [
         { text: 'Pin', value: 'pinNum', align: 'left', sortable: true },
         { text: 'GPIO', value: 'gpioNum', align: 'left', sortable: true },
-        { text: 'Channel', value: 'ledcChannel' },
-        { text: 'Duty', value: 'duty', align: 'left'},
-        { text: 'Set Config', value: 'setduty'}
+        { text: 'Channel', value: 'ledcChannel' }
       ],
       gpioItems: [
-        { value: false, pinNum: 1, gpioNum: 32, ledcChannel: 1, duty: 0, setduty: 0 },
-        { value: false, pinNum: 2, gpioNum: 33, ledcChannel: 2, duty: 0, setduty: 0 },
-        { value: false, pinNum: 3, gpioNum: 26, ledcChannel: 3, duty: 0, setduty: 0 },
-        { value: false, pinNum: 4, gpioNum: 27, ledcChannel: 4, duty: 0, setduty: 0 },
-        { value: false, pinNum: 5, gpioNum: 14, ledcChannel: 5, duty: 0, setduty: 0 },
-        { value: false, pinNum: 6, gpioNum: 12, ledcChannel: 6, duty: 0, setduty: 0 },
-        { value: false, pinNum: 7, gpioNum: 13, ledcChannel: 7, duty: 0, setduty: 0 },
-        { value: false, pinNum: 8, gpioNum: 15, ledcChannel: 8, duty: 0, setduty: 0 },
-        { value: false, pinNum: 9, gpioNum: 2, ledcChannel: 9, duty: 0, setduty: 0 },
-        { value: false, pinNum: 10, gpioNum: 5, ledcChannel: 10, duty: 0, setduty: 0 },
-        { value: false, pinNum: 11, gpioNum: 18, ledcChannel: 11, duty: 0, setduty: 0 },
-        { value: false, pinNum: 12, gpioNum: 19, ledcChannel: 12, duty: 0, setduty: 0 },
-        { value: false, pinNum: 13, gpioNum: 21, ledcChannel: 13, duty: 0, setduty: 0 },
-        { value: false, pinNum: 14, gpioNum: 22, ledcChannel: 14, duty: 0, setduty: 0 },
-        { value: false, pinNum: 15, gpioNum: 23, ledcChannel: 15, duty: 0, setduty: 0 }
+        { value: false, pinNum: 1, gpioNum: 32, ledcChannel: 1},
+        { value: false, pinNum: 2, gpioNum: 33, ledcChannel: 2},
+        { value: false, pinNum: 3, gpioNum: 26, ledcChannel: 3},
+        { value: false, pinNum: 4, gpioNum: 27, ledcChannel: 4},
+        { value: false, pinNum: 5, gpioNum: 14, ledcChannel: 5},
+        { value: false, pinNum: 6, gpioNum: 12, ledcChannel: 6},
+        { value: false, pinNum: 7, gpioNum: 13, ledcChannel: 7},
+        { value: false, pinNum: 8, gpioNum: 15, ledcChannel: 8},
+        { value: false, pinNum: 9, gpioNum: 2, ledcChannel: 9},
+        { value: false, pinNum: 10, gpioNum: 5, ledcChannel: 10},
+        { value: false, pinNum: 11, gpioNum: 18, ledcChannel: 11},
+        { value: false, pinNum: 12, gpioNum: 19, ledcChannel: 12},
+        { value: false, pinNum: 13, gpioNum: 21, ledcChannel: 13},
+        { value: false, pinNum: 14, gpioNum: 22, ledcChannel: 14},
+        { value: false, pinNum: 15, gpioNum: 23, ledcChannel: 15}
       ]
     }
   },
   methods: {
     submit () {
-        this.gpioItems.forEach(function (ch, i)
-        {
-            window.$bus.$emit(consts.EVENTS.UBUS_MESSAGE, 'espconfig-setchcfg', JSON.stringify({
-                channel: 1 * ch.ledcChannel,
-                gpio: 1 * ch.gpioNum
-            }))
-        })
+      this.gpioItems.forEach(function (ch, i) {
+        window.$bus.$emit(consts.EVENTS.UBUS_MESSAGE, 'espconfig-setchcfg', JSON.stringify({
+          channel: 1 * ch.ledcChannel,
+          gpio: 1 * ch.gpioNum
+        }))
+      })
     },
-     reset () {
-      },
-      setchannelDuty (val) {
-      this.$bus.$emit(consts.EVENTS.UBUS_MESSAGE, 'espconfig-setduty', JSON.stringify({channel: 1 * val.ledcChannel, duty: 1 * val.duty}))
+    reset () {
     }
   }
 }
