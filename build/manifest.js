@@ -33,12 +33,6 @@ module.exports = {
         }
 
         if('storage' in manifest) {
-            if(!('version' in manifest.storage))
-                throw new Error(`Storage of ${manifest.name} do not have required field "version"`);
-            if(!('migration' in manifest.storage))
-                throw new Error(`Storage of ${manifest.name} do not have required field "migration"`);
-            if(!('scripts' in manifest) || !('modules' in manifest.scripts) || !(manifest.storage.migration in manifest.scripts.modules))
-                throw new Error(`The ${manifest.name} application has migration [${manifest.storage.migration}] but do not have module for it`);
             if(!('objects' in manifest.storage))
                 throw new Error(`Storage of ${manifest.name} do not have required block "objects"`);
             for(let object_name in manifest.storage.objects) {
@@ -103,14 +97,6 @@ module.exports = {
                 result.push(this.makeBinaryField(this.BIN_BLOCK_SUBSCRIPTION, item));
             });
 
-        //Storage
-        if('storage' in manifest) {
-            //Version
-            result.push(this.makeBinaryField(this.BIN_BLOCK_STORAGE_VERSION, "" + manifest.storage.version));
-            //Migration
-            result.push(this.makeBinaryField(this.BIN_BLOCK_STORAGE_MIGRATION, manifest.storage.migration));
-        }
-
         return Buffer.concat(result);
     },
 
@@ -137,10 +123,20 @@ module.exports = {
                 return Buffer.concat(result);
             };
             for(let object_name in manifest.storage.objects) {
-                let struct = encode_struct(manifest.storage.objects[object_name].struct, 0);
+                let object = manifest.storage.objects[object_name];
+
+                let header = Buffer.concat([
+                    //Version
+                    this.makeBinaryField(this.BIN_BLOCK_STORAGE_VERSION, 'version' in object ? "" + object.version : "0"),
+                    //Migration
+                    this.makeBinaryField(this.BIN_BLOCK_STORAGE_MIGRATION, 'migration' in object ? object.migration : ""),
+                    //Struct
+                    encode_struct(object.struct, 0)
+                ]);
+
                 result[object_name] = Buffer.concat([
-                    Buffer.from(new Uint32Array([struct.length]).buffer),
-                    struct
+                    Buffer.from(new Uint32Array([header.length]).buffer),
+                    header
                 ]);
             }
         }

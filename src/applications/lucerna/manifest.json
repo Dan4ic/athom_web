@@ -56,16 +56,18 @@
     }
   },
   "storage" : {
-    "version" : 1,
-    "migration" : "migration",
     "objects" : {
       "test" : {
+        "version" : 1,
+        "migration" : "migration",
         "struct" : {
           "field1" : "int",
           "field2" : "int"
         }
       },
       "dots" : {
+        "version" : 1,
+        "migration" : "migration",
         "struct" : {
           "time" : "double",
           "brightness" : "double",
