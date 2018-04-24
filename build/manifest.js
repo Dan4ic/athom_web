@@ -74,7 +74,7 @@ module.exports = {
         return Buffer.concat([
             Buffer.from(new Uint32Array([type]).buffer),
             Buffer.from(new Uint32Array([name.length]).buffer),
-            Buffer.from(name, 'UTF-8')
+            Buffer.from(name, 'UTF-8'),
         ]);
     },
 
@@ -100,6 +100,15 @@ module.exports = {
         return Buffer.concat(result);
     },
 
+    makeStorageField(type, name){
+        return Buffer.concat([
+            Buffer.from(new Uint32Array([type]).buffer),
+            //Buffer.from(new Uint32Array([name.length]).buffer),
+            Buffer.from(name, 'UTF-8'),
+            Buffer.from(new Uint8Array([0]).buffer)
+        ]);
+    },
+
     storages(manifest){
         let result  = {};
 
@@ -111,11 +120,11 @@ module.exports = {
                 let result  = [];
                 for(let field in node) {
                     if(node[field] === "double") {
-                        result.push(this.makeBinaryField(level_prefix + this.BIN_BLOCK_STORAGE_TYPE_DOUBLE, field));
+                        result.push(this.makeStorageField(level_prefix + this.BIN_BLOCK_STORAGE_TYPE_DOUBLE, field));
                     } else if(node[field] === "int") {
-                        result.push(this.makeBinaryField(level_prefix + this.BIN_BLOCK_STORAGE_TYPE_INT, field));
+                        result.push(this.makeStorageField(level_prefix + this.BIN_BLOCK_STORAGE_TYPE_INT, field));
                     } else if(typeof node[field] === 'object'){
-                        result.push(this.makeBinaryField(level_prefix + this.BIN_BLOCK_STORAGE_TYPE_OBJECT, field));
+                        result.push(this.makeStorageField(level_prefix + this.BIN_BLOCK_STORAGE_TYPE_OBJECT, field));
                         result.push(encode_struct(node[field], level + 1));
                     } else
                         throw new Error(`Storage of ${manifest.name} have error type "${node[field]}"`);
@@ -127,9 +136,9 @@ module.exports = {
 
                 let header = Buffer.concat([
                     //Version
-                    this.makeBinaryField(this.BIN_BLOCK_STORAGE_VERSION, 'version' in object ? "" + object.version : "0"),
+                    this.makeStorageField(this.BIN_BLOCK_STORAGE_VERSION, 'version' in object ? "" + object.version : "0"),
                     //Migration
-                    this.makeBinaryField(this.BIN_BLOCK_STORAGE_MIGRATION, 'migration' in object ? object.migration : ""),
+                    this.makeStorageField(this.BIN_BLOCK_STORAGE_MIGRATION, 'migration' in object ? object.migration : ""),
                     //Struct
                     encode_struct(object.struct, 0)
                 ]);
