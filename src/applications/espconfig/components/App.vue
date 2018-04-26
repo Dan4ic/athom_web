@@ -20,11 +20,15 @@
         </v-card>
         <v-card style="width: 100%">
             <v-card-title>
-                <v-layout row wrap column>
+                <v-layout wrap column>
                     <h1>{{'FENIST_SENSORS_DATA_TITLE' | lang}}</h1>
                     <h5 v-for="sensor in owSensors">ID: {{sensor.owid}} Temperature: {{sensor.temperature}}&deg;C</h5>
                     <h5>Fan voltage: {{fan.voltage}} V</h5>
                     <h5>Fan tachometer: {{fan.tachometer}} RPM</h5>
+                    <vue-slider v-model="fan.setlevel"
+                                v-bind="fansliderdata"
+                                @callback="fansetlevel()"
+                    ></vue-slider>
                 </v-layout>
             </v-card-title>
         </v-card>
@@ -58,6 +62,9 @@
             },
             setchannelDuty (val) {
                 this.$bus.$emit(consts.EVENTS.UBUS_MESSAGE, 'espconfig-setduty', JSON.stringify({channel: 1 * val.channel, duty: 100 * val.value}));
+            },
+            fansetlevel () {
+                this.$bus.$emit(consts.EVENTS.UBUS_MESSAGE, 'fan-setlevel', JSON.stringify({ fanlevel: 1 * this.fan.setlevel }));
             }
         },
         mounted () {
@@ -80,6 +87,7 @@
                     temperature: 0
                 }],
                 fan: {
+                    setlevel: 0,
                     tachometer: 0,
                     voltage: 0
                 },
@@ -101,7 +109,7 @@
                     {channel: 15, value: 0}
                 ],
                 slidersdata: {
-                    width: 4,
+                    width: 10,
                     height: 300,
                     dotSize: 22,
                     eventType: 'auto',
@@ -118,6 +126,29 @@
                         marginLeft: '30px'
                     },
                     direction: 'vertical',
+                    speed: 0.5,
+                    processStyle: {
+                        backgroundColor: '#555'
+                    }
+                },
+                fansliderdata: {
+                    width: 300,
+                    height: 10,
+                    dotSize: 22,
+                    eventType: 'auto',
+                    min: 0,
+                    max: 255,
+                    interval: 1,
+                    disabled: false,
+                    show: true,
+                    tooltip: 'hover',
+                    piecewise: false,
+                    useKeyboard: true,
+                    style: {
+                        display: 'inline-block',
+                        marginLeft: '30px'
+                    },
+                    direction: 'horizontal',
                     speed: 0.5,
                     processStyle: {
                         backgroundColor: '#555'

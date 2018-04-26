@@ -29,7 +29,7 @@
     }
   },
   "scripts" : {
-    "subscriptions" : ["$-started", "espconfig-put", "espconfig-setchcfg", "espconfig-setduty"],
+    "subscriptions" : ["$-started", "espconfig-put", "espconfig-setchcfg", "espconfig-setduty", "fan-setlevel"],
     "entry" : "main",
     "modules" : {
       "main": {
