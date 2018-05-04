@@ -6,7 +6,9 @@ export default {
     },
     UBUS : {
         CURRENT_TIME : '$-current-time',
-        SUBSCRIBE : '$-subscribe',
+        IS_ONLINE : '$-online',
+        IS_OFFLINE : '$-offline',
+        SCRIPT_ERROR : '$-script-error',
     },
     EVENTS : {
         CORE_IS_LOADED : 'core-loaded',
