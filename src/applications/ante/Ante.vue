@@ -47,7 +47,7 @@
             </span>
                 <span v-if="!isMobileScreen" class="status_label">
                 {{ 'FIRMWARE' | lang }}: {{this.$store.state.system.firmware_v}}
-                    [{{isNetPending}}]
+                    [{{lang}}]
             </span>
             </v-footer>
 
@@ -62,7 +62,7 @@
                     :type="alerts[0].type"
                     :value="true"
                     transition="scale-transition"
-                    style="position: fixed; right: 16px; top: 16px; width: 400px; max-width: 80%; z-index: 2000"
+                    style="position: fixed; right: 16px; top: 16px; width: 400px; max-width: 80%; z-index: 20000"
             >
                 <span v-html="alerts[0].message"></span>
                 <v-btn
@@ -123,9 +123,6 @@
                 this.$router.push('/dashboard');
             }
 
-            this.onResize();
-            window.addEventListener('resize', this.onResize, { passive: true });
-
             //Loading available access points
             this.$bus.$on(consts.EVENTS.ALERT, (type, messages) => {
 
@@ -145,11 +142,6 @@
             });
 
         },
-        beforeDestroy () {
-            if (typeof window !== 'undefined') {
-                window.removeEventListener('resize', this.onResize, { passive: true })
-            }
-        },
         computed: {
             theme(){
                 return this.$store.state.display.theme;
@@ -160,11 +152,9 @@
             },
             isNetPending(){
                 return this.$store.state.is_net_pending;
-            }
-        },
-        methods: {
-            onResize () {
-                this.$store.commit('setIsMobile', window.innerWidth < 600);
+            },
+            lang(){
+                return this.$store.state.display.lang;
             }
         },
         watch : {
@@ -203,5 +193,46 @@
         vertical-align: top;
         content: '\A9';
     }
+
+    /* Custom datetime picker stylers */
+
+    .time-picker-title__time .picker__title__btn, .time-picker-title__time span {
+        height: 56px !important;
+        font-size: 60px !important;
+    }
+
+    .picker__body {
+        margin: auto !important;
+    }
+
+    .theme--dark .list__tile {
+        color: #fff;
+    }
+
+    .theme--light .list__tile{
+        color: rgba(0,0,0,.87);
+    }
+
+    .theme--light .card {
+        -webkit-box-shadow: none !important;
+        box-shadow: none !important;
+        border: solid 1px rgba(0,0,0,.1);
+        border-radius: 4px;
+    }
+
+    @media (max-width: 599px) {
+        table.table tbody td:first-child, table.table tbody td:not(:first-child),
+        table.table tbody th:first-child, table.table tbody th:not(:first-child),
+        table.table thead td:first-child, table.table thead td:not(:first-child),
+        table.table thead th:first-child, table.table thead th:not(:first-child) {
+            padding: 0 14px;
+        }
+
+        .container {
+            padding: 2px !important;
+        }
+
+    }
+
 
 </style>

@@ -1,10 +1,11 @@
 // Documentation of the server
 // https://webpack.js.org/configuration/dev-server/#devserver-setup
 'use strict'
-const fs = require('fs')
-const path = require('path')
-const utils = require('./utils')
-var bodyParser = require('body-parser')
+const fs = require('fs');
+const path = require('path');
+const utils = require('./utils');
+const bodyParser = require('body-parser');
+const formidable = require('formidable');
 
 const virtual_state_data = path.join(__dirname, '/devstorage/state.json');
 const virtual_ap_list_data = path.join(__dirname, '/devstorage/ap_list.json');
@@ -39,9 +40,43 @@ module.exports = function(app){
         }
     };
 
-    app.get('/api/profile', function(req, res) {
+    app.get('/manifest', function(req, res) {
         console.log('>Get profile data ');
         res.json(require(path.resolve(__dirname, "../static/profile.json")));
+    });
+
+    app.post('/firmware', function(req, res) {
+        console.log('>Flashing firmware');
+        let form = new formidable.IncomingForm();
+        form.parse(req, function (err, fields, files) {
+            //todo сделать что-то с этим
+        });
+        res.send(200);
+    });
+
+    app.post('/install', function(req, res) {
+        console.log('>Install application ');
+        let form = new formidable.IncomingForm();
+        form.parse(req, function (err, fields, files) {
+            let oldpath = files.data.path;
+            let newpath = path.resolve(__dirname, "../static/bundles/", (new Date).getTime() + '.smt');
+            fs.rename(oldpath, newpath, function (err) {
+                if (err) throw err;
+                //todo требуется реализовать развертывание устанавливаемых приложений
+                console.log(`File uploaded and moved! [${oldpath}] to [${newpath}] `);
+            });
+        });
+        res.send(200);
+    });
+
+    app.delete('/uninstall', function(req, res) {
+        console.log('>Uninstall application ');
+        if('appid' in req.body) {
+            console.log(`>Uninstall application ${req.body.appid}`);
+            res.status(200).send('OK');
+        } else {
+            res.status(500).send('Error of application id');
+        }
     });
 
     app.get('/api/state', function(req, res) {

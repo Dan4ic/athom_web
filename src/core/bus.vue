@@ -6,11 +6,10 @@
 import consts from './consts'
 
 export default {
-
     created(){
         this.$on(consts.EVENTS.UBUS_MESSAGE, (action, messages, distrib) => {
             if(!distrib || distrib != consts.WEBSOCKET.DISTRIB_MESSAGE_INTERNAL)
-                this.websocket.send(messages);
+                this.websocket.send(`${action};${messages}`);
         });
 
         setInterval(()=>{
@@ -25,9 +24,9 @@ export default {
     },
     methods : {
         startWebsocket(){
-
             //todo disabled websocket
-            return;
+            if(process.env.NODE_ENV !== 'production')
+                return;
 
             if (!"WebSocket" in window){
                 console.warn("WebSocket NOT supported by your Browser!");
@@ -35,7 +34,7 @@ export default {
             }
 
             if(!this.websocket)
-                this.websocket = new WebSocket(consts.WEBSOCKET.ADDRESS);
+                this.websocket = new WebSocket('ws://' + window.location.hostname + ':8080');
 
             this.$emit(consts.EVENTS.WS_STARTING);
 

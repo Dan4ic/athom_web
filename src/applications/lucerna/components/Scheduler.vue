@@ -227,8 +227,9 @@
 
 <script>
 
-    import consts from 'consts';
     import Spectrum from './Spectrum.vue';
+
+    const consts = window.$consts;
 
     export default {
 
@@ -242,6 +243,35 @@
             this.$bus.$on(consts.EVENTS.DO_SCREEN_REBUILD, (type, messages) => {
                 this.onResize();
             });
+
+            //todo ДЛЯ ТЕСТОВ ШЛЕМ ЕВЕНТ В КОНТРОЛЛЕР
+
+            this.$bus.$on(window.$consts.EVENTS.UBUS_MESSAGE, (type, messages) => {
+
+                if(["luc-sd-begin", "luc-sd-item", "luc-sd-end"].indexOf(type) < 0)
+                    return;
+
+                let data =  JSON.parse(messages);
+
+                switch(type){
+                    case "luc-sd-begin":
+                        if(data.uid != this.uid)
+                            this.receiving[data.pid] = [];
+                        break;
+                    case "luc-sd-item":
+                        if(data.pid in this.receiving)
+                            this.receiving[data.pid].push(this.createDot(data.t, data.b, false));
+                        break;
+                    case "luc-sd-end":
+                        if(data.pid in this.receiving) {
+                            this.dots =  this.receiving[data.pid];
+                            this.receiving  = {};
+                        }
+                        break;
+                }
+            });
+
+            //todo ДЛЯ ТЕСТОВ ШЛЕМ ЕВЕНТ В КОНТРОЛЛЕР
         },
 
         destroyed () {
@@ -288,70 +318,7 @@
         },
 
         data() {
-            const example_dots = [
-                    /*
-                {
-                    selected: false,
-                    time: 23760,
-                    brightness: 0.01,
-                    spectrum: {
-                        0: 0.1,
-                        1: 0.2,
-                        2: 0.1,
-                        3: 0.6,
-                        4: 1,
-                        5: 0.2,
-                        6: 0.1,
-                        7: 0.2
-                    }
-                },
-                {
-                    selected: false,
-                    time: 38880,
-                    brightness: 0.9,
-                    spectrum: {
-                        0: 0.3,
-                        1: 0.2,
-                        2: 0.2,
-                        3: 0.1,
-                        4: 0.6,
-                        5: 0.7,
-                        6: 0.1,
-                        7: 0.9
-                    }
-                },
-                {
-                    selected: false,
-                    time: 52560,
-                    brightness: 0.9,
-                    spectrum: {
-                        0: 0.3,
-                        1: 0.2,
-                        2: 0.2,
-                        3: 0.1,
-                        4: 0.6,
-                        5: 0.7,
-                        6: 0.1,
-                        7: 0.9
-                    }
-                },
-                {
-                    selected: false,
-                    time: 67620,
-                    brightness: 0.01,
-                    spectrum: {
-                        0: 1,
-                        1: 0.5,
-                        2: 0.4,
-                        3: 0.3,
-                        4: 0.2,
-                        5: 0.1,
-                        6: 0.1,
-                        7: 0.1
-                    }
-                },
-                */
-            ];
+            const example_dots = [];
 
             let dots = [];
 
@@ -364,6 +331,11 @@
             }
 
             let data = {
+                //todo Для тестов
+                uid : (new Date).getTime(),
+                receiving : {},
+                //todo Для тестов
+
                 clientWidth: null,
                 clientHeight: null,
                 event: {
@@ -590,7 +562,7 @@
                     this.event.dot.selected = !this.event.dot.selected;
                 }
 
-                this.dots.map((dot) => {
+                this.dots.map((dot, index) => {
                     if(this.selectionBox.isSelectionBox && this.isInSelBox(dot))
                         dot.selected = true;
 
@@ -599,6 +571,34 @@
                         dot.time = this.interval.offset + this.rebaseX(this.getChartX(dot)) / this.dpi;
                     }
                 });
+
+                //todo ДЛЯ ТЕСТОВ ШЛЕМ ЕВЕНТ В КОНТРОЛЛЕР
+                let packed_id   = (new Date).getTime();
+                let interval    = 40;
+                this.$bus.$emit(window.$consts.EVENTS.UBUS_MESSAGE, "luc-sd-begin", JSON.stringify({
+                   uid : this.uid,
+                   pid : packed_id
+                }));
+
+                this.dots.map((item) => {
+                    setTimeout(() => {
+                        this.$bus.$emit(window.$consts.EVENTS.UBUS_MESSAGE, "luc-sd-item", JSON.stringify({
+                            pid : packed_id,
+                            b : 1 * item.brightness.toFixed(2),
+                            t : 1 * item.time.toFixed(2),
+                        }));
+                    }, interval);
+                    interval += 40;
+                });
+
+                setTimeout(() => {
+                    this.$bus.$emit(window.$consts.EVENTS.UBUS_MESSAGE, "luc-sd-end", JSON.stringify({
+                        uid: this.uid,
+                        pid: packed_id
+                    }));
+                }, interval);
+                //todo ДЛЯ ТЕСТОВ ШЛЕМ ЕВЕНТ В КОНТРОЛЛЕР
+
 
                 this.draggingDot.isDragging = false;
                 this.draggingDot.offsetX = 0;

@@ -43,10 +43,16 @@ rm(path.join(config.build.assetsRoot, config.build.assetsSubDirectory), err => {
                 bundles.push(BundleApp.make(dir));
             }
         });
-        console.info(chalk.yellow('  Built applications bundles:\n'))
-        for(let i=0; i<bundles.length; i++) {
-            console.info(chalk.yellow(`  ${i+1}. ${bundles[i]}:\n`))
+        if('mjsfiles' in global) {
+            console.info(chalk.yellow('  Built mJS files:\n'))
+            global.mjsfiles.map((item, index)=>{
+                console.info(chalk.yellow(`  ${index+1}. ${item}`))
+            });
         }
+        console.info(chalk.yellow('\n  Built applications bundles:\n'))
+        bundles.map((item, index)=>{
+            console.info(chalk.yellow(`  ${index+1}. ${item};`))
+        });
     }
   })
 })

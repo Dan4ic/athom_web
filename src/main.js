@@ -8,6 +8,7 @@ import consts from './core/consts';
 import mixins from './core/mixins';
 import Apps from './core/applications';
 import Root from './Root.vue';
+import Axios from 'axios';
 
 Vue.use(Vuex);
 Vue.use(Vuetify);
@@ -18,10 +19,12 @@ window.Vue = Vue;
 let theBus  = new Vue(EventsBus);
 
 Vue.prototype.$bus              = theBus;
+Vue.prototype.$axios            = Axios;
 Vuex.Store.prototype.$bus       = theBus;
 window.Vue.$bus                 = theBus;
 window.$store                   = new Vuex.Store(storage);
 window.$bus                     = theBus;
+window.$axios                   = Axios;
 window.$consts                  = consts;
 window.$exportComponent         = Apps.exportComponent;
 window.$protocomponents         = [];   //

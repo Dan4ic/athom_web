@@ -1,5 +1,5 @@
 {
-
+  "name" : "Lucerna 2",
   "components" : {
     "lucerna2-app" : {
       "source" : "index.js",

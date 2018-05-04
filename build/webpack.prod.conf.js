@@ -13,6 +13,7 @@ const CompressionWebpackPlugin = require('compression-webpack-plugin')
 const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const fs = require('fs')
+const mjsmaker = require('./scripts')
 
 const env = process.env.NODE_ENV === 'testing'
     ? require('../config/test.env')
@@ -38,12 +39,15 @@ const webpackConfig = merge(baseWebpackConfig, {
             'process.env': env
         }),
         new UglifyJsPlugin({
+            test: /\.(js|mjs)$/,
             uglifyOptions: {
-                compress: {
-                    warnings: false
-                }
+                compress: true,
+                minimize: true,
+                output: {
+                    comments: false
+                },
             },
-            sourceMap: config.build.productionSourceMap,
+            sourceMap: false,
             parallel: true
         }),
         // extract css into its own file
@@ -116,7 +120,8 @@ const webpackConfig = merge(baseWebpackConfig, {
             filename: 'platform.html',
             template: 'platform.html',
             inject: true,
-            inlineSource: 'platform.css|platform.js',
+            chunks: ['app', 'vendor'],
+            inlineSource: 'app.js|vendor.js',
             //Injection source code to HTML
             minify: {
                 removeComments: true,
@@ -167,7 +172,7 @@ fs.readdirSync(apps_path).forEach(file => {
             );
             webpackConfig.plugins.push(
                 new CompressionWebpackPlugin({
-                    asset: `apps/${file}/component${index}.gz`,
+                    asset: `apps/${file}/component${index}.jgz`,
                     algorithm: 'gzip',
                     deleteOriginalAssets: true,
                     test: new RegExp(filename),
@@ -175,6 +180,8 @@ fs.readdirSync(apps_path).forEach(file => {
                 })
             );
         });
+
+        mjsmaker.make(file, manifest);
     }
 });
 

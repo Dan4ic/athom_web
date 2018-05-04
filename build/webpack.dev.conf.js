@@ -12,121 +12,107 @@ const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const portfinder = require('portfinder')
 const restapi = require('./restapi')
+const Manifest = require('./manifest')
 
 const HOST = '0.0.0.0' //process.env.HOST
 const PORT = process.env.PORT && Number(process.env.PORT)
 
 const devWebpackConfig = merge(baseWebpackConfig, {
-  module: {
-    rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap, usePostCSS: true })
-  },
-  // cheap-module-eval-source-map is faster for development
-  devtool: config.dev.devtool,
+    module: {
+        rules: utils.styleLoaders({sourceMap: config.dev.cssSourceMap, usePostCSS: true})
+    },
+    // cheap-module-eval-source-map is faster for development
+    devtool: config.dev.devtool,
 
-  // these devServer options should be customized in /config/index.js
-  devServer: {
-    clientLogLevel: 'warning',
-    historyApiFallback: {
-      rewrites: [
-        { from: /.*/, to: path.posix.join(config.dev.assetsPublicPath, 'index.html') },
-      ],
+    // these devServer options should be customized in /config/index.js
+    devServer: {
+        clientLogLevel: 'warning',
+        historyApiFallback: {
+            rewrites: [
+                {from: /.*/, to: path.posix.join(config.dev.assetsPublicPath, 'index.html')},
+            ],
+        },
+        hot: true,
+        contentBase: false, // since we use CopyWebpackPlugin.
+        compress: true,
+        host: HOST || config.dev.host,
+        port: PORT || config.dev.port,
+        open: config.dev.autoOpenBrowser,
+        overlay: config.dev.errorOverlay
+            ? {warnings: false, errors: true}
+            : false,
+        publicPath: config.dev.assetsPublicPath,
+        proxy: config.dev.proxyTable,
+        quiet: true, // necessary for FriendlyErrorsPlugin
+        watchOptions: {
+            poll: config.dev.poll,
+        },
+        setup: restapi
     },
-    hot: true,
-    contentBase: false, // since we use CopyWebpackPlugin.
-    compress: true,
-    host: HOST || config.dev.host,
-    port: PORT || config.dev.port,
-    open: config.dev.autoOpenBrowser,
-    overlay: config.dev.errorOverlay
-      ? { warnings: false, errors: true }
-      : false,
-    publicPath: config.dev.assetsPublicPath,
-    proxy: config.dev.proxyTable,
-    quiet: true, // necessary for FriendlyErrorsPlugin
-    watchOptions: {
-      poll: config.dev.poll,
-    },
-    setup : restapi
-  },
-  plugins: [
-    new webpack.DefinePlugin({
-      'process.env': require('../config/dev.env')
-    }),
-    new webpack.HotModuleReplacementPlugin(),
-    new webpack.NamedModulesPlugin(), // HMR shows correct file names in console on update.
-    new webpack.NoEmitOnErrorsPlugin(),
-    // https://github.com/ampedandwired/html-webpack-plugin
-    new HtmlWebpackPlugin({
-      filename: 'index.html',
-      template: 'platform.html',
-      inject: "body",
-      chunks: ['app'],
-      inlineSource: 'app.js',
-    }),
-    new HtmlWebpackInlineSourcePlugin(),
-    // copy custom static assets
-    new CopyWebpackPlugin([
-      {
-        from: path.resolve(__dirname, '../static'),
-        to: config.dev.assetsSubDirectory,
-        ignore: ['.*']
-      }
-    ])
-  ]
+    plugins: [
+        new webpack.DefinePlugin({
+            'process.env': require('../config/dev.env')
+        }),
+        new webpack.HotModuleReplacementPlugin(),
+        new webpack.NamedModulesPlugin(), // HMR shows correct file names in console on update.
+        new webpack.NoEmitOnErrorsPlugin(),
+        // https://github.com/ampedandwired/html-webpack-plugin
+        new HtmlWebpackPlugin({
+            filename: 'index.html',
+            template: 'platform.html',
+            inject: "body",
+            chunks: ['app'],
+            inlineSource: 'app.js',
+        }),
+        new HtmlWebpackInlineSourcePlugin(),
+        // copy custom static assets
+        new CopyWebpackPlugin([
+            {
+                from: path.resolve(__dirname, '../static'),
+                to: config.dev.assetsSubDirectory,
+                ignore: ['.*']
+            }
+        ])
+    ]
 })
 
 module.exports = new Promise((resolve, reject) => {
-  portfinder.basePort = process.env.PORT || config.dev.port
-  portfinder.getPort((err, port) => {
-    if (err) {
-      reject(err)
-    } else {
-      // publish the new Port, necessary for e2e tests
-      process.env.PORT = port
-      // add port to devServer config
-      devWebpackConfig.devServer.port = port
+    portfinder.basePort = process.env.PORT || config.dev.port
+    portfinder.getPort((err, port) => {
+        if (err) {
+            reject(err)
+        } else {
+            // publish the new Port, necessary for e2e tests
+            process.env.PORT = port
+            // add port to devServer config
+            devWebpackConfig.devServer.port = port
 
-      // Add FriendlyErrorsPlugin
-      devWebpackConfig.plugins.push(new FriendlyErrorsPlugin({
-        compilationSuccessInfo: {
-          messages: [`Your application is running here: http://${devWebpackConfig.devServer.host}:${port}`],
-        },
-        onErrors: config.dev.notifyOnErrors
-        ? utils.createNotifierCallback()
-        : undefined
-      }))
+            // Add FriendlyErrorsPlugin
+            devWebpackConfig.plugins.push(new FriendlyErrorsPlugin({
+                compilationSuccessInfo: {
+                    messages: [`Your application is running here: http://${devWebpackConfig.devServer.host}:${port}`],
+                },
+                onErrors: config.dev.notifyOnErrors
+                    ? utils.createNotifierCallback()
+                    : undefined
+            }))
 
-      resolve(devWebpackConfig)
-    }
-  })
+            resolve(devWebpackConfig)
+        }
+    })
 })
 
 
 //Prepare manifest
 const apps_path = path.resolve(__dirname, '../src/applications/');
 
-let profile = [];
+let profile = {};
+let appid = 1;
 
 fs.readdirSync(apps_path).forEach(dir => {
-    if(fs.lstatSync(path.resolve(apps_path, dir)).isDirectory()) {
-        let app_path    = path.resolve(apps_path, dir);
-        let manifest    = require(path.resolve(app_path, "manifest.json"));
-
-        if(fs.existsSync(path.resolve(app_path, "favicon.png"))) {
-            manifest.favicon    = 'data:image/png;base64,'
-                + new Buffer(fs.readFileSync(path.resolve(app_path, "favicon.png"))).toString('base64');
-        } else if(fs.existsSync(path.resolve(app_path, "favicon.svg"))) {
-            manifest.favicon    = 'data:image/svg+xml;utf8,'
-                + fs.readFileSync(path.resolve(app_path, "favicon.svg"));
-        }
-
-        if(dir in global.components){
-            for(let cname in manifest.components){
-              if(cname in global.components[dir])
-                  manifest.components[cname].source = global.components[dir][cname].bundle;
-            }
-        }
-        profile.push(manifest);
+    if (fs.lstatSync(path.resolve(apps_path, dir)).isDirectory()) {
+        profile[appid]  = Manifest.make(dir);
+        appid++;
     }
 });
 

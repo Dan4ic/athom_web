@@ -12,15 +12,23 @@ export default {
 
     //Include application lang constants
     includeLang(consts) {
-        for (let lng in consts)
+        //todo если включить debugger вываливается ошибка interval
+        //debugger;
+        console.info(consts);
+        for (let lng in consts) {
+            if(!window.$consts.LANGS[lng])
+                window.$consts.LANGS[lng]   = {};
             Object.assign(window.$consts.LANGS[lng], consts[lng]);
+        }
+        console.info(window.$consts.LANGS);
     },
 
     //Return registered components by category or category & action
     getComponentBy(category, action) {
         let result = [];
 
-        window.$store.state.apps.profiles.map(function (profile) {
+        for(let appid in window.$store.state.apps.profiles) {
+            let profile = window.$store.state.apps.profiles[appid];
             for (let name in profile.components) {
                 let component = profile.components[name];
                 if (component.intent_filter)
@@ -39,7 +47,7 @@ export default {
                         ) result.push(name);
                     }
             }
-        });
+        };
 
         return result;
     },
@@ -49,6 +57,7 @@ export default {
         if(component in window.$resolvers_components) {
             window.$resolvers_components[component].map((resolve) => {
                 try {
+                    console.log(`Resolved for ${component}`);
                     resolve(object)
                 } catch (e) {
                     console.error(e);
@@ -57,6 +66,7 @@ export default {
             });
             window.$resolvers_components[component] = [];
         }
+        window.$protocomponents[component]  = object;
     },
 
     //Create promise for dynamically load component
@@ -70,9 +80,10 @@ export default {
                     return;
                 }
 
-                if(component in window.$resolvers_components)
+                if(component in window.$resolvers_components) {
                     window.$resolvers_components[component].push(resolve);
-                else
+                    return;
+                } else
                     window.$resolvers_components[component] = [resolve];
 
                 const script = document.createElement("script");
