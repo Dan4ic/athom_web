@@ -1,6 +1,6 @@
 export default {
     WEBSOCKET : {
-        ADDRESS : "ws://192.168.1.96:8080",
+        ADDRESS : "ws://192.168.1.96:80",
         RECONNECT_TIMEOUT : 5000,
         DISTRIB_MESSAGE_INTERNAL : 'internal',
     },

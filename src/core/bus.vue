@@ -34,7 +34,7 @@ export default {
             }
 
             if(!this.websocket)
-                this.websocket = new WebSocket('ws://' + window.location.hostname + ':8080');
+                this.websocket = new WebSocket('ws://' + window.location.hostname);
 
             this.$emit(consts.EVENTS.WS_STARTING);
 
