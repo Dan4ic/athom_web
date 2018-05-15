@@ -5,13 +5,13 @@ log('MJS', 'Started VMS', 1);
 let test = "test--print";
 
 let rec_max = 1000;
-let record_num = 0;
+let record_num;
 let start = $core.time();
 
 let dots = $storage.open("dots");
 function append(max) {
     let start = $core.time();
-    let n = 0;
+    let n;
     for (n = 0; n < max; n++) {
         $storage.append(dots, {
             "brightness": n,

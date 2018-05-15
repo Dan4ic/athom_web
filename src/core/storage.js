@@ -44,6 +44,16 @@ export default {
         setProfiles(state, profiles) {
             for(let appid in profiles) {
                 let profile = profiles[appid];
+                if ('storage' in profile && 'objects' in profile.storage) {
+                    let object_struct = require('./storage-object');
+                    for(let object in profile.storage.objects)
+                        object_struct.state[object] = [];
+
+                    if(!(profile.name in state))
+                        this.registerModule(profile.name, require('./storage-collector'));
+
+                    this.registerModule([profile.name, 'data'], object_struct);
+                }
                 if ('components' in profile)
                     for (let cname in profile.components) {
                         if (!(cname in Vue.options.components)) {
