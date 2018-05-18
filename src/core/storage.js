@@ -46,6 +46,8 @@ export default {
                 let profile = profiles[appid];
                 if ('storage' in profile && 'objects' in profile.storage) {
                     let object_struct = require('./storage-object');
+                    object_struct.state.$namespace = profile.name;
+                    object_struct.state.$header = null;
                     for(let object in profile.storage.objects)
                         object_struct.state[object] = [];
 
@@ -53,6 +55,7 @@ export default {
                         this.registerModule(profile.name, require('./storage-collector'));
 
                     this.registerModule([profile.name, 'data'], object_struct);
+                    this.dispatch('Lucerna/data/reload', 'dots');
                 }
                 if ('components' in profile)
                     for (let cname in profile.components) {
@@ -251,9 +254,9 @@ export default {
                 context.commit('decNetPending');
                 context.dispatch('applyProfile', response.data);
                 context.dispatch('reloadState');
-            }).catch(function () {
+            }).catch(function (e) {
                 context.commit('decNetPending');
-                console.error('Error of loading profile');
+                console.error('Error of loading profile', e);
             });
         },
         
