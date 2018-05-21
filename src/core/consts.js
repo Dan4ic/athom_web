@@ -22,6 +22,8 @@ export default {
         WS_ERROR : 'ws-error',
         WS_CLOSED : 'ws-closed',
         UBUS_MESSAGE : 'ubus-message',
+        STORE_RELOADED : 'store-reloaded',
+        STORE_ERROR_RELOADED : 'store-error-reloaded'
     },
     ALERT_TYPE :{
         ERROR : 'error',
@@ -36,6 +38,5 @@ export default {
         TIME : "/api/time",
     },
     LANGS : {
-
     }
 }
