@@ -11,19 +11,16 @@ module.exports = {
     },
 
     mutations: {
-        applyData(state, object, data){
-            if(object in state) {
-                state[object] = data;
+        applyData(state, object){
+            debugger;
+            if(object.name in state) {
+                state[object.name] = object.data;
             } else
                 new Error('Undefined object storage ${object} for ${state.$namespace}');
         },
     },
 
     actions: {
-        loadBinaryObject(context, data){
-            context.commit('applyData', Binary.parseBinaryObject(data));
-        },
-
         reload(context, object){
             this.commit('incNetPending');
             if(object in context.state) {
@@ -34,7 +31,12 @@ module.exports = {
                     }
                 ).then((response) => {
                     this.commit('decNetPending');
-                    context.dispatch('loadBinaryObject', response.data);
+                    context.commit('applyData',
+                        {
+                            'name' : object,
+                            'data' : Binary.parseBinaryObject(response.data)
+                        }
+                    );
                     this.$bus.$emit(consts.EVENTS.STORE_RELOADED, object);
                 }).catch((e) => {
                     console.log(`Error of loading storage object for ${context.state.$namespace}/data/${object}`, e);
