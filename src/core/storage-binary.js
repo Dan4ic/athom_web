@@ -4,6 +4,12 @@ const bundle_str = require('../../build/storage');
 
 module.exports = {
 
+    parseBinaryInt8(state){
+        let result = new DataView(state.data, state.offset).getInt8(0, true);
+        state.offset += 1;
+        return result;
+    },
+
     parseBinaryInt32(state){
         let result = new DataView(state.data, state.offset).getInt32(0, true);
         state.offset += 4;
@@ -82,7 +88,25 @@ module.exports = {
     },
 
     //Parsing binary object header + body to object
+    parseBinaryRow(state){
+        let parseSubStruct = function(substruct){
+            let result = {};
+            for(let field_name in substruct){
+                let field = substruct[field_name];
+                if('substruct' in field)
+                    result[field.name] = parseSubStruct(field.substruct);
+                else
+                    result[field.name] = field.parser(state);
+            }
+            return result;
+        }
+
+        return parseSubStruct(state.struct);
+    },
+
+    //Parsing binary object header + body to object
     parseBinaryObject(data){
+        let result = [];
         let state = {
             part    : bundle_str.BIN_BLOCK_STORAGE_VERSION,
             data    : data,
@@ -90,11 +114,12 @@ module.exports = {
         };
 
         state.header_size = this.parseBinaryInt32(state);
-        let struct = this.parseBinaryStruct(state);
+        state.struct = this.parseBinaryStruct(state);
+        while(state.offset < state.data.byteLength){
+            if(!this.parseBinaryInt8(state))
+                result.push(this.parseBinaryRow(state));
+        }
 
-        console.log(struct);
-        debugger;
-
-        return [];
+        return result;
     }
 }
