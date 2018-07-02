@@ -12,7 +12,7 @@ module.exports = {
 
     mutations: {
         applyData(state, object, data){
-            if(object in context.state) {
+            if(object in state) {
                 state[object] = data;
             } else
                 new Error('Undefined object storage ${object} for ${state.$namespace}');
@@ -28,7 +28,7 @@ module.exports = {
             this.commit('incNetPending');
             if(object in context.state) {
                 Axios.get(
-                    `http://192.168.1.122/apps/${context.state.$namespace}/data/${object}`,
+                    `http://192.168.1.60/apps/${context.state.$namespace}/data/${object}`,
                     {
                         responseType : 'arraybuffer'
                     }

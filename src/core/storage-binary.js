@@ -42,7 +42,6 @@ module.exports = {
     },
 
     parseBinaryStruct(state, level){
-        debugger;
         let result  = [];
         while(state.offset < state.header_size){
             let field = this.parseBinaryField(state);
@@ -85,16 +84,17 @@ module.exports = {
     //Parsing binary object header + body to object
     parseBinaryObject(data){
         let state = {
-            part : bundle_str.BIN_BLOCK_STORAGE_VERSION,
-            data : data,
-            offset : 0
+            part    : bundle_str.BIN_BLOCK_STORAGE_VERSION,
+            data    : data,
+            offset  : 0
         };
 
         state.header_size = this.parseBinaryInt32(state);
         let struct = this.parseBinaryStruct(state);
 
         console.log(struct);
+        debugger;
 
-        return []
+        return [];
     }
 }
