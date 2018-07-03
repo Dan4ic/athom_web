@@ -159,9 +159,8 @@ module.exports = {
     //Making binary storage file with header and body
     //struct - JSON structure of object
     //data - data of storage
-    //return - binary storage
+    //return - binary storage (header + body)
     makeBinaryObject(struct, data){
-        debugger;
         //Making binary header
         let header = storage_builder.makeBinaryHeader(struct);
         let result = header;
@@ -182,10 +181,8 @@ module.exports = {
                 Buffer.from(new Uint8Array([0]).buffer), //Delete flag
                 this.makeBinaryRow(fields, data[index])
             ]);
-
         }
 
-        console.info(result);
         return result;
     }
 }

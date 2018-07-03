@@ -22,6 +22,7 @@ module.exports = {
         reload(context, object){
             this.commit('incNetPending');
             if(object in context.state) {
+                //todo need to remove IP
                 Axios.get(
                     `http://192.168.1.60/apps/${context.state.$namespace}/data/${object}`,
                     {
@@ -58,8 +59,29 @@ module.exports = {
             }
 
             this.commit('incNetPending');
-            Binary.makeBinaryObject(profile.storage.objects[object], context.state[object]);
-            this.commit('decNetPending');
+
+            let formData = new FormData();
+            formData.append(
+                object,
+                new Blob([Binary.makeBinaryObject(profile.storage.objects[object], context.state[object])]),
+                `${object}.str`
+            );
+
+            //todo need to remove IP
+            Axios.post(`http://192.168.1.60/apps/${context.state.$namespace}/data/${object}`,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            ).then(() => {
+                this.commit('decNetPending');
+            })
+            .catch((e) => {
+                console.error(e);
+                this.commit('decNetPending');
+            });
         }
     }
 }
