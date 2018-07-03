@@ -3,7 +3,6 @@
 const consts = require('consts').default;
 const Axios = require('axios');
 const Binary = require('./storage-binary');
-const Storage_builder = require('../../build/storage');
 
 module.exports = {
     namespaced: true,
@@ -12,11 +11,10 @@ module.exports = {
 
     mutations: {
         applyData(state, object){
-            debugger;
             if(object.name in state) {
                 state[object.name] = object.data;
             } else
-                new Error('Undefined object storage ${object} for ${state.$namespace}');
+                new Error('Undefined object storage ${object.name} for ${state.$namespace}');
         },
     },
 
@@ -48,11 +46,20 @@ module.exports = {
         },
 
         post(context, object){
-            this.commit('incNetPending');
-            if(object in context.state) {
-                //todo
-                console.info(`Posted /apps/${context.state.namespace}/data/${object}`);
+            let profile = null;
+            for(let index in $store.state.apps.profiles){
+                if($store.state.apps.profiles[index].name == context.state.$namespace)
+                    profile = $store.state.apps.profiles[index];
             }
+
+            if(!profile || !('storage' in profile) || !('objects' in profile.storage)
+                || !(object in profile.storage.objects)){
+                throw `Could not found profile for storage /apps/${context.state.$namespace}/data/${object}`;
+            }
+
+            this.commit('incNetPending');
+            Binary.makeBinaryObject(profile.storage.objects[object], context.state[object]);
+            this.commit('decNetPending');
         }
     }
 }
