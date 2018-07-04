@@ -60,9 +60,6 @@ module.exports = {
     },
 
     parseBinaryStruct(state){
-
-        debugger;
-
         let result      = [];
         let items       = result;
         let levels      = [];
@@ -187,6 +184,7 @@ module.exports = {
             offset  : 0
         };
         state.header_size = this.parseBinaryInt32(state);
+        state.offset += 9; //Skip signature data
         let fields = this.parseBinaryStruct(state);
 
         //Making binary body

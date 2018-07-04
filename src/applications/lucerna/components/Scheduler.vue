@@ -202,6 +202,14 @@
                 >
                     content_copy
                 </text>
+                <text
+                        :y="dotRadius * 2"
+                        :x="dotRadius * 10 + dotRadius / 2"
+                        :dy="dotRadius / 2"
+                        class="button ico"
+                        :font-size="dotRadius * 2"
+                        @mousedown.stop="onSave"
+                >save</text>
 
             </g>
         </svg>
@@ -404,6 +412,10 @@
 
         methods: {
 
+            onSave(){
+                this.$store.dispatch('Lucerna/data/post', 'dots');
+            },
+
             createDot(time, brightness, selected){
                 return {
                     selected: !!selected,
@@ -530,8 +542,6 @@
             },
 
             onMouseUp(){
-
-                debugger;
 
                 if(this.draggingNewDot.isDragging){
                     if(
@@ -784,8 +794,7 @@
                     return this.$store.state.Lucerna.data.dots;
                 },
                 set(value) {
-                    debugger;
-                    this.$store.commit('Lucerna/applyData', {name : 'dots', data : value});
+                    this.$store.commit('Lucerna/data/applyData', {name : 'dots', data : value});
                 }
             },
 

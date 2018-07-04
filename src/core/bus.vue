@@ -12,7 +12,7 @@ export default {
                 this.websocket.send(`${action};${messages}`);
         });
 
-        setInterval(()=>{
+        setInterval(() => {
             if(!this.websocket) //IS CLOSED
                 this.startWebsocket();
         }, 1000);
@@ -20,7 +20,6 @@ export default {
         setTimeout(()=>{
             this.startWebsocket();
         }, 500);
-
     },
     methods : {
         startWebsocket(){
