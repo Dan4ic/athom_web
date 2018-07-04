@@ -1,4 +1,7 @@
 'use strict'
+
+let crc32 =  require('./crc32');
+
 module.exports = {
     BIN_BLOCK_STORAGE_OBJECT : 10,
     BIN_BLOCK_STORAGE_VERSION : 11,
@@ -15,12 +18,19 @@ module.exports = {
         ]);
     },
 
+    makeBinarySignature(binary_header){
+        return Buffer.concat([
+            Buffer.from("STR01", 'UTF-8'),
+            Buffer.from(new Uint32Array([crc32.calcByBinary(binary_header)]).buffer)
+        ]);
+    },
+
     makeBinaryHeader(object_manifest){
         //Encoding object structure
         let encode_struct = (node, level) => {
             let level_prefix = level * 2048;
             let result  = [];
-            for(let field in node) {
+            Object.keys(node).sort().forEach((field) => {
                 if(node[field] === "double") {
                     result.push(this.makeBinaryField(level_prefix + this.BIN_BLOCK_STORAGE_TYPE_DOUBLE, field));
                 } else if(node[field] === "int") {
@@ -30,7 +40,8 @@ module.exports = {
                     result.push(encode_struct(node[field], level + 1));
                 } else
                     throw new Error(`Storage of ${manifest.name} have error type "${node[field]}"`);
-            }
+
+            });
             return Buffer.concat(result);
         };
 
@@ -41,6 +52,12 @@ module.exports = {
             this.makeBinaryField(this.BIN_BLOCK_STORAGE_MIGRATION, 'migration' in object_manifest ? object_manifest.migration : ""),
             //Struct
             encode_struct(object_manifest.struct, 0)
+        ]);
+
+        //Adding signature of storage
+        header = Buffer.concat([
+            this.makeBinarySignature(header),
+            header
         ]);
 
         return Buffer.concat([

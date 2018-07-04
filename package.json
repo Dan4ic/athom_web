@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "axios": "0.16.2",
+    "module": "^1.2.5",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.0"
@@ -88,7 +89,7 @@
     "webpack-bundle-analyzer": "^2.9.0",
     "webpack-dev-server": "^2.9.1",
     "webpack-merge": "^4.1.0",
-    "uglify-es" : "^3.3.9"
+    "uglify-es": "^3.3.9"
   },
   "engines": {
     "node": ">= 6.0.0",

@@ -24,7 +24,7 @@ module.exports = {
             if(object in context.state) {
                 let url =
                     (process.env.NODE_ENV === 'development' ? (process.env.HW_DEVICE_URL ? process.env.HW_DEVICE_URL : '') : '')
-                    + `http://192.168.1.60/apps/${context.state.$namespace}/data/${object}`;
+                    + `/apps/${context.state.$namespace}/data/${object}`;
 
                 Axios.get(url,
                     {
