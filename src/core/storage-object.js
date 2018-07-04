@@ -22,9 +22,11 @@ module.exports = {
         reload(context, object){
             this.commit('incNetPending');
             if(object in context.state) {
-                //todo need to remove IP
-                Axios.get(
-                    `http://192.168.1.60/apps/${context.state.$namespace}/data/${object}`,
+                let url =
+                    (process.env.NODE_ENV === 'development' ? (process.env.HW_DEVICE_URL ? process.env.HW_DEVICE_URL : '') : '')
+                    + `http://192.168.1.60/apps/${context.state.$namespace}/data/${object}`;
+
+                Axios.get(url,
                     {
                         responseType : 'arraybuffer'
                     }
@@ -67,9 +69,10 @@ module.exports = {
                 `${object}.str`
             );
 
-            //todo need to remove IP
-            Axios.post(`http://192.168.1.60/apps/${context.state.$namespace}/data/${object}`,
-                formData,
+            let url =
+                (process.env.NODE_ENV === 'development' ? (process.env.HW_DEVICE_URL ? process.env.HW_DEVICE_URL : '') : '')
+                + `/apps/${context.state.$namespace}/data/${object}`;
+            Axios.post(url, formData,
                 {
                     headers: {
                         'Content-Type': 'multipart/form-data'
