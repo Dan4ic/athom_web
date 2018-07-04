@@ -4,7 +4,7 @@ let log = ffi('void log(char*, char*, int)');
 log('MJS', 'Started VMS', 1);
 let test = "test--print";
 
-let rec_max = 10;
+let rec_max = 1;
 let record_num;
 let start = $core.time();
 
@@ -12,6 +12,7 @@ let dots = $storage.open("dots");
 function append(max) {
     let start = $core.time();
     let n;
+    print(">>>> Started <<<<");
     for (n = 0; n < max; n++) {
         $storage.append(dots, {
             "brightness": n,
@@ -34,11 +35,15 @@ function append(max) {
                 "15": 40
             }
         });
+        print("Append ", n, " record");
     }
     print("Append ", n, " records spent ", $core.time() - start, " sec");
 }
 
 append(rec_max);
+
+$storage.close(dots);
+/*
 
 let update_start = $core.time();
 record_num = 0;
@@ -85,3 +90,4 @@ listener(function(event, content, data) {
         log('MJS', 'EVENT [' +event + "]:[" + content + "]", 1);   //Error info
     }
 }, null);
+*/
