@@ -318,18 +318,6 @@
         },
 
         data() {
-            const example_dots = [];
-
-            let dots = [];
-
-            for (let day = 0; day < 10; day++) {
-                example_dots.map(function (element) {
-                    let new_dot = Object.assign({}, element);
-                    new_dot.time += day * 86400;
-                    dots.push(new_dot);
-                });
-            }
-
             let data = {
                 //todo Для тестов
                 uid : (new Date).getTime(),
@@ -378,7 +366,6 @@
                     resolution: this.intervalResolution,
                     offset: this.intervalStartOffset ? +this.intervalStartOffset : 0      //Смещение графика слева
                 },
-                dots: dots,
                 isShowDotInspector : false,
                 toolbar : {
                     top : 0,
@@ -543,6 +530,8 @@
             },
 
             onMouseUp(){
+
+                debugger;
 
                 if(this.draggingNewDot.isDragging){
                     if(
@@ -790,6 +779,15 @@
         },
 
         computed: {
+            dots : {
+                get(){
+                    return this.$store.state.Lucerna.data.dots;
+                },
+                set(value) {
+                    debugger;
+                    this.$store.commit('Lucerna/applyData', {name : 'dots', data : value});
+                }
+            },
 
             dotsForInspection : {
                 get(){

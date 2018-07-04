@@ -59,10 +59,19 @@ module.exports = {
         return result;
     },
 
-    parseBinaryStruct(state, level){
-        let result  = [];
+    parseBinaryStruct(state){
+
+        debugger;
+
+        let result      = [];
+        let items       = result;
+        let levels      = [];
         while(state.offset < state.header_size){
             let field = this.parseBinaryField(state);
+
+            while(levels.length > field.level)
+                items = levels.pop();
+
             switch (field.type){
                 case bundle_str.BIN_BLOCK_STORAGE_VERSION : {
                     state.version = field.name;
@@ -73,14 +82,17 @@ module.exports = {
                     break;
                 }
                 case bundle_str.BIN_BLOCK_STORAGE_TYPE_OBJECT : {
-                    result.push({
+                    let obj = {
                         name : field.name,
-                        substruct : this.parseBinaryStruct(state, (level ? 0 : level) + 1)
-                    });
+                        substruct : []
+                    };
+                    items.push(obj);
+                    levels.push(items);
+                    items = obj.substruct;
                     break;
                 }
                 case bundle_str.BIN_BLOCK_STORAGE_TYPE_INT : {
-                    result.push({
+                    items.push({
                         name : field.name,
                         parser : this.parseBinaryInt32,
                         maker : this.makeBinaryInt32
@@ -88,13 +100,15 @@ module.exports = {
                     break;
                 }
                 case bundle_str.BIN_BLOCK_STORAGE_TYPE_DOUBLE : {
-                    result.push({
+                    items.push({
                         name : field.name,
                         parser : this.parseBinaryDouble64,
                         maker : this.makeBinaryDouble64
                     });
                     break;
                 }
+                default:
+                    throw `Error type field ${type}`
             }
         }
 
@@ -128,6 +142,7 @@ module.exports = {
         };
 
         state.header_size = this.parseBinaryInt32(state);
+        state.offset += 9; //Skip signature data
         state.struct = this.parseBinaryStruct(state);
         while(state.offset < state.data.byteLength){
             if(!this.parseBinaryInt8(state))

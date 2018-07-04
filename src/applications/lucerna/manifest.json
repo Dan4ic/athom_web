@@ -71,7 +71,7 @@
         "struct" : {
           "time" : "double",
           "brightness" : "double",
-          "levels" : {
+          "spectrum" : {
             "0": "int",
             "1": "int",
             "2": "int",

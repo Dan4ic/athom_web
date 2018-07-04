@@ -8,7 +8,7 @@ import consts from './consts'
 export default {
     created(){
         this.$on(consts.EVENTS.UBUS_MESSAGE, (action, messages, distrib) => {
-            if(!distrib || distrib != consts.WEBSOCKET.DISTRIB_MESSAGE_INTERNAL)
+            if(this.websocket && (!distrib || distrib != consts.WEBSOCKET.DISTRIB_MESSAGE_INTERNAL))
                 this.websocket.send(`${action};${messages}`);
         });
 
