@@ -91,6 +91,10 @@ module.exports = {
             .catch((e) => {
                 console.error(e);
                 this.commit('decNetPending');
+                this.$bus.$emit(
+                    consts.EVENTS.ALERT, consts.ALERT_TYPE.ERROR,
+                    `Error of posting data for ${context.state.$namespace}/${object}` + (e.response.data ? '<br>' + e.response.data : '')
+                );
             });
         }
     }

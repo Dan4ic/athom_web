@@ -31,15 +31,15 @@
                         <h3>{{'COLORS_TITLE' | lang}}</h3>
                     </v-layout>
                     <v-layout row wrap>
-                        <template v-for="i in channelNumber" >
+                        <template v-for="i in channelsNumber" >
                             <label
                                     class="color-packer"
                                     :style="{
-                                        'background-color' : channels[i - 1].color,
-                                        'color' : getContrastYIQ(channels[i - 1].color)
+                                        'background-color' : config.channels[i - 1],
+                                        'color' : getContrastYIQ(config.channels[i - 1])
                                     }"
                             >{{i}}
-                                <input type="color" :placeholder="i + 1" v-model="channels[i - 1].color"/>
+                                <input type="color" :placeholder="i + 1" v-model="config.channels[i - 1]"/>
                             </label>
                         </template>
                     </v-layout>
@@ -68,38 +68,68 @@
     export default {
         name: 'SettingsLucerna',
         computed : {
+            config(){
+                if(this.$store.state.Lucerna.data.configs) {
+                    this.$store.commit('Lucerna/data/applyData', {name : 'config', data : []});
+                    this.$store.dispatch('Lucerna/data/reload', 'config');
+                }
+
+                if(!this.$store.state.Lucerna.data.config.length)
+                    this.new_config = {
+                        channelNumber : 4,
+                        channels : [
+                            '#f4fcde', '#0000FF', '#FF0000', '#f533ee',
+                            '#f4fcde', '#0000FF', '#FF0000', '#f533ee',
+                            '#f4fcde', '#0000FF', '#FF0000', '#f533ee',
+                            '#f4fcde', '#0000FF', '#FF0000', '#f533ee'
+                        ],
+                        interval : {
+                            width : 86400
+                        }
+                    };
+                else if(!this.new_config)
+                    this.new_config = this.copyConfig(this.$store.state.Lucerna.data.config[0], 'ui');
+
+                return this.new_config;
+            },
+
+
             daysNumber: {
                 get(){
-                    return this.interval.width !== null ? this.interval.width / 86400
-                        : this.$store.state.lucerna.interval.width / 86400;
+                    return this.config.interval.width / 86400;
                 },
                 set(value){
-                    this.interval.width = value * 86400;
+                    this.config.interval.width = (value < 1 ? 1 : (value < 365 ? value : 365)) * 86400;
                 }
             },
+
             channelsNumber: {
                 get(){
-                    return this.channelNumber;
+                    return this.config.channelNumber;
                 },
                 set(value){
-
-                    if(+value < 1)
-                        value   = 0;
-                    else if(+value > 16)
-                        value   = 16;
-
-                    if(value > this.channels.length){
-                        for(let f=this.channels.length; f<value; f++)
-                            this.channels.push({
-                                color : '#ff00ff'
-                            });
-                    }
-
-                    this.channelNumber = +value;
+                    this.config.channelNumber = (+value < 1 ? 1 : (+value > 16 ? 16 : +value));
                 }
             }
         },
         methods : {
+            copyConfig(source, to){
+                let result = {
+                    channelNumber : source.channelNumber,
+                    channels : [],
+                    interval : {
+                        width : source.interval.width
+                    }
+                };
+                for(let key in source.channels) {
+                    if(to == 'ui')
+                        result.channels[key] = '#' + ('000000' + (+source.channels[key]).toString(16)).slice(-6);
+                    else if(to == 'hw')
+                        result.channels[key] = parseInt(source.channels[key].slice(-6), 16);
+                }
+                return result;
+            },
+
             getContrastYIQ(hexcolor){
                 var r = parseInt(hexcolor.substr(1,2),16);
                 var g = parseInt(hexcolor.substr(3,2),16);
@@ -107,16 +137,24 @@
                 var yiq = ((r*299)+(g*587)+(b*114))/1000;
                 return ((yiq >= 128) ? 'black' : 'white');
             },
+
+            numberToHexColor(num){
+                num >>>= 0;
+                let b = num & 0xFF,
+                    g = (num & 0xFF00) >>> 8,
+                    r = (num & 0xFF0000) >>> 16;
+                return "rgba(" + [r, g, b, 255].join(",") + ")";
+            },
+
             reset(){
-                this.channels   = [];
-                this.$store.state.lucerna.channels.map((channel) => {
-                    this.channels.push(Object.assign({}, channel));
-                });
-                this.channelNumber  = this.channels.length;
+                this.new_config = null;
             },
             submit(){
-                this.$store.commit('lucerna/setIntervalWidth', this.daysNumber * 86400);
-                this.$store.commit('lucerna/setChannelsParams', this.channels);
+                this.$store.commit('Lucerna/data/applyData', {
+                    name : 'config',
+                    data : [this.copyConfig(this.new_config, 'hw')]
+                });
+                this.$store.dispatch('Lucerna/data/post', 'config');
             },
             upload(evt){
                 let files = evt.target.files;
@@ -153,18 +191,9 @@
                 document.body.removeChild(element);
             }
         },
-        mounted(){
-          this.reset();
-        },
         data () {
             return {
-                channelNumber   : null,
-                channels : null,
-                interval    : {
-                    width       : null,
-                    resolution  : null,
-                    offset      : null
-                },
+                new_config : null,
             }
         }
     }
