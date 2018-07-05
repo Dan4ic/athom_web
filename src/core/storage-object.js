@@ -10,6 +10,12 @@ module.exports = {
     },
 
     mutations: {
+        //Setting storage status
+        $setStorageStatus(state, object){
+            state.$status[object.name] = object.status;
+        },
+
+        //Setting new data to storage
         applyData(state, object){
             if(object.name in state) {
                 state[object.name] = object.data;
@@ -80,6 +86,7 @@ module.exports = {
                 }
             ).then(() => {
                 this.commit('decNetPending');
+                this.$bus.$emit(window.$consts.EVENTS.UBUS_MESSAGE, '$-storage-changed', `${this.state.guid}@${context.state.$namespace}/${object}`);
             })
             .catch((e) => {
                 console.error(e);

@@ -37,6 +37,12 @@ export default {
         AP_AVAILABLE : "/api/rescan_net",
         TIME : "/api/time",
     },
+    STORAGES : {
+        STATUS_EMPTY   : 'empty',
+        STATUS_LOADING : 'loading',
+        STATUS_POSTING : 'posting',
+        STATUS_READY   : 'ready',
+    },
     LANGS : {
     }
 }

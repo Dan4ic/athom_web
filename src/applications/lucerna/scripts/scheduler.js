@@ -4,7 +4,7 @@ let log = ffi('void log(char*, char*, int)');
 log('MJS', 'Started VMS', 1);
 let test = "test--print";
 
-let rec_max = 1;
+let rec_max = 0;
 let record_num;
 let start = $core.time();
 

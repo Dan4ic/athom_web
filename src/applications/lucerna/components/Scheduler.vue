@@ -252,29 +252,14 @@
                 this.onResize();
             });
 
-            //todo ДЛЯ ТЕСТОВ ШЛЕМ ЕВЕНТ В КОНТРОЛЛЕР
-
             this.$bus.$on(window.$consts.EVENTS.UBUS_MESSAGE, (type, messages) => {
-
-                if(["luc-sd-begin", "luc-sd-item", "luc-sd-end"].indexOf(type) < 0)
-                    return;
-
-                let data =  JSON.parse(messages);
-
                 switch(type){
-                    case "luc-sd-begin":
-                        if(data.uid != this.uid)
-                            this.receiving[data.pid] = [];
-                        break;
-                    case "luc-sd-item":
-                        if(data.pid in this.receiving)
-                            this.receiving[data.pid].push(this.createDot(data.t, data.b, false));
-                        break;
-                    case "luc-sd-end":
-                        if(data.pid in this.receiving) {
-                            this.dots =  this.receiving[data.pid];
-                            this.receiving  = {};
-                        }
+                    case "$-storage-changed":
+                        let parts = messages.split('@');
+                        let node_guid = parts[0];
+                        let object = parts[1];
+                        if((node_guid != this.$store.state.guid) && (object === 'Lucerna/dots'))
+                            this.$store.dispatch('Lucerna/data/reload', 'dots');
                         break;
                 }
             });
@@ -571,34 +556,6 @@
                     }
                 });
 
-                //todo ДЛЯ ТЕСТОВ ШЛЕМ ЕВЕНТ В КОНТРОЛЛЕР
-                let packed_id   = (new Date).getTime();
-                let interval    = 40;
-                this.$bus.$emit(window.$consts.EVENTS.UBUS_MESSAGE, "luc-sd-begin", JSON.stringify({
-                   uid : this.uid,
-                   pid : packed_id
-                }));
-
-                this.dots.map((item) => {
-                    setTimeout(() => {
-                        this.$bus.$emit(window.$consts.EVENTS.UBUS_MESSAGE, "luc-sd-item", JSON.stringify({
-                            pid : packed_id,
-                            b : 1 * item.brightness.toFixed(2),
-                            t : 1 * item.time.toFixed(2),
-                        }));
-                    }, interval);
-                    interval += 40;
-                });
-
-                setTimeout(() => {
-                    this.$bus.$emit(window.$consts.EVENTS.UBUS_MESSAGE, "luc-sd-end", JSON.stringify({
-                        uid: this.uid,
-                        pid: packed_id
-                    }));
-                }, interval);
-                //todo ДЛЯ ТЕСТОВ ШЛЕМ ЕВЕНТ В КОНТРОЛЛЕР
-
-
                 this.draggingDot.isDragging = false;
                 this.draggingDot.offsetX = 0;
                 this.draggingDot.offsetY = 0;
@@ -791,6 +748,11 @@
         computed: {
             dots : {
                 get(){
+                    if(!this.$store.state.Lucerna.data.dots) {
+                        this.$store.commit('Lucerna/data/applyData', {name : 'dots', data : []});
+                        this.$store.dispatch('Lucerna/data/reload', 'dots');
+                    }
+
                     return this.$store.state.Lucerna.data.dots;
                 },
                 set(value) {

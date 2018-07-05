@@ -4,6 +4,7 @@ import consts from "consts";
 
 export default {
     state: {
+        guid : null,                            //GUID of the node
         is_net_pending: 1,                      //Counter of NET requests
         user: {
             first_enter: true                   //True if first enter user on controller
@@ -40,6 +41,11 @@ export default {
     },
 
     mutations: {
+        //Set client IP (when connected to access point)
+        setGUID(state, value) {
+            state.guid = value;
+        },
+
         //Set profiles of applications
         setProfiles(state, profiles) {
             for(let appid in profiles) {
@@ -47,15 +53,18 @@ export default {
                 if ('storage' in profile && 'objects' in profile.storage) {
                     let object_struct = require('./storage-object');
                     object_struct.state.$namespace = profile.name;
-                    object_struct.state.$header = null;
                     for(let object in profile.storage.objects)
-                        object_struct.state[object] = [];
+                        object_struct.state[object] = null;
 
                     if(!(profile.name in state))
                         this.registerModule(profile.name, require('./storage-collector'));
 
                     this.registerModule([profile.name, 'data'], object_struct);
-                    this.dispatch('Lucerna/data/reload', 'dots');
+
+                    for(let object in profile.storage.objects) {
+                        if(profile.storage.objects[object].preload)
+                            this.dispatch(`${profile.name}/data/reload`, object);
+                    }
                 }
                 if ('components' in profile)
                     for (let cname in profile.components) {
@@ -274,6 +283,12 @@ export default {
 
         //Initiation function
         initData(context) {
+
+            //Settinf UBUS address
+            context.commit('setGUID', 'xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            }));
 
             //Autodetect language
             context.commit('setLang', (navigator.language || navigator.userLanguage).toLowerCase());

@@ -57,12 +57,12 @@
   },
   "storage" : {
     "objects" : {
-      "test" : {
+      "config" : {
         "version" : 1,
-        "migration" : "migration",
+        "preload" : true,
         "struct" : {
-          "field1" : "int",
-          "field2" : "int"
+          "days" : "int",
+          "channels" : "int"
         }
       },
       "dots" : {
