@@ -234,7 +234,6 @@
 </template>
 
 <script>
-
     import Spectrum from './Spectrum.vue';
 
     const consts = window.$consts;
@@ -255,16 +254,11 @@
             this.$bus.$on(window.$consts.EVENTS.UBUS_MESSAGE, (type, messages) => {
                 switch(type){
                     case "$-storage-changed":
-                        let parts = messages.split('@');
-                        let node_guid = parts[0];
-                        let object = parts[1];
-                        if((node_guid != this.$store.state.guid) && (object === 'Lucerna/dots'))
+                        if(messages === 'Lucerna/dots')
                             this.$store.dispatch('Lucerna/data/reload', 'dots');
                         break;
                 }
             });
-
-            //todo ДЛЯ ТЕСТОВ ШЛЕМ ЕВЕНТ В КОНТРОЛЛЕР
         },
 
         destroyed () {

@@ -1,9 +1,9 @@
 let listener = ffi('void listener(void (*)(char*, char*, userdata), userdata)');
 let emit = ffi('void emit(char*, char*)');
 let log = ffi('void log(char*, char*, int)');
-log('MJS', 'Started VMS', 1);
-let test = "test--print";
+log('MJS', 'Starting Lucerna script...', 1);
 
+/*
 let rec_max = 0;
 let record_num;
 let start = $core.time();
@@ -43,6 +43,26 @@ function append(max) {
 append(rec_max);
 
 $storage.close(dots);
+*/
+
+listener(function(event, content, data) {
+    print(">>> EVENT: ", event, ";", content, ";", data, "<<<");
+    if((event === "$-storage-changed") && (content === "Lucerna/dots")){
+        print("Detected changed dots storage");
+        let dots = $storage.open("dots");
+        let record_num = 0;
+        for(let found = $storage.first(dots); found ; found = $storage.next(dots)){
+            let dot = $storage.get(dots);
+            print("Dot time=", dot.time, "brightness=", dot.brightness);
+            ++record_num;
+        }
+        print("Total dots is ", record_num);
+        $storage.close(dots);
+    }
+}, null);
+
+log('MJS', 'Lucerna script is stared.', 1);
+
 /*
 
 let update_start = $core.time();

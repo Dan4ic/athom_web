@@ -86,7 +86,6 @@ module.exports = {
                 }
             ).then(() => {
                 this.commit('decNetPending');
-                this.$bus.$emit(window.$consts.EVENTS.UBUS_MESSAGE, '$-storage-changed', `${this.state.guid}@${context.state.$namespace}/${object}`);
             })
             .catch((e) => {
                 console.error(e);

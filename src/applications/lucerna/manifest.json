@@ -38,7 +38,7 @@
     }
   },
   "scripts" : {
-    "subscriptions" : ["$-started", "$-script-error", "lucerna-echo"],
+    "subscriptions" : ["$-storage-changed"],
     "entry" : "scheduler",
     "modules" : {
       "scheduler": {
