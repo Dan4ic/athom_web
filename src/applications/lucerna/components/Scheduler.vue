@@ -235,6 +235,7 @@
 
 <script>
     import Spectrum from './Spectrum.vue';
+    import CloneDeep from 'lodash.clonedeep';
 
     const consts = window.$consts;
 
@@ -249,6 +250,11 @@
 
             this.$bus.$on(consts.EVENTS.DO_SCREEN_REBUILD, (type, messages) => {
                 this.onResize();
+            });
+
+            this.$bus.$on(consts.EVENTS.STORE_RELOADED, (object) => {
+                if(object == 'Lucerna/dots')
+                    this.local_dots = this.copyDotsFromVUEX();
             });
 
             this.$bus.$on(window.$consts.EVENTS.UBUS_MESSAGE, (type, messages) => {
@@ -341,6 +347,7 @@
                 },
                 width: 1000,
                 height: 350,
+                local_dots : null,
                 zoom: {
                     value: 1,    //Текущий зум
                     step: 1.1,  //K преращение зума
@@ -390,8 +397,23 @@
         },
 
         methods: {
-
             onSave(){
+                let clone_dots = CloneDeep(this.local_dots);
+
+                clone_dots.sort((a, b) => {
+                   if(a.time < b.time)
+                       return -1;
+                   else if(a.time > b.time)
+                       return 1;
+                   return 0;
+                });
+
+                clone_dots.map((dot) => {
+                    dot.time        = Math.floor(dot.time);
+                    dot.brightness  = Math.floor(dot.brightness * 100000);
+                });
+
+                this.$store.commit('Lucerna/data/applyData', {name : 'dots', data : clone_dots});
                 this.$store.dispatch('Lucerna/data/post', 'dots');
             },
 
@@ -400,16 +422,7 @@
                     selected: !!selected,
                     time: time,
                     brightness: brightness,
-                    spectrum: {
-                        0: 0.1,
-                        1: 0.2,
-                        2: 0.1,
-                        3: 0.6,
-                        4: 1,
-                        5: 0.2,
-                        6: 0.1,
-                        7: 0.2
-                    }
+                    spectrum: {}
                 }
             },
 
@@ -737,20 +750,27 @@
 
                 return point1.y - height * koof;
             },
+
+            copyDotsFromVUEX(){
+                let result = CloneDeep(this.$store.state.Lucerna.data.dots);
+                if(result)
+                    result.map((dot) => {
+                        dot.brightness = dot.brightness / 100000;
+                    });
+
+                return result;
+            }
         },
 
         computed: {
             dots : {
                 get(){
-                    if(!this.$store.state.Lucerna.data.dots) {
-                        this.$store.commit('Lucerna/data/applyData', {name : 'dots', data : []});
+                    if(!this.$store.state.Lucerna.data.dots)
                         this.$store.dispatch('Lucerna/data/reload', 'dots');
-                    }
-
-                    return this.$store.state.Lucerna.data.dots;
+                    return this.local_dots ? this.local_dots : (this.local_dots = this.copyDotsFromVUEX());
                 },
                 set(value) {
-                    this.$store.commit('Lucerna/data/applyData', {name : 'dots', data : value});
+                    this.local_dots = value;
                 }
             },
 

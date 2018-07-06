@@ -44,11 +44,11 @@ module.exports = {
                             'data' : Binary.parseBinaryObject(response.data)
                         }
                     );
-                    this.$bus.$emit(consts.EVENTS.STORE_RELOADED, object);
+                    this.$bus.$emit(consts.EVENTS.STORE_RELOADED, `${context.state.$namespace}/${object}`);
                 }).catch((e) => {
                     console.log(`Error of loading storage object for ${context.state.$namespace}/data/${object}`, e);
                     this.commit('decNetPending');
-                    this.$bus.$emit(consts.EVENTS.STORE_ERROR_RELOADED, object);
+                    this.$bus.$emit(consts.EVENTS.STORE_ERROR_RELOADED, `${context.state.$namespace}/${object}`);
                 });
             } else
                 new Error('Undefined object storage ${object} for ${context.state.$namespace}');

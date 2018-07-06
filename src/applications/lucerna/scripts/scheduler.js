@@ -45,19 +45,54 @@ append(rec_max);
 $storage.close(dots);
 */
 
+function getConfig(){
+    let config = $storage.open("config");
+    let result = {
+        interval : {
+            width : 86400
+        },
+        channelNumber : 4,
+        channels : {
+            0  : 100000, 1  : 100000, 2  : 100000, 3  : 100000,
+            4  : 100000, 5  : 100000, 6  : 100000, 7  : 100000,
+            8  : 100000, 9  : 100000, 10 : 100000, 11 : 100000,
+            12 : 100000, 13 : 100000, 14 : 100000, 15 : 100000,
+        }
+    };
+    if($storage.first(config))
+        result = $storage.get(config);
+    $storage.close(config);
+    return result;
+}
+
+let config = getConfig();
+
+function getCurrentInterval(){
+    let dots = $storage.open("dots");
+    let time = $core.time() %
+    for(let found = $storage.first(dots); found ; found = $storage.next(dots)){
+        if()
+        let dot = $storage.get(dots);
+        print("Dot time=", dot.time, "brightness=", dot.brightness);
+        ++record_num;
+    }
+    print("Total dots is ", record_num);
+    $storage.close(dots);
+}
+
+function doInterval(){
+    print("Calculating interval....");
+    let interval = getCurrentInterval();
+    print("Interval is ", interval.start, '<>', interval.stop);
+}
+
+
 listener(function(event, content, data) {
     print(">>> EVENT: ", event, ";", content, ";", data, "<<<");
-    if((event === "$-storage-changed") && (content === "Lucerna/dots")){
-        print("Detected changed dots storage");
-        let dots = $storage.open("dots");
-        let record_num = 0;
-        for(let found = $storage.first(dots); found ; found = $storage.next(dots)){
-            let dot = $storage.get(dots);
-            print("Dot time=", dot.time, "brightness=", dot.brightness);
-            ++record_num;
+    if(event === "$-storage-changed") {
+        if((content === "Lucerna/dots") || (content === "Lucerna/config")) {
+            doInterval();
         }
-        print("Total dots is ", record_num);
-        $storage.close(dots);
     }
 }, null);
 

@@ -89,7 +89,7 @@
         "version" : 1,
         "migration" : "migration",
         "struct" : {
-          "time" : "double",
+          "time" : "int",
           "brightness" : "double",
           "spectrum" : {
             "0": "int",
