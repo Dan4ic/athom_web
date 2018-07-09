@@ -14,6 +14,7 @@ const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const fs = require('fs')
 const mjsmaker = require('./scripts')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const env = process.env.NODE_ENV === 'testing'
     ? require('../config/test.env')
@@ -34,6 +35,7 @@ const webpackConfig = merge(baseWebpackConfig, {
         chunkFilename: utils.assetsPath('js/[id].js')
     },
     plugins: [
+        new BundleAnalyzerPlugin(),
         // http://vuejs.github.io/vue-loader/en/workflow/production.html
         new webpack.DefinePlugin({
             'process.env': env
@@ -41,8 +43,11 @@ const webpackConfig = merge(baseWebpackConfig, {
         new UglifyJsPlugin({
             test: /\.(js|mjs)$/,
             uglifyOptions: {
+                ecma : 8,
                 compress: true,
                 minimize: true,
+                ie8 : true,
+                safari10 : true,
                 output: {
                     comments: false
                 },

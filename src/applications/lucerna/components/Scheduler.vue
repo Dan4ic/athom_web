@@ -235,7 +235,6 @@
 
 <script>
     import Spectrum from './Spectrum.vue';
-    import CloneDeep from 'lodash.clonedeep';
 
     const consts = window.$consts;
 
@@ -397,8 +396,27 @@
         },
 
         methods: {
+            cloneDots(dots){
+                if(!dots)
+                    return null;
+
+                let result = [];
+                dots.map((dot) => {
+                    result = {
+                        time    : +dot.time,
+                        brightness : +dot.brightness,
+                        spectrum : []
+                    };
+                    dot.spectrum.map((level, key) => {
+                        result.spectrum[key] = +level;
+                    });
+                });
+
+                return result;
+            },
+
             onSave(){
-                let clone_dots = CloneDeep(this.local_dots);
+                let clone_dots = this.cloneDots(this.local_dots);
 
                 clone_dots.sort((a, b) => {
                    if(a.time < b.time)
@@ -752,7 +770,7 @@
             },
 
             copyDotsFromVUEX(){
-                let result = CloneDeep(this.$store.state.Lucerna.data.dots);
+                let result = this.cloneDots(this.$store.state.Lucerna.data.dots);
                 if(result)
                     result.map((dot) => {
                         dot.brightness = dot.brightness / 100000;
