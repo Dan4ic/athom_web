@@ -11,7 +11,7 @@ module.exports = {
     },
 
     makeBinaryInt8(value){
-        return Buffer.from(new Uint8Array([value === null ? 0 : 1 * value]).buffer);
+        return new Uint8Array([value === null ? 0 : 1 * value]);
     },
 
     parseBinaryInt32(state){
@@ -21,7 +21,7 @@ module.exports = {
     },
 
     makeBinaryInt32(value){
-        return Buffer.from(new Uint32Array([value === null ? 0 : 1 * value]).buffer);
+        return new Uint8Array(new Uint32Array([value === null ? 0 : 1 * value]).buffer);
     },
 
     parseBinaryDouble64(state){
@@ -31,7 +31,7 @@ module.exports = {
     },
 
     makeBinaryDouble64(value){
-        return Buffer.from(new Float64Array([value === null ? 0 : 1 * value]).buffer);
+        return new Uint8Array(new Float64Array([value === null ? 0 : 1 * value]).buffer);
     },
 
     parseBinaryString(state){
@@ -163,7 +163,7 @@ module.exports = {
             else
                 bin_data = fields[f].maker(!object ? null : object[field.name]);
 
-            result = result ?  Buffer.concat([result, bin_data]) : bin_data;
+            result = result ?  storage_builder.concatUint8Array([result, bin_data]) : bin_data;
         }
         return result;
     },
@@ -189,9 +189,9 @@ module.exports = {
 
         //Making binary body
         for(let index in data) {
-            result = Buffer.concat([
+            result = storage_builder.concatUint8Array([
                 result,
-                Buffer.from(new Uint8Array([0]).buffer), //Delete flag
+                new Uint8Array([0]).buffer, //Delete flag
                 this.makeBinaryRow(fields, data[index])
             ]);
         }

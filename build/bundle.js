@@ -24,7 +24,7 @@ module.exports = {
             this.appendName(bundle, `data/${storage_name}.str`);
             let storage = storages[storage_name];
             fs.appendFileSync(bundle, Buffer.from(new Uint32Array([storage.length]).buffer), "binary");
-            fs.appendFileSync(bundle, storage);
+            fs.appendFileSync(bundle, new Buffer(storage));
         }
     },
     appendName(bundle, name){

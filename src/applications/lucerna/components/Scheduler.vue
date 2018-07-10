@@ -402,14 +402,15 @@
 
                 let result = [];
                 dots.map((dot) => {
-                    result = {
+                    let clone_dot = {
                         time    : +dot.time,
                         brightness : +dot.brightness,
                         spectrum : []
                     };
-                    dot.spectrum.map((level, key) => {
-                        result.spectrum[key] = +level;
-                    });
+                    for(let key in dot.spectrum){
+                        clone_dot.spectrum[key] = +dot.spectrum[key];
+                    }
+                    result.push(clone_dot);
                 });
 
                 return result;
