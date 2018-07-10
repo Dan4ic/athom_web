@@ -20,6 +20,8 @@ function getConfig(){
     if($storage.first(config))
         result = $storage.get(config);
     $storage.close(config);
+
+    print("Interval=", result.interval.width, " channelNumber=", result.channelNumber);
     return result;
 }
 
@@ -81,7 +83,9 @@ doInterval();
 listener(function(event, content, data) {
     print(">>> EVENT: ", event, ";", content, ";", data, "<<<");
     if(event === "$-storage-changed") {
-        if((content === "Lucerna/dots") || (content === "Lucerna/config")) {
+        if(content === "Lucerna/config") {
+            config = getConfig();
+        } else if(content === "Lucerna/dots") {
             doInterval();
         }
     }
