@@ -830,7 +830,8 @@
             },
 
             currentTime(){
-                return (this.hwDateTime / 1000) % this.interval.width;
+                return ((this.hwDateTime.getTime() - this.hwDateTime.getTimezoneOffset() * 60000) / 1000)
+                    % this.interval.width;
             },
 
             //Вычисляет толщину линии перехода между днями
