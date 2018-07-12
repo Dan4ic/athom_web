@@ -57,7 +57,6 @@ module.exports = {
             let level_prefix = level * 2048;
             let result  = [];
             Object.keys(node).sort().forEach((field) => {
-                console.log(`${field} = ${level}`);
                 if(node[field] === "double") {
                     result.push(this.makeBinaryField(level_prefix + this.BIN_BLOCK_STORAGE_TYPE_DOUBLE, field));
                 } else if(node[field] === "int") {
@@ -71,8 +70,6 @@ module.exports = {
             });
             return this.concatUint8Array(result);
         };
-
-
 
         let header = this.concatUint8Array([
             //Version

@@ -13,7 +13,13 @@
         name: 'Lucerna',
         computed : {
             interval(){
-                return this.$store.state.lucerna.interval;
+                let result = {
+                    width : 86400
+                };
+                let config = this.$store.state.Lucerna.data.config;
+                if(config && config.length)
+                    result = config[0].interval;
+                return result;
             }
         },
         data() {
