@@ -7,6 +7,11 @@ let ledc_setDutyFadeToChannel = ffi('int ledc_setDutyFadeToChannel(int, int, int
 let ledc_setChanneltoGPIO = ffi('int ledc_setChanneltoGPIO(int, int)');
 let ledc_setTimersConfig = ffi('int ledc_setTimersConfig(int , int)');
 
+
+setTimeout(function(prm1, prm2){
+    print("Prm1 =", prm1, " prm2 =", prm2);
+}, 5000, "prm1", "prm2");
+
 let channels_ids = [
     "0", "1", "2",  "3",  "4",  "5",  "6",  "7",
     "8", "9", "10", "11", "12", "13", "14", "15"
@@ -147,6 +152,7 @@ function restartExecution(){
             let channel = channels_ids[f];
             ledc_setDutyFadeToChannel(+channel, 0, 0);
             print("     turned off channel ", channel);
+            clearInterval()
         }
         print("No interval");
     }
