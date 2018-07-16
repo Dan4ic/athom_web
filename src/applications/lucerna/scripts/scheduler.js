@@ -119,6 +119,11 @@ function calcTransition(border, dot1, dot2){
 let timer = null;
 
 let execute = function(){
+    if(timer) {
+        clearTimeout(timer);
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Timer is cleared ", timer, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+    }
+
     let interval = getCurrentInterval();
     if(interval) {
         let transition = calcTransition(interval.time, interval.start, interval.stop);
@@ -131,6 +136,7 @@ let execute = function(){
         }
 
         exposition *= 1000; //To ms
+        exposition += 10; //For exposition will be > 0
 
         print("Interval is ", interval.start.time, '<>', interval.stop.time, ' exposition is ', exposition, 'ms');
 
@@ -161,10 +167,6 @@ let execute = function(){
 };
 
 function restartExecution(){
-    if(timer) {
-        clearTimeout(timer);
-        timer = null;
-    }
     execute();
 }
 
