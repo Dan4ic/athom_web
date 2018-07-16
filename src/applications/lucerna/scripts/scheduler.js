@@ -7,29 +7,6 @@ let ledc_setDutyFadeToChannel = ffi('int ledc_setDutyFadeToChannel(int, int, int
 let ledc_setChanneltoGPIO = ffi('int ledc_setChanneltoGPIO(int, int)');
 let ledc_setTimersConfig = ffi('int ledc_setTimersConfig(int , int)');
 
-
-let counter = 0;
-
-let dots = $storage.open("dots");
-print("Handle dots = ", dots);
-$storage.close(dots);
-
-
-let timer = setInterval(function(prm1, prm2){
-    print("*****************************************");
-    print(" Prm1 =", prm1, " prm2 =", prm2);
-    print(" Core time = ", $core.time() % config.interval.width);
-    if(counter++ > 3) {
-        clearInterval(timer);
-        print(" Interval cleared");
-    } else {
-        print(" Counter=", counter);
-    }
-    print("*****************************************");
-}, 5000, "prm1", "prm2");
-
-print("*************** Created timer handle=", timer);
-
 let channels_ids = [
     "0", "1", "2",  "3",  "4",  "5",  "6",  "7",
     "8", "9", "10", "11", "12", "13", "14", "15"
@@ -139,7 +116,9 @@ function calcTransition(border, dot1, dot2){
     return result;
 }
 
-function restartExecution(){
+let timer = null;
+
+let execute = function(){
     let interval = getCurrentInterval();
     if(interval) {
         let transition = calcTransition(interval.time, interval.start, interval.stop);
@@ -151,13 +130,15 @@ function restartExecution(){
             exposition = interval.stop.time - interval.time;
         }
 
+        exposition *= 1000; //To ms
+
         print("Interval is ", interval.start.time, '<>', interval.stop.time, ' exposition is ', exposition, 'ms');
 
         for(let f = 0; f < channels_ids.length; f++) {
             let channel = JSON.parse(channels_ids[f]);
             /* todo really code
-            ledc_setDutyFadeToChannel(channel, transition.spectrum[channel] / 100, exposition);
-            ledc_setDutyFadeToChannel(channel, interval.stop.spectrum[channel] / 100, exposition);
+            ledc_setDutyFadeToChannel(channel, transition.spectrum[channel] / 10, exposition);
+            ledc_setDutyFadeToChannel(channel, interval.stop.spectrum[channel] / 10, exposition);
             print("     channel ", channel, " from ", transition.spectrum[channel], " to ", interval.stop.spectrum[channel]);
             */
             //Test code
@@ -165,18 +146,26 @@ function restartExecution(){
             ledc_setDutyFadeToChannel(channel, interval.stop.brightness / 10, exposition);
             print("     channel ", channel, " from ", transition.brightness, " to ", interval.stop.brightness);
         }
+
+        timer = setTimeout(execute, exposition);
+
     } else {
         for(let f = 0; f < channels_ids.length; f++) {
             let channel = channels_ids[f];
             ledc_setDutyFadeToChannel(+channel, 0, 0);
             print("     turned off channel ", channel);
-            clearInterval()
+            clearInterval();
         }
         print("No interval");
     }
-}
+};
 
-function nextExecution(){
+function restartExecution(){
+    if(timer) {
+        clearTimeout(timer);
+        timer = null;
+    }
+    execute();
 }
 
 listener(function(event, content, data) {
