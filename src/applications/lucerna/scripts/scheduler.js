@@ -8,9 +8,27 @@ let ledc_setChanneltoGPIO = ffi('int ledc_setChanneltoGPIO(int, int)');
 let ledc_setTimersConfig = ffi('int ledc_setTimersConfig(int , int)');
 
 
-setTimeout(function(prm1, prm2){
-    print("Prm1 =", prm1, " prm2 =", prm2);
+let counter = 0;
+
+let dots = $storage.open("dots");
+print("Handle dots = ", dots);
+$storage.close(dots);
+
+
+let timer = setInterval(function(prm1, prm2){
+    print("*****************************************");
+    print(" Prm1 =", prm1, " prm2 =", prm2);
+    print(" Core time = ", $core.time() % config.interval.width);
+    if(counter++ > 3) {
+        clearInterval(timer);
+        print(" Interval cleared");
+    } else {
+        print(" Counter=", counter);
+    }
+    print("*****************************************");
 }, 5000, "prm1", "prm2");
+
+print("*************** Created timer handle=", timer);
 
 let channels_ids = [
     "0", "1", "2",  "3",  "4",  "5",  "6",  "7",
