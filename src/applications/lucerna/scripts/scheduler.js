@@ -119,10 +119,8 @@ function calcTransition(border, dot1, dot2){
 let timer = null;
 
 let execute = function(){
-    if(timer) {
+    if(timer)
         clearTimeout(timer);
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Timer is cleared ", timer, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-    }
 
     let interval = getCurrentInterval();
     if(interval) {

@@ -212,6 +212,13 @@
                 >save</text>
 
             </g>
+            <channel-editor v-if="isShowChannelsInspector"
+                v-model="channelsEditorInterface"
+                :left="width - dotRadius * 4 - 16"
+                :top="chart.offset.top + 16"
+                :height="chart.height"
+                :width="dotRadius * 4"
+            ></channel-editor>
         </svg>
         <v-form ref="form" v-if="isShowDotInspector" class="dot-inspector">
             <v-card style="height: 100%">
@@ -235,13 +242,15 @@
 
 <script>
     import Spectrum from './Spectrum.vue';
+    import ChannelEditor from './Channels.vue';
 
     const consts = window.$consts;
 
     export default {
 
         components : {
-            spectrum : Spectrum
+            spectrum : Spectrum,
+            'channel-editor' : ChannelEditor,
         },
         created () {
             window.addEventListener('mousewheel', this.proxyScrollEvent);
@@ -292,6 +301,10 @@
             intervalStartOffset: {
                 required: false,
                 default: null
+            },
+            channels: {
+                type: Array,
+                required: true
             },
         },
 
@@ -351,8 +364,8 @@
                     value: 1,    //Текущий зум
                     step: 1.1,  //K преращение зума
                     //Возможные дискретности времени на оси Х
-                    time_parts: [1, 10, 30, 60, 300, 600, 1800, 3600, 7200, 14400, 43200, 86400],
-                    max_parts: 12
+                    time_parts: [60, 300, 600, 1800, 3600, 7200, 14400, 43200, 86400],
+                    max_parts: 9
                 },
                 interval: {
                     width: this.intervalWidth,
@@ -385,7 +398,7 @@
                             this.scrolling.power    /= 1.04;
                         }
                     }, 20),
-                    clientX: 0,
+                    clientX: 0
                 }
             };
 
@@ -782,11 +795,46 @@
         },
 
         computed: {
+            channelsEditorInterface : {
+                get(){
+                    let the_dot = this.selectedDots[0];
+                    let result  = [];
+                    result.push({
+                        color : '#FFFFFF',
+                        level : the_dot.brightness
+                    });
+
+                    this.channels.map((channel) => {
+                        result.push({
+                            color : channel.color,
+                            level : the_dot.spectrum[channel]
+                        });
+                    });
+                    return result;
+                },
+                set(value) {
+
+                }
+            },
+
+            isShowChannelsInspector(){
+                return this.selectedDots.length > 0;
+            },
+
+            selectedDots(){
+                let result = [];
+                this.dots.map((dot) => {
+                    if(dot.selected)
+                        result.push(dot);
+                });
+                return result;
+            },
+
             dots : {
                 get(){
                     if(!this.$store.state.Lucerna.data.dots)
                         this.$store.dispatch('Lucerna/data/reload', 'dots');
-                    return this.local_dots ? this.local_dots : (this.local_dots = this.copyDotsFromVUEX());
+                    return this.local_dots ? this.local_dots : (this.local_dots = this.copyDotsFromVUEX() ? this.local_dots : []);
                 },
                 set(value) {
                     this.local_dots = value;
@@ -914,7 +962,7 @@
                 let parts_number = null;
                 let result = [];
 
-                this.zoom.time_parts.map(function (candidate) {
+                this.zoom.time_parts.map((candidate) => {
                     let candidate_parts_number = this.exposition / candidate;
 
                     if (
@@ -926,7 +974,7 @@
                         parts_number = candidate_parts_number;
 
                     }
-                }.bind(this));
+                });
 
                 if (!time_part)
                     time_part = this.zoom.time_parts[this.zoom.time_parts.length - 1] || 1;
@@ -1102,7 +1150,6 @@
         },
 
         filters: {
-
             day(timestamp) {
                 return (timestamp - timestamp % 86400) / 86400 + 1;
             },
