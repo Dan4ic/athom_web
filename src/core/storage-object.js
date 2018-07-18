@@ -4,6 +4,8 @@ const consts = require('consts').default;
 const Axios = require('axios');
 const Binary = require('./storage-binary');
 
+let urls_in_pending = [];
+
 module.exports = {
     namespaced: true,
     state: {
@@ -31,25 +33,29 @@ module.exports = {
                 let url =
                     (process.env.NODE_ENV === 'development' ? (process.env.HW_DEVICE_URL ? process.env.HW_DEVICE_URL : '') : '')
                     + `/apps/${context.state.$namespace}/data/${object}`;
-
-                Axios.get(url,
-                    {
-                        responseType : 'arraybuffer'
-                    }
-                ).then((response) => {
-                    this.commit('decNetPending');
-                    context.commit('applyData',
+                if(urls_in_pending.indexOf(url) < 0) {
+                    let url_index = urls_in_pending.push(url) - 1;
+                    Axios.get(url,
                         {
-                            'name' : object,
-                            'data' : Binary.parseBinaryObject(response.data)
+                            responseType : 'arraybuffer'
                         }
-                    );
-                    this.$bus.$emit(consts.EVENTS.STORE_RELOADED, `${context.state.$namespace}/${object}`);
-                }).catch((e) => {
-                    console.log(`Error of loading storage object for ${context.state.$namespace}/data/${object}`, e);
-                    this.commit('decNetPending');
-                    this.$bus.$emit(consts.EVENTS.STORE_ERROR_RELOADED, `${context.state.$namespace}/${object}`);
-                });
+                    ).then((response) => {
+                        this.commit('decNetPending');
+                        context.commit('applyData',
+                            {
+                                'name' : object,
+                                'data' : Binary.parseBinaryObject(response.data)
+                            }
+                        );
+                        this.$bus.$emit(consts.EVENTS.STORE_RELOADED, `${context.state.$namespace}/${object}`);
+                        urls_in_pending.splice(url_index, 1);
+                    }).catch((e) => {
+                        console.log(`Error of loading storage object for ${context.state.$namespace}/data/${object}`, e);
+                        this.commit('decNetPending');
+                        this.$bus.$emit(consts.EVENTS.STORE_ERROR_RELOADED, `${context.state.$namespace}/${object}`);
+                        urls_in_pending.splice(url_index, 1);
+                    });
+                }
             } else
                 new Error('Undefined object storage ${object} for ${context.state.$namespace}');
         },

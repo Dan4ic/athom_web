@@ -153,7 +153,6 @@
                             :cx="rebaseX(getChartX(dot))"
                             :cy="rebaseY(getChartY(dot))"
                             @mousedown="onDotMouseDown(dot)"
-                            @dblclick="isShowDotInspector=true"
                     ></circle>
                 </g>
 
@@ -213,30 +212,18 @@
 
             </g>
             <channel-editor v-if="isShowChannelsInspector"
+                class="channel-editor"
                 v-model="channelsEditorInterface"
                 :left="width - dotRadius * 4 - 16"
                 :top="chart.offset.top + 16"
                 :height="chart.height"
                 :width="dotRadius * 4"
+                :koofScreenX="koofScreenX"
+                :koofScreenY="koofScreenY"
             ></channel-editor>
         </svg>
-        <v-form ref="form" v-if="isShowDotInspector" class="dot-inspector">
-            <v-card style="height: 100%">
-                <v-card-title primary-title >
-                    <v-container style="padding: 0">
-                        <v-layout row>
-                            <h1>{{'DOT_INSPECTOR' | lang}}</h1>
-                        </v-layout>
-                        <v-layout>
-                            <lucerna-dot-inspector v-model="dotsForInspection"></lucerna-dot-inspector>
-                        </v-layout>
-                    </v-container>
-                </v-card-title>
-                <v-card-actions text-xs-right style="position: absolute; bottom: 0; z-index: 10001">
-                    <v-btn @click="isShowDotInspector=false">{{'SUBMIT' | lang }}</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-form>
+        <div style="position: fixed; right: 0; top: 0; z-index: 100000;">{{isShowChannelsInspector}}</div>
+
     </div>
 </template>
 
@@ -372,7 +359,6 @@
                     resolution: this.intervalResolution,
                     offset: this.intervalStartOffset ? +this.intervalStartOffset : 0      //Смещение графика слева
                 },
-                isShowDotInspector : false,
                 toolbar : {
                     top : 0,
                     left : 60,
@@ -415,11 +401,10 @@
 
                 let result = [];
                 dots.map((dot) => {
-                    let clone_dot = {
-                        time    : +dot.time,
-                        brightness : +dot.brightness,
-                        spectrum : []
-                    };
+                    let clone_dot = this.createDot();
+                    clone_dot.time = +dot.time;
+                    clone_dot.brightness = +dot.brightness;
+
                     for(let key in dot.spectrum){
                         clone_dot.spectrum[key] = +dot.spectrum[key];
                     }
@@ -797,19 +782,21 @@
         computed: {
             channelsEditorInterface : {
                 get(){
-                    let the_dot = this.selectedDots[0];
                     let result  = [];
-                    result.push({
-                        color : '#FFFFFF',
-                        level : the_dot.brightness
-                    });
-
-                    this.channels.map((channel) => {
+                    let the_dot = this.selectedDots.length ? this.selectedDots[0] : this.dots[0];
+                    if(the_dot) {
                         result.push({
-                            color : channel.color,
-                            level : the_dot.spectrum[channel]
+                            color: '#FFFFFF',
+                            level: the_dot.brightness
                         });
-                    });
+
+                        this.channels.map((channel) => {
+                            result.push({
+                                color: channel.color,
+                                level: the_dot.spectrum[channel]
+                            });
+                        });
+                    }
                     return result;
                 },
                 set(value) {
@@ -834,7 +821,7 @@
                 get(){
                     if(!this.$store.state.Lucerna.data.dots)
                         this.$store.dispatch('Lucerna/data/reload', 'dots');
-                    return this.local_dots ? this.local_dots : (this.local_dots = this.copyDotsFromVUEX() ? this.local_dots : []);
+                    return this.local_dots ? this.local_dots : ((this.local_dots = this.copyDotsFromVUEX()) ? this.local_dots : []);
                 },
                 set(value) {
                     this.local_dots = value;
@@ -1175,15 +1162,6 @@
 
 <style lang="less" rel="stylesheet/less">
 
-    .dot-inspector {
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        z-index: 10000;
-    }
-
     .light-schedule {
 
         .toolbar {
@@ -1282,6 +1260,10 @@
         .schedulePath {
             fill: none;
             stroke: #0000F5;
+        }
+
+        .channel-editor {
+            transition: all 0.1s ease-in;
         }
 
     }
