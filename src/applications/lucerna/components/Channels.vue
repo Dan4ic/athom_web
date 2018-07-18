@@ -91,9 +91,17 @@
             }
         },
         methods : {
+            doCloseChannels(except){
+                this.channels.map((channel)=>{
+                    if(channel !== except)
+                        this.doExpandChannel(channel, false);
+                });
+            },
             doExpandChannel(channel, value){
                 if(!channel.expand && value)
                     this.sliding = false;
+                if(value)
+                    this.doCloseChannels(channel);
                 channel.expand = value;
             },
             onSliderMouseDown(channel, event){
@@ -111,6 +119,8 @@
                     else if(level < 0)
                         level = 0;
                     channel.level = level;
+                    this.value[channel.index].level = level;
+                    this.$emit('input', this.value);
                 }
             },
             getContrastYIQ(hexcolor){
@@ -127,20 +137,26 @@
                 return this.radius * 2 + this.getExpanderWidth(channel);
             },
             remakeParams(params){
-                params.channels = [];
+                if(!params.channels)
+                    params.channels = [];
                 params.cellHeight = (this.height - 16) / this.value.length;
                 params.radius = (params.cellHeight > this.width ? this.width : params.cellHeight) / 2;
                 params.fontHeight = params.radius * 0.75;
 
                 let top_offset = 0;
-                this.value.map((channel) => {
-                    params.channels.push({
-                        expand: false,
-                        color: channel.color,
-                        level: channel.level,
-                        x: this.width / 2,
-                        y: top_offset,
-                    });
+                this.value.map((source, index) => {
+                    if(!params.channels[index])
+                        params.channels[index] = {};
+
+                    let dest = params.channels[index];
+
+                    dest.index = index;
+                    dest.expand = !!dest.expand;
+                    dest.color = source.color;
+                    dest.level = source.level;
+                    dest.x = this.width / 2;
+                    dest.y = top_offset;
+
                     top_offset += (!top_offset ? params.radius * 0.75 : 0) + params.radius * 2 + 2;
                 });
 

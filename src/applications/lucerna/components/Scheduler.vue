@@ -214,9 +214,9 @@
             <channel-editor v-if="isShowChannelsInspector"
                 class="channel-editor"
                 v-model="channelsEditorInterface"
-                :left="width - dotRadius * 4 - 16"
-                :top="chart.offset.top + 16"
-                :height="chart.height"
+                :left="width - dotRadius * 4 - dotRadius * 2.5"
+                :top="chart.offset.top + dotRadius * 2.5"
+                :height="chart.height - dotRadius * 2.5 - chart.offset.top"
                 :width="dotRadius * 4"
                 :koofScreenX="koofScreenX"
                 :koofScreenY="koofScreenY"
@@ -789,23 +789,31 @@
                             color: '#FFFFFF',
                             level: the_dot.brightness
                         });
-
-                        this.channels.map((channel) => {
-                            result.push({
-                                color: channel.color,
-                                level: the_dot.spectrum[channel]
-                            });
-                        });
+                        for(let channel in the_dot.spectrum) {
+                            if(this.channels[+channel])
+                                result.push({
+                                    color: this.channels[+channel].color,
+                                    level: the_dot.spectrum[channel]
+                                });
+                        }
                     }
                     return result;
                 },
                 set(value) {
-
+                    let the_dot = this.selectedDots.length ? this.selectedDots[0] : this.dots[0];
+                    if(the_dot) {
+                        value.map((channel, index)=>{
+                            if(!index)
+                                the_dot.brightness = channel.level;
+                            else
+                                the_dot.spectrum[index - 1] = channel.level;
+                        });
+                    }
                 }
             },
 
             isShowChannelsInspector(){
-                return this.selectedDots.length > 0;
+                return !this.isMobileScreen && this.selectedDots.length > 0;
             },
 
             selectedDots(){
