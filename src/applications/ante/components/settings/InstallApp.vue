@@ -15,7 +15,7 @@
                             <input
                                     type="file"
                                     accept=".smt"
-                                    style="position: fixed; top: 0; left: 0; width: 1px; height: 1px; z-index: 0;"
+                                    style="position: absolute; width: 0.1px; height: 0.1px; z-index: -1; opacity: 0; overflow: hidden;"
                                     @change="readFile"
                             />
                         </label>

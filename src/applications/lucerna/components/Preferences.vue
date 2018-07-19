@@ -35,11 +35,16 @@
                             <label
                                     class="color-packer"
                                     :style="{
-                                        'background-color' : config.channels[i - 1],
-                                        'color' : getContrastYIQ(config.channels[i - 1])
+                                        'background-color' : config.channels[i - 1].color,
+                                        'color' : getContrastYIQ(config.channels[i - 1].color)
                                     }"
                             >{{i}}
-                                <input type="color" :placeholder="i + 1" v-model="config.channels[i - 1]"/>
+                                <input
+                                        type="file"
+                                        accept=".led"
+                                        style="position: absolute; width: 0.1px; height: 0.1px; z-index: -1; opacity: 0; overflow: hidden;"
+                                        @change="uploadLEDFile"
+                                />
                             </label>
                         </template>
                     </v-layout>
@@ -66,35 +71,24 @@
     import Utils from '../utils';
     let consts = window.$consts;
 
+    const default_config = {
+        channelNumber: 4,
+        channels: [
+            {color: '#00FF00', mw: 0}, {color: '#0000FF', mw: 0}, {color: '#FF0000', mw: 0},
+            {color: '#00FF00', mw: 0}, {color: '#0000FF', mw: 0}, {color: '#FF0000', mw: 0},
+            {color: '#00FF00', mw: 0}, {color: '#0000FF', mw: 0}, {color: '#FF0000', mw: 0},
+            {color: '#00FF00', mw: 0}, {color: '#0000FF', mw: 0}, {color: '#FF0000', mw: 0},
+            {color: '#00FF00', mw: 0}, {color: '#0000FF', mw: 0}, {color: '#FF0000', mw: 0},
+            {color: '#00FF00', mw: 0}
+        ],
+        interval: {
+            width: 86400
+        }
+    };
+
     export default {
         name: 'SettingsLucerna',
         computed : {
-            config(){
-                if(this.$store.state.Lucerna.data.configs) {
-                    this.$store.commit('Lucerna/data/applyData', {name : 'config', data : []});
-                    this.$store.dispatch('Lucerna/data/reload', 'config');
-                }
-
-                if(!this.$store.state.Lucerna.data.config.length)
-                    this.new_config = {
-                        channelNumber : 4,
-                        channels : [
-                            '#f4fcde', '#0000FF', '#FF0000', '#f533ee',
-                            '#f4fcde', '#0000FF', '#FF0000', '#f533ee',
-                            '#f4fcde', '#0000FF', '#FF0000', '#f533ee',
-                            '#f4fcde', '#0000FF', '#FF0000', '#f533ee'
-                        ],
-                        interval : {
-                            width : 86400
-                        }
-                    };
-                else if(!this.new_config)
-                    this.new_config = this.copyConfig(this.$store.state.Lucerna.data.config[0], 'ui');
-
-                return this.new_config;
-            },
-
-
             daysNumber: {
                 get(){
                     return this.config.interval.width / 86400;
@@ -118,29 +112,49 @@
                 let result = {
                     channelNumber : source.channelNumber,
                     channels : [],
+                    spectrum : [],
                     interval : {
                         width : source.interval.width
                     }
                 };
                 for(let key in source.channels) {
                     if(to == 'ui')
-                        result.channels[key] = '#' + ('000000' + (+source.channels[key]).toString(16)).slice(-6);
+                        result.channels[key] = {
+                            color : '#' + ('000000' + (+source.channels[key].color).toString(16)).slice(-6),
+                            mw : source.channels[key].mw
+                        };
                     else if(to == 'hw')
-                        result.channels[key] = parseInt(source.channels[key].slice(-6), 16);
+                        result.channels[key] = {
+                            color : parseInt(source.channels[key].color.slice(-6), 16),
+                            mw : source.channels[key].mw
+                        };
                 }
+
+                return result;
+            },
+
+            copySpectrum(source, to){
+                let result = [];
+                source.map((item) => {
+                    if(to == 'ui')
+                        result.push({
+                            channel : +item.channel,
+                            wave : +item.wave,
+                            value : +item.value / 1000
+                        });
+                    else if(to == 'hw')
+                        result.push({
+                            channel : +item.channel,
+                            wave : +item.wave,
+                            value : Math.round(+item.value * 1000)
+                        });
+                });
+
                 return result;
             },
 
             getContrastYIQ(hexcolor){
                 return Utils.getContrastYIQ(hexcolor)
-            },
-
-            numberToHexColor(num){
-                num >>>= 0;
-                let b = num & 0xFF,
-                    g = (num & 0xFF00) >>> 8,
-                    r = (num & 0xFF0000) >>> 16;
-                return "rgba(" + [r, g, b, 255].join(",") + ")";
             },
 
             reset(){
@@ -149,9 +163,44 @@
             submit(){
                 this.$store.commit('Lucerna/data/applyData', {
                     name : 'config',
-                    data : [this.copyConfig(this.new_config, 'hw')]
+                    data : [this.copyConfig(this.config, 'hw')]
+                });
+                this.$store.commit('Lucerna/data/applyData', {
+                    name : 'spectrum',
+                    data : [this.copySpectrum(this.spectrum, 'hw')]
                 });
                 this.$store.dispatch('Lucerna/data/post', 'config');
+                //this.$store.dispatch('Lucerna/data/post', 'spectrum');
+            },
+
+            uploadLEDFile(evt){
+                let files = evt.target.files;
+                let file = files[0];
+                let reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        let led = JSON.parse(event.target.result);
+                        let error_format = typeof led !== 'object';
+                        error_format |= !('name' in led);
+                        error_format |= !('color' in led);
+                        error_format |= !('mw' in led);
+                        error_format |= !('waves' in led);
+
+                        if(error_format)
+                            throw 'Error format file';
+
+                        channels.map((channel) => {
+                            if(!('color' in  channel))
+                                throw `Required field color`;
+                        });
+                        this.channels   = channels;
+                        this.channelNumber  = channels.length;
+                    } catch(e){
+                        this.$bus.$emit(consts.EVENTS.ALERT, consts.ALERT_TYPE.ERROR, Vue.filter('lang')('ERROR_LOAD_LIGHT_CONFIG'));
+                        console.error(e);
+                    }
+                }
+                reader.readAsText(file);
             },
             upload(evt){
                 let files = evt.target.files;
@@ -189,9 +238,33 @@
             }
         },
         data () {
-            return {
-                new_config : null,
-            }
+            let data = {};
+            this.$bus.$on(consts.EVENTS.STORE_RELOADED, (action, content) => {
+                switch(action){
+                    case 'Lucerna/spectrum':
+                        this.spectrum = this.copySpectrum(this.$store.state.Lucerna.data.spectrum, 'ui');
+                        break;
+                    case 'Lucerna/config':
+                        this.config = this.copyConfig(this.$store.state.Lucerna.data.config[0], 'ui');
+                        break;
+                }
+            });
+
+            if(!this.$store.state.Lucerna.data.config) {
+                this.$store.dispatch('Lucerna/data/reload', 'config');
+                data.config = default_config;
+            } if(!this.$store.state.Lucerna.data.config.length)
+                data.config = default_config;
+            else
+                data.config = this.copyConfig(this.$store.state.Lucerna.data.config[0], 'ui');
+
+            if(!this.$store.state.Lucerna.data.spectrum) {
+                this.$store.dispatch('Lucerna/data/reload', 'spectrum');
+                data.spectrum = [];
+            } else
+                data.spectrum = this.copySpectrum(this.$store.state.Lucerna.data.spectrum, 'ui');
+
+            return data;
         }
     }
 </script>
@@ -261,8 +334,10 @@
         position: fixed;
         left: 0;
         top: 0;
-        width: 1px;
-        height: 1px;
+        opacity: 0;
+        overflow: hidden;
+        width: 0.1px;
+        height: 0.1px;
         z-index: -1;
     }
 
