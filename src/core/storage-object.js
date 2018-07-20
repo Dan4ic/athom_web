@@ -28,11 +28,13 @@ module.exports = {
 
     actions: {
         reload(context, object){
-            this.commit('incNetPending');
             if(object in context.state) {
                 let url =
                     (process.env.NODE_ENV === 'development' ? (process.env.HW_DEVICE_URL ? process.env.HW_DEVICE_URL : '') : '')
                     + `/apps/${context.state.$namespace}/data/${object}`;
+
+                window.$axios._addPendingRequest(url);
+
                 if(urls_in_pending.indexOf(url) < 0) {
                     let url_index = urls_in_pending.push(url) - 1;
                     Axios.get(url,
@@ -40,7 +42,7 @@ module.exports = {
                             responseType : 'arraybuffer'
                         }
                     ).then((response) => {
-                        this.commit('decNetPending');
+                        window.$axios._removePendingRequest(url);
                         context.commit('applyData',
                             {
                                 'name' : object,
@@ -51,7 +53,7 @@ module.exports = {
                         urls_in_pending.splice(url_index, 1);
                     }).catch((e) => {
                         console.log(`Error of loading storage object for ${context.state.$namespace}/data/${object}`, e);
-                        this.commit('decNetPending');
+                        window.$axios._removePendingRequest(url);
                         this.$bus.$emit(consts.EVENTS.STORE_ERROR_RELOADED, `${context.state.$namespace}/${object}`);
                         urls_in_pending.splice(url_index, 1);
                     });
@@ -72,8 +74,6 @@ module.exports = {
                 throw `Could not found profile for storage /apps/${context.state.$namespace}/data/${object}`;
             }
 
-            this.commit('incNetPending');
-
             let formData = new FormData();
             formData.append(
                 object,
@@ -84,6 +84,9 @@ module.exports = {
             let url =
                 (process.env.NODE_ENV === 'development' ? (process.env.HW_DEVICE_URL ? process.env.HW_DEVICE_URL : '') : '')
                 + `/apps/${context.state.$namespace}/data/${object}`;
+
+            window.$axios._addPendingRequest(url);
+
             Axios.post(url, formData,
                 {
                     headers: {
@@ -91,11 +94,15 @@ module.exports = {
                     }
                 }
             ).then(() => {
-                this.commit('decNetPending');
+                debugger;
+                Vue.nextTick(() => {
+                    window.$axios._removePendingRequest(url);
+                });
             })
             .catch((e) => {
+                debugger;
                 console.error(e);
-                this.commit('decNetPending');
+                window.$axios._removePendingRequest(url);
                 this.$bus.$emit(
                     consts.EVENTS.ALERT, consts.ALERT_TYPE.ERROR,
                     `Error of posting data for ${context.state.$namespace}/${object}` + (e.response.data ? '<br>' + e.response.data : '')

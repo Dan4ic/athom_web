@@ -55,7 +55,6 @@
 
 <script>
 
-    import Сonsts from 'consts';
     import Utils from '../utils';
 
     export default {

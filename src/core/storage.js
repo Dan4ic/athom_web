@@ -5,7 +5,7 @@ import consts from "consts";
 export default {
     state: {
         guid : null,                            //GUID of the node
-        is_net_pending: 1,                      //Counter of NET requests
+        is_net_pending: false,                  //Axios requests in pending
         user: {
             first_enter: true                   //True if first enter user on controller
         },
@@ -105,15 +105,8 @@ export default {
             state.net.sta_ssid = value;
         },
 
-        //Increment count of active sockets
-        incNetPending(state) {
-            state.is_net_pending++;
-        },
-
-        //Decrement count of active sockets
-        decNetPending(state) {
-            if (state.is_net_pending > 0)
-                state.is_net_pending--;
+        setIsNetPending(state, pending) {
+            state.is_net_pending = pending;
         },
 
         //Flag of mobile device
@@ -179,9 +172,9 @@ export default {
         //Put configuration to controller
         putConfiguration(context, config) {
 
-            context.commit('incNetPending');
+            window.$axios._addPendingRequest(consts.REST.CONFIG);
             Axios.put(consts.REST.CONFIG, config.data).then((response) => {
-                context.commit('decNetPending');
+                window.$axios._removePendingRequest(consts.REST.CONFIG);
 
                 context.dispatch('applyState', response.data);
 
@@ -191,7 +184,7 @@ export default {
                 this.$bus.$emit(consts.EVENTS.PUT_CONFIG_SUCCESS);
 
             }).catch(() => {
-                context.commit('decNetPending');
+                window.$axios._removePendingRequest(consts.REST.CONFIG);
 
                 if ('error' in config)
                     config['error'](config, this);
@@ -209,14 +202,14 @@ export default {
                 return;
 
             context.commit('setReloadingAPList', true);
-            context.commit('incNetPending');
+            window.$axios._addPendingRequest(consts.REST.AP_AVAILABLE);
 
             Axios.get(consts.REST.AP_AVAILABLE).then((response) => {
-                context.commit('decNetPending');
+                window.$axios._removePendingRequest(consts.REST.AP_AVAILABLE);
                 context.commit('setAPAvailable', response.data);
                 context.commit('setReloadingAPList', false);
             }).catch(function () {
-                context.commit('decNetPending');
+                window.$axios._removePendingRequest(consts.REST.AP_AVAILABLE);
                 context.commit('setReloadingAPList', false);
             });
 
@@ -257,32 +250,38 @@ export default {
 
         //Reload profile of applications
         reloadProfile(context) {
-            context.commit('incNetPending');
+            window.$axios._addPendingRequest(consts.REST.PROFILE);
 
             Axios.get(consts.REST.PROFILE).then((response) => {
-                context.commit('decNetPending');
+                window.$axios._removePendingRequest(consts.REST.PROFILE);
                 context.dispatch('applyProfile', response.data);
                 context.dispatch('reloadState');
             }).catch(function (e) {
-                context.commit('decNetPending');
+                window.$axios._removePendingRequest(consts.REST.PROFILE);
                 console.error('Error of loading profile', e);
             });
         },
         
         //Reload available access point list
         reloadState(context) {
-            context.commit('incNetPending');
+            window.$axios._addPendingRequest(consts.REST.STATE);
 
             Axios.get(consts.REST.STATE).then((response) => {
-                context.commit('decNetPending');
+                window.$axios._removePendingRequest(consts.REST.STATE);
                 context.dispatch('applyState', response.data);
             }).catch(function () {
-                context.commit('decNetPending');
+                window.$axios._removePendingRequest(consts.REST.STATE);
             });
         },
 
         //Initiation function
         initData(context) {
+
+            setInterval(()=>{
+                let nex_status = window.$axios._isPendingRequest();
+                if(context.state.is_net_pending !== nex_status)
+                    context.commit('setIsNetPending', nex_status);
+            }, 200);
 
             //Settinf UBUS address
             context.commit('setGUID', 'xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -313,7 +312,7 @@ export default {
                 }
 
                 context.dispatch('reloadProfile');
-                context.commit('decNetPending');
+                window.$axios._removePendingRequest(consts.EVENTS.CORE_IS_LOADED);
 
             });
 

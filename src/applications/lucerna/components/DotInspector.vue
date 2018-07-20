@@ -6,7 +6,7 @@
 
 <script>
 
-    import consts from 'consts';
+    let consts = window.$consts;
 
     export default {
 

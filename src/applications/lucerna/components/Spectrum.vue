@@ -10,10 +10,14 @@
                 />
             </linearGradient>
         </defs>
-        <path :d="path" fill="url(#spectrumGradient)" :opacity="opacity"/>
+        <path
+                :class="{'path-spectrum' : true, 'animate' : !noAnimate}"
+                :d="path" fill="url(#spectrumGradient)"
+                :opacity="opacity"
+        />
         <template v-for="line in axis">
             <line
-                    class="line-wave"
+                    class="line-wave animate"
                     :x1="line.x"
                     :x2="line.x"
                     :y1="height - line.length"
@@ -35,12 +39,11 @@
 
 <script>
 
-    import consts from 'consts';
     import waves from './waves.json';
 
     export default {
 
-        props: ['value', 'width', 'height', 'opacity', 'text-height'],
+        props: ['value', 'width', 'height', 'opacity', 'text-height', 'no-animate'],
 
         computed :{
             axis(){
@@ -58,16 +61,15 @@
                 return result;
             },
             path(){
-                let spectum = this.$store.state.lucerna.channels[0].spectrum;
                 let max = 0;
-                for(let w in spectum){
-                    if(spectum[w] > max)
-                        max = spectum[w];
+                for(let w in this.spectrum){
+                    if(this.spectrum[w] > max)
+                        max = this.spectrum[w];
                 }
 
                 let result = this.gradient.map((stop) => {
-                    if(spectum[stop.key])
-                        return (stop.offset * this.width).toFixed(4) + ' ' + (1 * this.height - spectum[stop.key] / max * this.height)
+                    if(this.spectrum[stop.key])
+                        return (stop.offset * this.width).toFixed(4) + ' ' + (1 * this.height - this.spectrum[stop.key] / max * this.height)
                     else
                         return (stop.offset * this.width).toFixed(4) + ` ${this.height}`;
                 }).join(',');
@@ -89,11 +91,18 @@
             }
         },
 
+        watch : {
+            value(){
+                this.spectrum = this.value;
+            }
+        },
+
         data(){
             return {
                 waveStart : 360,
                 waveStop  : 750,
-                waves   : waves
+                waves   : waves,
+                spectrum : this.value
             }
         }
 
@@ -110,8 +119,16 @@
         stroke: #000;
     }
 
+    .path-spectrum {
+    }
+
+    .animate {
+        transition: all 0.15s ease-in;
+    }
+
     .dot-inspector {
 
     }
+
 
 </style>

@@ -35,6 +35,8 @@
                             :height="chart.height"
                             opacity="0.35"
                             :text-height="fontSizeAxisX"
+                            v-model="currentSpectrum"
+                            :no-animate="animate.spectrumTimer"
                     ></spectrum>
                 </g>
 
@@ -243,6 +245,15 @@
             window.addEventListener('mousewheel', this.proxyScrollEvent);
             window.addEventListener('resize', this.onResize);
 
+            if(!this.$store.state.Lucerna.data.dots)
+                this.$store.dispatch('Lucerna/data/reload', 'dots');
+
+            if(!this.$store.state.Lucerna.data.config)
+                this.$store.dispatch('Lucerna/data/reload', 'config');
+
+            if(!this.$store.state.Lucerna.data.spectrum)
+                this.$store.dispatch('Lucerna/data/reload', 'spectrum');
+
             this.$bus.$on(consts.EVENTS.DO_SCREEN_REBUILD, (type, messages) => {
                 this.onResize();
             });
@@ -257,6 +268,8 @@
                     case "$-storage-changed":
                         if(messages === 'Lucerna/dots')
                             this.$store.dispatch('Lucerna/data/reload', 'dots');
+                        else if(messages === 'Lucerna/spectrum')
+                            this.$store.dispatch('Lucerna/data/reload', 'spectrum');
                         break;
                 }
             });
@@ -385,6 +398,9 @@
                         }
                     }, 20),
                     clientX: 0
+                },
+                animate : {
+                    spectrumTimer : null
                 }
             };
 
@@ -428,6 +444,8 @@
                 clone_dots.map((dot) => {
                     dot.time        = Math.floor(dot.time);
                     dot.brightness  = Math.floor(dot.brightness * 100000);
+                    for(let channel=0; channel < this.channels.length; channel++)
+                        dot.spectrum[channel] = (dot.spectrum[channel] ? +dot.spectrum[channel] : 0) * 10000;
                 });
 
                 this.$store.commit('Lucerna/data/applyData', {name : 'dots', data : clone_dots});
@@ -439,7 +457,12 @@
                     selected: !!selected,
                     time: time,
                     brightness: brightness,
-                    spectrum: {}
+                    spectrum: (()=>{
+                        let result = {};
+                        for(let f=0; f < this.channels.length; f++)
+                            result[f] = brightness;
+                        return result;
+                    })()
                 }
             },
 
@@ -773,6 +796,8 @@
                 if(result)
                     result.map((dot) => {
                         dot.brightness = dot.brightness / 100000;
+                        for(let channel=0; channel < this.channels.length; channel++)
+                            dot.spectrum[channel] = (dot.spectrum[channel] ? +dot.spectrum[channel] : 0) * 0.0001;
                     });
 
                 return result;
@@ -780,33 +805,56 @@
         },
 
         computed: {
+
+            //Return dot for inspection
+            theDot(){
+                return this.selectedDots.length ? this.selectedDots[0] :
+                    (this.dots[0] ? this.dots[0] : this.createDot(0, 0, 0));
+            },
+
+            currentSpectrum() {
+                let spectrum = {};
+                this.channels.map((channel, index) => {
+                    channel.spectrum.map((wave) => {
+                        spectrum[wave.wave] = (spectrum[wave.wave] ? spectrum[wave.wave] : 0)
+                            + (wave.value * channel.mw * (this.theDot.spectrum[index] ? this.theDot.spectrum[index] : 0));
+                    });
+                });
+                return spectrum;
+            },
             channelsEditorInterface : {
                 get(){
                     let result  = [];
-                    let the_dot = this.selectedDots.length ? this.selectedDots[0] : this.dots[0];
-                    if(the_dot) {
+                    if(this.theDot) {
                         result.push({
                             color: '#FFFFFF',
-                            level: the_dot.brightness
+                            level: this.theDot.brightness
                         });
-                        for(let channel in the_dot.spectrum) {
+
+                        for(let channel in this.theDot.spectrum) {
                             if(this.channels[+channel])
                                 result.push({
                                     color: this.channels[+channel].color,
-                                    level: the_dot.spectrum[channel]
+                                    level: this.theDot.spectrum[channel]
                                 });
                         }
                     }
                     return result;
                 },
                 set(value) {
-                    let the_dot = this.selectedDots.length ? this.selectedDots[0] : this.dots[0];
-                    if(the_dot) {
+                    if(this.theDot) {
+                        if(this.animate.spectrumTimer)
+                            clearTimeout(this.animate.spectrumTimer);
+
+                        this.animate.spectrumTimer = setTimeout(() => {
+                            this.animate.spectrumTimer = null;
+                        }, 250);
+
                         value.map((channel, index)=>{
                             if(!index)
-                                the_dot.brightness = channel.level;
+                                this.theDot.brightness = channel.level;
                             else
-                                the_dot.spectrum[index - 1] = channel.level;
+                                this.theDot.spectrum[index - 1] = channel.level;
                         });
                     }
                 }

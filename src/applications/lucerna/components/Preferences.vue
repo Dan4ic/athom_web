@@ -43,7 +43,7 @@
                                         type="file"
                                         accept=".led"
                                         style="position: absolute; width: 0.1px; height: 0.1px; z-index: -1; opacity: 0; overflow: hidden;"
-                                        @change="uploadLEDFile"
+                                        @change="uploadLEDFile($event, i - 1)"
                                 />
                             </label>
                         </template>
@@ -74,12 +74,12 @@
     const default_config = {
         channelNumber: 4,
         channels: [
-            {color: '#00FF00', mw: 0}, {color: '#0000FF', mw: 0}, {color: '#FF0000', mw: 0},
-            {color: '#00FF00', mw: 0}, {color: '#0000FF', mw: 0}, {color: '#FF0000', mw: 0},
-            {color: '#00FF00', mw: 0}, {color: '#0000FF', mw: 0}, {color: '#FF0000', mw: 0},
-            {color: '#00FF00', mw: 0}, {color: '#0000FF', mw: 0}, {color: '#FF0000', mw: 0},
-            {color: '#00FF00', mw: 0}, {color: '#0000FF', mw: 0}, {color: '#FF0000', mw: 0},
-            {color: '#00FF00', mw: 0}
+            {color: '#000000', mw: 0}, {color: '#000000', mw: 0}, {color: '#000000', mw: 0},
+            {color: '#000000', mw: 0}, {color: '#000000', mw: 0}, {color: '#000000', mw: 0},
+            {color: '#000000', mw: 0}, {color: '#000000', mw: 0}, {color: '#000000', mw: 0},
+            {color: '#000000', mw: 0}, {color: '#000000', mw: 0}, {color: '#000000', mw: 0},
+            {color: '#000000', mw: 0}, {color: '#000000', mw: 0}, {color: '#000000', mw: 0},
+            {color: '#000000', mw: 0}
         ],
         interval: {
             width: 86400
@@ -112,7 +112,6 @@
                 let result = {
                     channelNumber : source.channelNumber,
                     channels : [],
-                    spectrum : [],
                     interval : {
                         width : source.interval.width
                     }
@@ -142,12 +141,15 @@
                             wave : +item.wave,
                             value : +item.value / 1000
                         });
-                    else if(to == 'hw')
-                        result.push({
-                            channel : +item.channel,
-                            wave : +item.wave,
-                            value : Math.round(+item.value * 1000)
-                        });
+                    else if(to == 'hw') {
+                        let value = Math.round(+item.value * 1000);
+                        if(value)
+                            result.push({
+                                channel: +item.channel,
+                                wave: +item.wave,
+                                value: Math.round(+item.value * 1000)
+                            });
+                    }
                 });
 
                 return result;
@@ -167,13 +169,13 @@
                 });
                 this.$store.commit('Lucerna/data/applyData', {
                     name : 'spectrum',
-                    data : [this.copySpectrum(this.spectrum, 'hw')]
+                    data : this.copySpectrum(this.spectrum, 'hw')
                 });
                 this.$store.dispatch('Lucerna/data/post', 'config');
-                //this.$store.dispatch('Lucerna/data/post', 'spectrum');
+                this.$store.dispatch('Lucerna/data/post', 'spectrum');
             },
 
-            uploadLEDFile(evt){
+            uploadLEDFile(evt, channel){
                 let files = evt.target.files;
                 let file = files[0];
                 let reader = new FileReader();
@@ -189,12 +191,22 @@
                         if(error_format)
                             throw 'Error format file';
 
-                        channels.map((channel) => {
-                            if(!('color' in  channel))
-                                throw `Required field color`;
+                        ((cnl) => {
+                            cnl.mw = +led.mw;
+                            cnl.color = `#${led.color}`;
+                        })(this.config.channels[channel]);
+
+                        this.spectrum = this.spectrum.filter((wave) => {
+                            return wave.channel != channel;
                         });
-                        this.channels   = channels;
-                        this.channelNumber  = channels.length;
+
+                        for(let wave in led.waves)
+                            this.spectrum.push({
+                                channel : +channel,
+                                wave : +wave,
+                                value : +led.waves[wave]
+                            });
+
                     } catch(e){
                         this.$bus.$emit(consts.EVENTS.ALERT, consts.ALERT_TYPE.ERROR, Vue.filter('lang')('ERROR_LOAD_LIGHT_CONFIG'));
                         console.error(e);
@@ -208,17 +220,16 @@
                 let reader = new FileReader();
                 reader.onload = (event) => {
                     try {
-                        let channels    = JSON.parse(event.target.result);
-                        if(!Array.isArray(channels))
+                        let data = JSON.parse(event.target.result);
+                        let error_format = typeof data !== 'object';
+                        error_format |= !('config' in data);
+                        error_format |= !('spectrum' in data);
+
+                        if(error_format)
                             throw 'Error format file';
-                        channels.map((channel) => {
-                            if(!('color' in  channel))
-                                throw `Required field color`;
-                        });
 
-                        this.channels   = channels;
-                        this.channelNumber  = channels.length;
-
+                        this.config = data.config;
+                        this.spectrum = data.spectrum;
                     } catch(e){
                         this.$bus.$emit(consts.EVENTS.ALERT, consts.ALERT_TYPE.ERROR, Vue.filter('lang')('ERROR_LOAD_LIGHT_CONFIG'));
                         console.error(e);
@@ -227,7 +238,10 @@
                 reader.readAsText(file);
             },
             download(){
-                let content = encodeURIComponent(JSON.stringify(this.channels));
+                let content = encodeURIComponent(JSON.stringify({
+                    config : this.config,
+                    spectrum : this.spectrum
+                }));
                 let element = document.createElement('a');
                 element.setAttribute('href', 'data:text/json;charset=utf-8,' + content);
                 element.setAttribute('download', "ledkit.json");
