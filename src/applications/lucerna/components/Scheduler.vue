@@ -808,8 +808,7 @@
 
             //Return dot for inspection
             theDot(){
-                return this.selectedDots.length ? this.selectedDots[0] :
-                    (this.dots[0] ? this.dots[0] : this.createDot(0, 0, 0));
+                return this.selectedDots.length ? this.selectedDots[0] : this.createDot(0, 0, 0);
             },
 
             currentSpectrum() {

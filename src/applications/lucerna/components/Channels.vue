@@ -4,7 +4,7 @@
             <g :key="index">
                 <rect
                         class="channel-item"
-                        :style = "{'fill' : channel.color, 'opacity' : channel.expand ? 1 : 0.3}"
+                        :style = "{'fill' : channel.color, 'opacity' : channel.expand ? 1 : 0.5}"
                         :x="channel.x - getExpanderWidth(channel)"
                         :y="channel.y - radius"
                         :rx="radius"
