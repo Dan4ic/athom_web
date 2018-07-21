@@ -27,11 +27,7 @@
                 if(config && config.length)
                     config = config[0];
                 else
-                    return [
-                        { color : '#FF0000' },
-                        { color : '#00FF00' },
-                        { color : '#0000FF' }
-                    ]
+                    return [];
                 let result = [];
                 for(let channel = 0; channel < config.channelNumber; channel++) {
                     result.push(
