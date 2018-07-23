@@ -54,7 +54,7 @@ export default {
         //Return datetime of controller
         hwDateTime: function () {
             if(!this.$store.state.datetime.curr_datetime)
-                return null;
+                return new Date(0);
             else {
                 return new Date(this.$store.state.datetime.curr_datetime + (new Date).getTimezoneOffset() * 60000);
             }

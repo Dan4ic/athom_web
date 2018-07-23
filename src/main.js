@@ -45,24 +45,17 @@ window.$applications    = {};
 //Panding request manager
 let pending_requests_count = 0;
 window.$axios._addPendingRequest = function(url){
+    console.info('Remove pending ', url, pending_requests_count);
     pending_requests_count++;
-    //pending_requests.push(url);
-    //console.info(pending_requests);
 }
 
 window.$axios._removePendingRequest = function(url){
     pending_requests_count--;
-    /*
-    let index = pending_requests.indexOf(url);
-    //console.log('befoore ', pending_requests, `For remove ${url} index = ${index}`, pending_requests.splice(index, 1));
-    if(index >= 0)
-        pending_requests.splice(index, 1);
-    //console.info(pending_requests);
-    */
+    console.info('Add pending ', url, pending_requests_count);
 }
 
 window.$axios._isPendingRequest = function(url){
-    return pending_requests_count >0 ;//.slice(0);
+    return pending_requests_count >0;
 }
 
 Vue.config.productionTip = false;

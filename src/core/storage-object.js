@@ -4,8 +4,6 @@ const consts = require('consts').default;
 const Axios = require('axios');
 const Binary = require('./storage-binary');
 
-let urls_in_pending = [];
-
 module.exports = {
     namespaced: true,
     state: {
@@ -35,29 +33,25 @@ module.exports = {
 
                 window.$axios._addPendingRequest(url);
 
-                if(urls_in_pending.indexOf(url) < 0) {
-                    let url_index = urls_in_pending.push(url) - 1;
-                    Axios.get(url,
+                Axios.get(url,
+                    {
+                        responseType : 'arraybuffer'
+                    }
+                ).then((response) => {
+                    window.$axios._removePendingRequest(url);
+                    context.commit('applyData',
                         {
-                            responseType : 'arraybuffer'
+                            'name' : object,
+                            'data' : Binary.parseBinaryObject(response.data)
                         }
-                    ).then((response) => {
-                        window.$axios._removePendingRequest(url);
-                        context.commit('applyData',
-                            {
-                                'name' : object,
-                                'data' : Binary.parseBinaryObject(response.data)
-                            }
-                        );
-                        this.$bus.$emit(consts.EVENTS.STORE_RELOADED, `${context.state.$namespace}/${object}`);
-                        urls_in_pending.splice(url_index, 1);
-                    }).catch((e) => {
-                        console.log(`Error of loading storage object for ${context.state.$namespace}/data/${object}`, e);
-                        window.$axios._removePendingRequest(url);
-                        this.$bus.$emit(consts.EVENTS.STORE_ERROR_RELOADED, `${context.state.$namespace}/${object}`);
-                        urls_in_pending.splice(url_index, 1);
-                    });
-                }
+                    );
+                    this.$bus.$emit(consts.EVENTS.STORE_RELOADED, `${context.state.$namespace}/${object}`);
+                }).catch((e) => {
+                    console.log(`Error of loading storage object for ${context.state.$namespace}/data/${object}`, e);
+                    window.$axios._removePendingRequest(url);
+                    this.$bus.$emit(consts.EVENTS.STORE_ERROR_RELOADED, `${context.state.$namespace}/${object}`);
+                    urls_in_pending.splice(url_index, 1);
+                });
             } else
                 new Error('Undefined object storage ${object} for ${context.state.$namespace}');
         },

@@ -46,7 +46,7 @@ const webpackConfig = merge(baseWebpackConfig, {
                 ecma : 8,
                 compress: true,
                 minimize: true,
-                ie8 : true,
+                //ie8 : true,
                 safari10 : true,
                 output: {
                     comments: false

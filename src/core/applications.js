@@ -14,7 +14,6 @@ export default {
     includeLang(consts) {
         //todo если включить debugger вываливается ошибка interval
         //debugger;
-        console.info(consts);
         for (let lng in consts) {
             if(!window.$consts.LANGS[lng])
                 window.$consts.LANGS[lng]   = {};
@@ -86,8 +85,9 @@ export default {
                 } else
                     window.$resolvers_components[component] = [resolve];
 
-                window.$axios._addPendingRequest(url);
                 const script = document.createElement("script");
+
+                window.$axios._addPendingRequest(url);
 
                 script.onload = () => {
                     window.$axios._removePendingRequest(url);
@@ -100,13 +100,13 @@ export default {
                 };
 
                 script.onerror = () => {
+                    window.$axios._removePendingRequest(url);
                     script.remove();
 
                     if(attempt-- > 0)
                         doLoadComponent(attempt)
                     else {
                         console.error(`Error load component ${component}`);
-                        window.$axios._removePendingRequest(url);
                         window.$bus.$emit(consts.EVENTS.ALERT, consts.ALERT_TYPE.ERROR, Vue.filter('lang')('ERROR_LOAD_APP'));
                         reject(new Error("Failed to load module script with URL " + url));
                     }

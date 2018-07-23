@@ -591,9 +591,12 @@
                         && (this.draggingNewDot.y <= this.chart.offset.top + this.chart.height)
                         && (this.draggingNewDot.x >= this.chart.offset.left)
                         && (this.draggingNewDot.x <= this.chart.offset.left + this.chart.width)
-                    )
+                    ) {
+                        this.cleanSelectedDots();
                         this.dots.push(this.createDroppedDot(true));
+                    }
                     this.draggingNewDot.isDragging = false;
+
                 }
 
                 if (this.draggingDot.isDragging && this.draggingDot.offsetX == 0 && this.draggingDot.offsetY == 0) {
@@ -643,7 +646,6 @@
 
                         this.selectionBox.bottom            = this.selectionBox.top;
                     } else {
-                        //this.cleanSelectedDots();
                         this.scrolling.isScrolling = true;
                     }
                 }
