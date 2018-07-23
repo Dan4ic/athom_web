@@ -72,7 +72,7 @@
     let consts = window.$consts;
 
     const default_config = {
-        channelNumber: 4,
+        channelNumber: 0,
         channels: [
             {color: '#000000', mw: 0}, {color: '#000000', mw: 0}, {color: '#000000', mw: 0},
             {color: '#000000', mw: 0}, {color: '#000000', mw: 0}, {color: '#000000', mw: 0},
