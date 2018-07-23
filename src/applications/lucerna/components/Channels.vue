@@ -108,6 +108,35 @@
                 this.doExpandChannel(channel, true);
             },
 
+            calcLevelsByBrightness() {
+                let max = 0;
+                for(let channel = 1; channel < this.channels.length; channel++)
+                    if(this.channels[channel].level >  max)
+                        max = this.channels[channel].level;
+
+                let brightness = this.channels[0].level;
+
+                for(let channel = 1; channel < this.channels.length; channel++)
+                    this.channels[channel].level = !max ? brightness : brightness * (this.channels[channel].level / max);
+            },
+
+            calcBrightnessByLevels() {
+                let max = 0;
+                for(let channel = 1; channel < this.channels.length; channel++)
+                    if(this.channels[channel].level >  max)
+                        max = this.channels[channel].level;
+
+                this.channels[0].level = max;
+            },
+
+            updateValue(){
+                this.channels.map((channel) => {
+                    this.value[channel.index].level = channel.level;
+                });
+
+                this.$emit('input', this.value);
+            },
+
             onMouseMove(channel, event) {
                 this.doExpandChannel(channel, true);
                 if(this.sliding){
@@ -118,8 +147,13 @@
                     else if(level < 0)
                         level = 0;
                     channel.level = level;
-                    this.value[channel.index].level = level;
-                    this.$emit('input', this.value);
+
+                    if(channel.index === 0)
+                        this.calcLevelsByBrightness();
+                    else
+                        this.calcBrightnessByLevels();
+
+                    this.updateValue();
                 }
             },
             getContrastYIQ(hexcolor){
