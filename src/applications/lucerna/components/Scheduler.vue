@@ -564,6 +564,16 @@
                 }
             },
 
+            calcLevelsByBrightness(dot) {
+                let max = 0;
+                for(let channel = 0; channel < this.channels.length; channel++)
+                    if(dot.spectrum[channel] >  max)
+                        max = dot.spectrum[channel];
+
+                for(let channel = 0; channel < this.channels.length; channel++)
+                    dot.spectrum[channel] = !max ? dot.brightness : dot.brightness * (dot.spectrum[channel] / max);
+            },
+
             onDotMouseDown(dot){
                 this.draggingDot.isDragging = true;
                 this.draggingDot.offsetX = 0;
@@ -600,6 +610,7 @@
                     if (dot.selected) {
                         dot.brightness = (this.chart.height - this.rebaseY(this.getChartY(dot))) / this.chart.height;
                         dot.time = this.interval.offset + this.rebaseX(this.getChartX(dot)) / this.dpi;
+                        this.calcLevelsByBrightness(dot);
                     }
                 });
 
@@ -632,7 +643,7 @@
 
                         this.selectionBox.bottom            = this.selectionBox.top;
                     } else {
-                        this.cleanSelectedDots();
+                        //this.cleanSelectedDots();
                         this.scrolling.isScrolling = true;
                     }
                 }

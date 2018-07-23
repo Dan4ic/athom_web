@@ -94,13 +94,9 @@ module.exports = {
                     }
                 }
             ).then(() => {
-                debugger;
-                Vue.nextTick(() => {
-                    window.$axios._removePendingRequest(url);
-                });
+                window.$axios._removePendingRequest(url);
             })
             .catch((e) => {
-                debugger;
                 console.error(e);
                 window.$axios._removePendingRequest(url);
                 this.$bus.$emit(
