@@ -50,7 +50,6 @@ module.exports = {
                     console.log(`Error of loading storage object for ${context.state.$namespace}/data/${object}`, e);
                     window.$axios._removePendingRequest(url);
                     this.$bus.$emit(consts.EVENTS.STORE_ERROR_RELOADED, `${context.state.$namespace}/${object}`);
-                    urls_in_pending.splice(url_index, 1);
                 });
             } else
                 new Error('Undefined object storage ${object} for ${context.state.$namespace}');
